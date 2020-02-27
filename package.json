@@ -1,0 +1,14 @@
+{
+  "name": "@small-tech/acme-http-01",
+  "version": "1.0.0",
+  "description": "Small ACME library for provisioning certificates using http-01 challenges",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aral Balkan",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "bent": "^7.1.0"
+  }
+}
