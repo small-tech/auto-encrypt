@@ -1,6 +1,10 @@
 // Implements the subset of RFC 8555 – Automatic Certificate Management Environment (ACME) – necessary for a client to
 // support TLS certificate provisioning from Let’s Encrypt using HTTP-01 challenges.
 
+// Note that where Boulder (Let’s Encrypt’s ACME implementation; the only one that really matters)
+// differs from the ACME spec, we will go with Let’s Encrypt’s implementation.
+// https://github.com/letsencrypt/boulder/blob/master/docs/acme-divergences.md
+
 const util = require('util')
 const prepareRequest = require('bent')
 
