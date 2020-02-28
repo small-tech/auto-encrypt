@@ -12,6 +12,7 @@ const jose = require('jose')
 
 const Identity = require('./lib/Identity')
 const Directory = require('./lib/Directory')
+const Nonce = require('./lib/Nonce')
 
 async function main () {
 
@@ -19,23 +20,13 @@ async function main () {
   const identity = Identity.getSharedInstance()
 
   // Get the directory.
-  const directory = new Directory()
-  await directory.getUrls()
-
-  console.log(directory)
-
-  // Get a new nonce (RFC §7.2)
-  const newNonceRequest = prepareRequest('HEAD', directory.newNonceUrl)
-  const newNonceResponse = await newNonceRequest()
-  const newNonce = newNonceResponse.headers['replay-nonce']
-
-  console.log('New nonce', newNonce)
+  const directory = await Directory.getInstance()
 
   const payload = { termsOfServiceAgreed: true }
   const protectedHeader = {
     alg: 'RS256',
     jwk: identity.publicJWK,
-    nonce: newNonce,
+    nonce: await Nonce.new(),
     url: directory.newAccountUrl
   }
   const signedRequest = jose.JWS.sign.flattened(payload, identity.key, protectedHeader)
