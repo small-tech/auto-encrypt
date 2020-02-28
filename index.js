@@ -9,7 +9,6 @@ const util = require('util')
 const prepareRequest = require('bent')
 
 const jose = require('jose')
-const base64url = require('base64url')
 
 const Identity = require('./lib/Identity')
 const Directory = require('./lib/Directory')
@@ -20,6 +19,8 @@ async function main () {
   const identity = Identity.getSharedInstance()
 
   console.log(identity)
+
+  process.exit(0)
 
   // Get the directory.
   const directory = new Directory()
@@ -36,19 +37,12 @@ async function main () {
 
   const payload = { termsOfServiceAgreed: true }
   const protectedHeader = {
-    alg: 'EdDSA',
-    crv: 'Ed25519',
-    jwk: identity.publicKey,
+    alg: 'RS256',
+    jwk: identity.publicJWK,
     nonce: newNonce,
     url: directory.newAccountUrl
   }
-
-  console.log('payload', payload)
-  console.log('protectedHeader', protectedHeader)
-
-  const signedRequest = jose.JWS.sign.flattened(payload, identity.OKPKey, protectedHeader)
-  signedRequest.protected = base64url(signedRequest.protected)
-  signedRequest.payload = base64url(signedRequest.payload)
+  const signedRequest = jose.JWS.sign.flattened(payload, identity.key, protectedHeader)
 
   console.log('Signed request', signedRequest)
 
@@ -72,10 +66,15 @@ async function main () {
     console.log('error', error)
     responseBody = error.responseBody
   }
-  const responseBuffer = await responseBody
-  console.log(responseBuffer.toString('utf-8'))
+  if (responseBody) {
+    const responseBuffer = await responseBody
+    console.log(responseBuffer.toString('utf-8'))
+  }
 
   console.log('New account response', newAccountResponse)
+
+  // TODO: Next we need to save the response.
+  // TODO: Move this into its own class.
 }
 
 main()
