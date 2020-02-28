@@ -48,7 +48,8 @@ async function main () {
 
   console.log('Signed request', signedRequest)
 
-  // Prepare a new account request (RFC § 7.3)
+  // Prepare a new account request (RFC 8555 § 7.3 Account Management)
+  // TODO: Add required headers (see RFC 8555 § 6.2 Request Authentication)
   // const newAccountRequest = prepareRequest('POST', directory.newAccountUrl, 'json', /* acceptable responses are */ 200, 201, {
   //   protected: base64url({
   //     alg: 'EdDSA',
