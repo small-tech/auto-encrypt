@@ -48,25 +48,30 @@ async function main () {
 
   console.log('Signed request', signedRequest)
 
+  // The required headers as per RFC 8555 § 6.1 (HTTPS Requests) and § 6.2 (Request Authentication)
+  const headers = {
+    'Content-Type': 'application/jose+json',
+    'User-Agent': 'small-tech.org-acme/1.0.0 node/12.16.0',
+    'Accept-Language': 'en-US'
+  }
+
   // Prepare a new account request (RFC 8555 § 7.3 Account Management)
-  // TODO: Add required headers (see RFC 8555 § 6.2 Request Authentication)
-  // const newAccountRequest = prepareRequest('POST', directory.newAccountUrl, 'json', /* acceptable responses are */ 200, 201, {
-  //   protected: base64url({
-  //     alg: 'EdDSA',
-  //     crv: 'Ed25519',
-  //     jwk: identity.publicKey,
-  //     nonce: newNonce,
-  //     url: directory.newAccountUrl
-  //   }),
-  //   payload: base64url({
-  //     termsOfServiceAgreed: true
-  //   }),
-  //   signature: ''
-  // })
+  const newAccountRequest = prepareRequest('POST', directory.newAccountUrl, 'json', /* acceptable responses are */ 200, 201)
 
-  // const newAccountResponse = await newAccountRequest()
+  console.log('newAccountRequest', newAccountRequest)
 
-  // console.log('New account response', newAccountResponse)
+  let responseBody
+  let newAccountResponse
+  try {
+    newAccountResponse = await newAccountRequest('', signedRequest, headers)
+  } catch (error) {
+    console.log('error', error)
+    responseBody = error.responseBody
+  }
+  const responseBuffer = await responseBody
+  console.log(responseBuffer.toString('utf-8'))
+
+  console.log('New account response', newAccountResponse)
 }
 
 main()
