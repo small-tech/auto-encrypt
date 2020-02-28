@@ -4,9 +4,17 @@
 const util = require('util')
 const prepareRequest = require('bent')
 
+const Identity = require('./lib/Identity')
 const Directory = require('./lib/Directory')
 
 async function main () {
+
+  // Generate/save or load the identity.
+  const identity = Identity.getSharedInstance()
+
+  console.log(identity)
+
+  // Get the directory.
   const directory = new Directory()
   await directory.getUrls()
 
@@ -18,6 +26,8 @@ async function main () {
   const newNonce = newNonceResponse.headers['replay-nonce']
 
   console.log('New nonce', newNonce)
+
+
 }
 
 main()
