@@ -18,10 +18,6 @@ async function main () {
   // Generate/save or load the identity.
   const identity = Identity.getSharedInstance()
 
-  console.log(identity)
-
-  process.exit(0)
-
   // Get the directory.
   const directory = new Directory()
   await directory.getUrls()
