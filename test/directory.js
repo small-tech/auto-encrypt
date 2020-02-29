@@ -7,12 +7,18 @@ test('directory', async t => {
 
   t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
 
-  const directory = await Directory.getSharedInstance() // the default is to use the staging server
+  // Test singleton instantiation bypass attempt error.
+  t.throws(() => { new Directory() }, /The Directory is a singleton/, 'Directory class cannot be directly instantiated')
 
-  t.strictEquals(directory.isStaging, true, 'directory singleton instance defaults to using LE staging server')
-  t.strictEquals(directory.isProduction, false, 'directory singleton instance does not default to use LE production server')
-  t.strictEquals(directory.acmeEndpoint, Directory.STAGING_ENDPOINT, 'the staging endpoint is correctly set')
-  t.strictEquals(directory.isReady, true, 'directory is ready')
+  //
+  // Staging.
+  //
+
+  const stagingDirectory = await Directory.getSharedInstance() // the default is to use the staging server
+
+  t.strictEquals(stagingDirectory.isStaging, true, 'directory singleton instance defaults to using LE staging server')
+  t.strictEquals(stagingDirectory.isProduction, false, 'directory singleton instance does not default to use LE production server')
+  t.strictEquals(stagingDirectory.acmeEndpoint, Directory.STAGING_ENDPOINT, 'the staging endpoint is correctly set')
 
   // Also test the actual Urls returned just so we’re notified if anything chances on their end
   // (the returned URLs are subject to change but it is unlikely).
@@ -22,18 +28,28 @@ test('directory', async t => {
 
   const url = p => `${stagingBaseUrl}/${p}`
 
-  t.strictEquals(directory.keyChangeUrl, url('key-change'), 'staging key change url is as expected')
-  t.strictEquals(directory.newAccountUrl, url('new-acct'), 'staging new account url is as expected')
-  t.strictEquals(directory.newNonceUrl, url('new-nonce'), 'staging new nonce url is as expected')
-  t.strictEquals(directory.newOrderUrl, url('new-order'), 'staging new order url is as expected')
-  t.strictEquals(directory.revokeCertUrl, url('revoke-cert'), 'staging revoke cert url is as expected')
-  t.strictEquals(directory.websiteUrl, stagingWebsiteUrl, 'staging web site url is as expected')
-  t.strictEquals(directory.termsOfServiceUrl, termsOfServiceUrl, 'terms of service url is as expected')
+  t.strictEquals(stagingDirectory.keyChangeUrl, url('key-change'), 'staging key change url is as expected')
+  t.strictEquals(stagingDirectory.newAccountUrl, url('new-acct'), 'staging new account url is as expected')
+  t.strictEquals(stagingDirectory.newNonceUrl, url('new-nonce'), 'staging new nonce url is as expected')
+  t.strictEquals(stagingDirectory.newOrderUrl, url('new-order'), 'staging new order url is as expected')
+  t.strictEquals(stagingDirectory.revokeCertUrl, url('revoke-cert'), 'staging revoke cert url is as expected')
+  t.strictEquals(stagingDirectory.websiteUrl, stagingWebsiteUrl, 'staging web site url is as expected')
+  t.strictEquals(stagingDirectory.termsOfServiceUrl, termsOfServiceUrl, 'terms of service url is as expected')
 
   // Ensure Directory is a singleton.
-  const directory2 = await Directory.getSharedInstance()
+  const stagingDirectory2 = await Directory.getSharedInstance()
+  t.strictEquals(stagingDirectory, stagingDirectory2, 'directory single instance is actually a singleton')
 
-  t.strictEquals(directory, directory2, 'directory single instance is actually a singleton')
+  //
+  // Production.
+  //
+
+  // Setup: null out the singleton instance so we can test the production setup.
+  Directory.instance = null
+  Directory.directory = undefined
+  Directory.isReady = false
+
+  const productionDirectory = await Directory.getSharedInstance(/* staging = */ false)
 
   t.end()
 })
