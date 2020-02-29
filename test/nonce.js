@@ -24,10 +24,7 @@ test('Nonce', async t => {
   const freshNonce2 = await Nonce.get()
 
   t.strictEquals(freshNonce2, mockFreshNonce, 'the fresh nonce returned should match the manully-set fresh nonce')
-  t.strictEquals(Nonce.freshNonce, null, 'the manully-set fresh nonce should be null since the nonce has now been used')
-
-  // Trying to manually set the same nonce twice should throw an error.
-  // TODO
+  t.strictEquals(Nonce.freshNonce, null, 'the manually-set fresh nonce should be null since the nonce has now been used')
 
   t.end()
 })
