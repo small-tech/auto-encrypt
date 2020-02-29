@@ -13,7 +13,7 @@ const jose = require('jose')
 const Identity = require('../lib/Identity')
 
 test('Identity', t => {
-  t.plan = 14
+  t.plan = 17
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -72,6 +72,17 @@ test('Identity', t => {
 
   // Sanity check: the two different instantiations should be different objects
   t.notStrictEquals(identityFromFile, identity, 'instances are different after manually nulling out previous singleton property')
+
+  // filePath should be read-only
+  t.throws(() => {identity.filePath = 'this is not allowed'}, 'filePath property is read-only')
+
+  // Check that the default (non-testing) settings path works.
+  Identity.instance = null
+  const nonTestingIdentity = Identity.getSharedInstance()
+  const nonTestingIdentityFilePath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'identity.pem')
+
+  t.strictEquals(nonTestingIdentity.filePath, nonTestingIdentityFilePath, 'the file path is as expected')
+  t.notStrictEquals(nonTestingIdentity.key.kid, identity.key.kid, 'key ids differ between testing and default identities as expected')
 
   t.end()
 })
