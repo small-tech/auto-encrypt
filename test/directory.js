@@ -1,9 +1,9 @@
 const test = require('tape')
-
+const util = require('util')
 const Directory = require('../lib/Directory')
 
 test('directory' /* , {skip: true} */, async t => {
-  t.plan = 23
+  t.plan = 24
 
   t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
 
@@ -19,6 +19,10 @@ test('directory' /* , {skip: true} */, async t => {
   t.strictEquals(stagingDirectory.isStaging, true, 'directory singleton instance defaults to using LE staging server')
   t.strictEquals(stagingDirectory.isProduction, false, 'directory singleton instance does not default to use LE production server')
   t.strictEquals(stagingDirectory.acmeEndpoint, Directory.STAGING_ENDPOINT, 'the staging endpoint is correctly set')
+
+  // isStaging and isProduction should be read-only
+  t.throws(() => { stagingDirectory.isStaging = true }, 'isStaging is read-only')
+  t.throws(() => { stagingDirectory.isProduction = true }, 'isProduction is read-only')
 
   // Also test the actual Urls returned just so we’re notified if anything chances on their end
   // (the returned URLs are subject to change but it is unlikely).
@@ -39,6 +43,22 @@ test('directory' /* , {skip: true} */, async t => {
   // Ensure Directory is a singleton.
   const stagingDirectory2 = await Directory.getSharedInstance()
   t.strictEquals(stagingDirectory, stagingDirectory2, 'directory single instance is actually a singleton')
+
+  // Check that the custom inspection output matches what we expect.
+  const dehydrate = h => h.replace(/\s/g, '')
+  t.strictEquals(dehydrate(util.inspect(stagingDirectory)), dehydrate(`
+    # Directory (URLs for the Let’s Encrypt ${stagingDirectory.isStaging ? 'staging' : 'PRODUCTION'} endpoint)
+
+    ## URLs:
+
+    - keyChangeUrl     : ${stagingDirectory.keyChangeUrl}
+    - newAccountUrl    : ${stagingDirectory.newAccountUrl}
+    - newNonceUrl      : ${stagingDirectory.newNonceUrl}
+    - newOrderUrl      : ${stagingDirectory.newOrderUrl}
+    - revokeCertUrl    : ${stagingDirectory.revokeCertUrl}
+    - termsOfServiceUrl: ${stagingDirectory.termsOfServiceUrl}
+    - websiteUrl       : ${stagingDirectory.websiteUrl}
+  `))
 
   //
   // Production.
@@ -69,6 +89,20 @@ test('directory' /* , {skip: true} */, async t => {
   t.strictEquals(productionDirectory.revokeCertUrl, productionUrl('revoke-cert'), 'production revoke cert url is as expected')
   t.strictEquals(productionDirectory.websiteUrl, productionWebsiteUrl, 'production web site url is as expected')
 
+  // Check that the custom inspection output matches what we expect.
+  t.strictEquals(dehydrate(util.inspect(productionDirectory)), dehydrate(`
+    # Directory (URLs for the Let’s Encrypt ${productionDirectory.isStaging ? 'staging' : 'PRODUCTION'} endpoint)
+
+    ## URLs:
+
+    - keyChangeUrl     : ${productionDirectory.keyChangeUrl}
+    - newAccountUrl    : ${productionDirectory.newAccountUrl}
+    - newNonceUrl      : ${productionDirectory.newNonceUrl}
+    - newOrderUrl      : ${productionDirectory.newOrderUrl}
+    - revokeCertUrl    : ${productionDirectory.revokeCertUrl}
+    - termsOfServiceUrl: ${productionDirectory.termsOfServiceUrl}
+    - websiteUrl       : ${productionDirectory.websiteUrl}
+  `))
+
   t.end()
 })
-
