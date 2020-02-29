@@ -2,7 +2,7 @@ const test = require('tape')
 const util = require('util')
 const Directory = require('../lib/Directory')
 
-test('Directory' /* , {skip: true} */, async t => {
+test('Directory', {skip: true}, async t => {
   t.plan = 24
 
   t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
