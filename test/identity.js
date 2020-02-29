@@ -12,7 +12,7 @@ const fs = require('fs-extra')
 const jose = require('jose')
 const Identity = require('../lib/Identity')
 
-test('identity', t => {
+test('Identity', t => {
   t.plan = 9
 
   //
