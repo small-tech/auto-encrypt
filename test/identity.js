@@ -6,6 +6,7 @@
 
 const test = require('tape')
 
+const util = require('util')
 const os = require('os')
 const path = require('path')
 const fs = require('fs-extra')
@@ -13,7 +14,7 @@ const jose = require('jose')
 const Identity = require('../lib/Identity')
 
 test('Identity', t => {
-  t.plan = 17
+  t.plan = 18
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -83,6 +84,25 @@ test('Identity', t => {
 
   t.strictEquals(nonTestingIdentity.filePath, nonTestingIdentityFilePath, 'the file path is as expected')
   t.notStrictEquals(nonTestingIdentity.key.kid, identity.key.kid, 'key ids differ between testing and default identities as expected')
+
+  // Check that custom inspection output matches what we expect.
+  const dehydrate = h => h.replace(/\s/g, '')
+  t.strictEquals(dehydrate(util.inspect(identity)), dehydrate(`
+    # Identity
+
+    Generates, stores, loads, and saves an identity (JWT OKP key using
+    Ed25519 curve) from/to file storage.
+
+    - Identity file path: ${identity.filePath}
+
+    ## Properties
+
+    - .key        : the jose.JWK.RSAKey instance
+    - .privateJWK : JavaScript object representation of JWK (private key)
+    - .publicJWK  : JavaScript object representation of JWK (public key)
+
+    To see key details, please log() the .key property.
+  `))
 
   t.end()
 })

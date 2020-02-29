@@ -7,7 +7,7 @@
 const test = require('tape')
 const Nonce = require('../lib/Nonce')
 
-test('Nonce', {skip: true}, async t => {
+test('Nonce' /*, {skip: true} */, async t => {
   t.plan(8)
 
   // Asking for a nonce when no nonce has been manually set should result

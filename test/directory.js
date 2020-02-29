@@ -2,7 +2,7 @@ const test = require('tape')
 const util = require('util')
 const Directory = require('../lib/Directory')
 
-test('Directory', {skip: true}, async t => {
+test('Directory' /*, {skip: true} */, async t => {
   t.plan = 24
 
   t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
@@ -44,7 +44,7 @@ test('Directory', {skip: true}, async t => {
   const stagingDirectory2 = await Directory.getSharedInstance()
   t.strictEquals(stagingDirectory, stagingDirectory2, 'directory single instance is actually a singleton')
 
-  // Check that the custom inspection output matches what we expect.
+  // Check that custom inspection output matches what we expect.
   const dehydrate = h => h.replace(/\s/g, '')
   t.strictEquals(dehydrate(util.inspect(stagingDirectory)), dehydrate(`
     # Directory (URLs for the Let’s Encrypt ${stagingDirectory.isStaging ? 'staging' : 'PRODUCTION'} endpoint)
