@@ -21,6 +21,7 @@ const prepareRequest = require('bent')
 
 const jose = require('jose')
 
+const log = require('./lib/log')
 const Identity = require('./lib/Identity')
 const Directory = require('./lib/Directory')
 const Nonce = require('./lib/Nonce')
@@ -42,7 +43,7 @@ async function main () {
   }
   const signedRequest = jose.JWS.sign.flattened(payload, identity.key, protectedHeader)
 
-  console.log('Signed request', signedRequest)
+  log('Protected header', protectedHeader)
 
   // The required headers as per RFC 8555 § 6.1 (HTTPS Requests) and § 6.2 (Request Authentication)
   const headers = {
@@ -52,24 +53,25 @@ async function main () {
   }
 
   // Prepare a new account request (RFC 8555 § 7.3 Account Management)
-  const newAccountRequest = prepareRequest('POST', directory.newAccountUrl, 'json', /* acceptable responses are */ 200, 201)
+  const newAccountRequest = prepareRequest('POST', directory.newAccountUrl, /* acceptable responses are */ 200, 201)
 
-  console.log('newAccountRequest', newAccountRequest)
+  log('newAccountRequest', newAccountRequest)
 
   let responseBody
   let newAccountResponse
   try {
     newAccountResponse = await newAccountRequest('', signedRequest, headers)
   } catch (error) {
-    console.log('error', error)
+    log('error', error)
     responseBody = error.responseBody
   }
   if (responseBody) {
     const responseBuffer = await responseBody
-    console.log(responseBuffer.toString('utf-8'))
+    log(responseBuffer.toString('utf-8'))
   }
 
-  console.log('New account response', newAccountResponse)
+  log('New account response', newAccountResponse)
+  log('Headers', newAccountResponse.headers)
 
   // TODO: Next we need to save the response.
   // TODO: Move this into its own class.
