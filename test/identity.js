@@ -13,7 +13,7 @@ const jose = require('jose')
 const Identity = require('../lib/Identity')
 
 test('identity', t => {
-  t.plan = 8
+  t.plan = 9
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -22,7 +22,11 @@ test('identity', t => {
   const testIdentityFilePath = path.join(testSettingsPath, 'identity.pem')
   fs.removeSync(testSettingsPath)
 
-  // Test identity creation.
+  //
+  // Test singleton identity creation.
+  //
+  t.throws(() => { new Identity() }, /Identity is a singleton/, 'Identity class cannot be directly instantiated')
+
   const identity = Identity.getSharedInstance(testSettingsPath)
 
   t.strictEquals(identity.settingsPath, testSettingsPath, 'custom settings path should be used')

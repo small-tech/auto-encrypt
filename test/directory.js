@@ -8,7 +8,7 @@ test('directory' /* , {skip: true} */, async t => {
   t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
 
   // Test singleton instantiation bypass attempt error.
-  t.throws(() => { new Directory() }, /The Directory is a singleton/, 'Directory class cannot be directly instantiated')
+  t.throws(() => { new Directory() }, /Directory is a singleton/, 'Directory class cannot be directly instantiated')
 
   //
   // Staging.
