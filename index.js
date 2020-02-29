@@ -32,13 +32,13 @@ async function main () {
   const identity = Identity.getSharedInstance()
 
   // Get the directory.
-  const directory = await Directory.getInstance()
+  const directory = await Directory.getSharedInstance()
 
   const payload = { termsOfServiceAgreed: true }
   const protectedHeader = {
     alg: 'RS256',
     jwk: identity.publicJWK,
-    nonce: await Nonce.new(),
+    nonce: await Nonce.get(),
     url: directory.newAccountUrl
   }
   const signedRequest = jose.JWS.sign.flattened(payload, identity.key, protectedHeader)
