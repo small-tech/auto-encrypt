@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unit test: Identity class.
+//
+////////////////////////////////////////////////////////////////////////////////
+
 const test = require('tape')
 
 const os = require('os')
@@ -9,10 +15,11 @@ const Identity = require('../lib/Identity')
 test('identity', t => {
   t.plan = 8
 
-  // Setup: ensure that an identity does not exist.
+  //
+  // Setup: create testing paths and ensure that an identity does not already exist at those paths.
+  //
   const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
   const testIdentityFilePath = path.join(testSettingsPath, 'identity.pem')
-
   fs.removeSync(testSettingsPath)
 
   // Test identity creation.

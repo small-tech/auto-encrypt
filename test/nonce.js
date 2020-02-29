@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unit test: Nonce class.
+//
+////////////////////////////////////////////////////////////////////////////////
+
 const test = require('tape')
 const Nonce = require('../lib/Nonce')
 
@@ -23,7 +29,7 @@ test('Nonce', async t => {
 
   const freshNonce2 = await Nonce.get()
 
-  t.strictEquals(freshNonce2, mockFreshNonce, 'the fresh nonce returned should match the manully-set fresh nonce')
+  t.strictEquals(freshNonce2, mockFreshNonce, 'the fresh nonce returned should match the manually-set fresh nonce')
   t.strictEquals(Nonce.freshNonce, null, 'the manually-set fresh nonce should be null since the nonce has now been used')
 
   t.end()
