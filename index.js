@@ -57,11 +57,11 @@ class AcmeHttp01 {
   async init () {
     this.account = await Account.getSharedInstance(this.settingsPath)
 
-    console.log(`Account received. kid = ${this.account.kid}`)
+    // console.log(`Account received. kid = ${this.account.kid}`)
 
     // TODO
 
-    console.log('Graceful exit. (This module is still under initial development.)')
+    // console.log('Graceful exit. (This module is still under initial development.)')
   }
 
   get settingsPath ()      { return this._settingsPath                                   }

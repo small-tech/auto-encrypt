@@ -10,13 +10,13 @@ const Nonce = require('../lib/Nonce')
 test('Nonce' /*, {skip: true} */, async t => {
   t.plan(8)
 
-  // Asking for a nonce when no nonce has been manually set should result
-  // in a fresh nonce being retrieved from the ACME server.
-  t.strictEquals(Nonce.freshNonce, null, 'the initial value of the manually-set fresh nonce should be null')
+  // Setup: ensure that we start with a null freshNonce (as other tests might
+  // have resulted in a manual value being set).
+  Nonce.freshNonce = null
 
   const freshNonce = await Nonce.get()
 
-  t.false(freshNonce === null, 'the manually-set fresh nonce should not be null')
+  t.false(freshNonce === null, 'the fresh nonce should not be null')
   t.strictEquals(typeof freshNonce, 'string', 'the fresh nonce should be a string')
   t.true(freshNonce.match(/^[A-Za-z0-9_-]+$/) !== null, 'the fresh nonce should be base64url encoded')
   t.true(Nonce.freshNonce === null, 'the manually-set fresh nonce should still be null after remote fetch')
@@ -31,6 +31,8 @@ test('Nonce' /*, {skip: true} */, async t => {
 
   t.strictEquals(freshNonce2, mockFreshNonce, 'the fresh nonce returned should match the manually-set fresh nonce')
   t.strictEquals(Nonce.freshNonce, null, 'the manually-set fresh nonce should be null since the nonce has now been used')
+
+  t.throws(() => { new Nonce() }, 'the nonce class is a static class and cannot be instantiated')
 
   t.end()
 })
