@@ -8,7 +8,7 @@ const AcmeHttp01 = require('../index')
 const Configuration = require('../lib/Configuration')
 
 test('AcmeHttp01', async t => {
-  t.plan = 4
+  t.plan(4)
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.

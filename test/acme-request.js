@@ -1,9 +1,10 @@
 const test = require('tape')
+const http = require('http')
 const AcmeRequest = require('../lib/AcmeRequest')
 const Account = require('../lib/Account')
 
 test('AcmeRequest', async t => {
-  t.plan = 1
+  t.plan(3)
 
   const { protectedHeader, signedRequest, httpsRequest, httpsHeaders } = await (new AcmeRequest()).prepare('newOrder', {aPayload: true}, /* useKid = */ true)
 
@@ -18,8 +19,22 @@ test('AcmeRequest', async t => {
   t.strictEquals(protectedHeader.kid, (await Account.getSharedInstance()).kid, 'account kid should be in protected header by default')
 
   // Test call failure.
-  const payload = { termsOfServiceAgreed: false }
-  t.throws(()=>{ await (new AcmeRequest().execute('newAccount', payload, /* useKid = */ false)) }, 'misconfigured request should throw')
+  const preparedRequest = await (new AcmeRequest()).prepare('custom-command', {aPayload: true}, /* useKid = */ true, /* url = */ 'http://localhost:3132')
+
+  const server = http.createServer((request, response) => {
+    response.statusCode = 500
+    response.end()
+  })
+  server.listen(3132)
+
+  try {
+    await (new AcmeRequest())._execute(preparedRequest)
+    t.fail()
+  } catch (error) {
+    t.pass('unexpected server response code should throw')
+  }
+
+  server.close()
 
   t.end()
 })

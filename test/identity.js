@@ -16,7 +16,7 @@ const Configuration = require('../lib/Configuration')
 const Identity = require('../lib/Identity')
 
 test('Identity', t => {
-  t.plan = 16
+  t.plan(16)
 
   //
   // Setup: Ensure we are starting from a fresh Identity instance, create testing paths,

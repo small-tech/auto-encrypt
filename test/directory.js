@@ -3,7 +3,7 @@ const util = require('util')
 const Directory = require('../lib/Directory')
 
 test('Directory' /*, {skip: true} */, async t => {
-  t.plan = 23
+  t.plan(25)
 
   //
   // Null out the Directory singleton instance so we know we’re starting with a fresh instance.
