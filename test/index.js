@@ -7,7 +7,7 @@ const test = require('tape')
 const AcmeHttp01 = require('../index')
 
 test('AcmeHttp01', async t => {
-  t.plan = 6
+  t.plan = 7
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -28,6 +28,12 @@ test('AcmeHttp01', async t => {
 
   const acmeHttp01_2 = await AcmeHttp01.getSharedInstance() // Not specifying the path should not affect subsequent calls.
   t.strictEquals(acmeHttp01, acmeHttp01_2, 'there is only one copy of the AcmeHttp01 singleton instance (2)')
+
+  // Check that the default (non-testing) settings path works.
+  AcmeHttp01.instance = null
+  const regularInstance = await AcmeHttp01.getSharedInstance()
+  const regularInstanceSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01')
+  t.strictEquals(regularInstance.settingsPath, regularInstanceSettingsPath, 'the default settings path is set as expected')
 
   t.end()
 })
