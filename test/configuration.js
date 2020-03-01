@@ -5,7 +5,7 @@ const test = require('tape')
 const Configuration = require('../lib/Configuration')
 
 test('Configuration', t => {
-  t.plan(3)
+  t.plan(4)
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
   //
@@ -22,6 +22,8 @@ test('Configuration', t => {
 
   t.strictEquals(Configuration.settingsPath, defaultSettingsPath, 'the default settings path is set as expected')
   t.true(fs.existsSync(defaultSettingsPath), 'the default settings path should be created')
+
+  t.throws(()=>{ new Configuration() }, /Configuration is a static class/, 'configuration is a static class')
 
   t.end()
 })
