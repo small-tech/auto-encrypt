@@ -14,7 +14,7 @@ const jose = require('jose')
 const Identity = require('../lib/Identity')
 
 test('Identity', t => {
-  t.plan = 18
+  t.plan = 19
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -32,6 +32,7 @@ test('Identity', t => {
 
   // Test identity creation and persistence.
   t.strictEquals(identity.settingsPath, testSettingsPath, 'custom settings path should be used')
+  t.throws(() => { identity.settingsPath = 'this is not allowed' }, 'settingsPath property is read-only')
   t.true(fs.existsSync(testSettingsPath), 'the test settings path should be created')
   t.strictEquals(identity.filePath, testIdentityFilePath, 'the identity file path should be correct')
   t.true(fs.existsSync(identity.filePath), 'the identity PEM file exists')
@@ -76,14 +77,6 @@ test('Identity', t => {
 
   // filePath should be read-only
   t.throws(() => {identity.filePath = 'this is not allowed'}, 'filePath property is read-only')
-
-  // Check that the default (non-testing) settings path works.
-  Identity.instance = null
-  const nonTestingIdentity = Identity.getSharedInstance()
-  const nonTestingIdentityFilePath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'identity.pem')
-
-  t.strictEquals(nonTestingIdentity.filePath, nonTestingIdentityFilePath, 'the file path is as expected')
-  t.notStrictEquals(nonTestingIdentity.key.kid, identity.key.kid, 'key ids differ between testing and default identities as expected')
 
   // Check that custom inspection output matches what we expect.
   const dehydrate = h => h.replace(/\s/g, '')
