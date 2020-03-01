@@ -61,7 +61,7 @@ test('Directory' /*, {skip: true} */, async t => {
     - revokeCertUrl    : ${stagingDirectory.revokeCertUrl}
     - termsOfServiceUrl: ${stagingDirectory.termsOfServiceUrl}
     - websiteUrl       : ${stagingDirectory.websiteUrl}
-  `))
+  `), 'custom inspection output should be as expected')
 
   //
   // Production.
@@ -105,7 +105,7 @@ test('Directory' /*, {skip: true} */, async t => {
     - revokeCertUrl    : ${productionDirectory.revokeCertUrl}
     - termsOfServiceUrl: ${productionDirectory.termsOfServiceUrl}
     - websiteUrl       : ${productionDirectory.websiteUrl}
-  `))
+  `), 'custom inspection output should be as expected')
 
   t.end()
 })

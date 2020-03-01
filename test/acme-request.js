@@ -17,5 +17,9 @@ test('AcmeRequest', async t => {
 
   t.strictEquals(protectedHeader.kid, (await Account.getSharedInstance()).kid, 'account kid should be in protected header by default')
 
+  // Test call failure.
+  const payload = { termsOfServiceAgreed: false }
+  t.throws(()=>{ await (new AcmeRequest().execute('newAccount', payload, /* useKid = */ false)) }, 'misconfigured request should throw')
+
   t.end()
 })

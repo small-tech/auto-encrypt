@@ -22,7 +22,7 @@ test('Identity', t => {
   // Setup: Ensure we are starting from a fresh Identity instance, create testing paths,
   // and ensure that an identity does not already exist at those paths.
   //
-  Identity.instance = null 
+  Identity.instance = null
   const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
   const testIdentityFilePath = path.join(testSettingsPath, 'identity.pem')
   fs.removeSync(testSettingsPath)
@@ -99,7 +99,7 @@ test('Identity', t => {
     - .publicJWK  : JavaScript object representation of JWK (public key)
 
     To see key details, please log() the .key property.
-  `))
+  `), 'custom inspection output should be as expected')
 
   t.end()
 })
