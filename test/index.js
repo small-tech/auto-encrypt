@@ -5,9 +5,10 @@ const path = require('path')
 const test = require('tape')
 
 const AcmeHttp01 = require('../index')
+const Configuration = require('../lib/Configuration')
 
 test('AcmeHttp01', async t => {
-  t.plan = 7
+  t.plan = 4
 
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
@@ -22,18 +23,10 @@ test('AcmeHttp01', async t => {
 
   t.strictEquals(AcmeHttp01.instance, acmeHttp01, 'there is only one copy of the AcmeHttp01 singleton instance (1)')
 
-  t.strictEquals(acmeHttp01.settingsPath, testSettingsPath, 'custom settings path should be used')
-  t.throws(() => { acmeHttp01.settingsPath = 'this is not allowed' }, 'settingsPath property is read-only')
-  t.true(fs.existsSync(testSettingsPath), 'the test settings path should be created')
+  t.strictEquals(Configuration.settingsPath, testSettingsPath, 'the settings path should be set correctly')
 
   const acmeHttp01_2 = await AcmeHttp01.getSharedInstance() // Not specifying the path should not affect subsequent calls.
   t.strictEquals(acmeHttp01, acmeHttp01_2, 'there is only one copy of the AcmeHttp01 singleton instance (2)')
-
-  // Check that the default (non-testing) settings path works.
-  AcmeHttp01.instance = null
-  const regularInstance = await AcmeHttp01.getSharedInstance()
-  const regularInstanceSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01')
-  t.strictEquals(regularInstance.settingsPath, regularInstanceSettingsPath, 'the default settings path is set as expected')
 
   t.end()
 })

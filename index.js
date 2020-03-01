@@ -19,10 +19,8 @@
 const os = require('os')
 const path = require('path')
 const fs = require('fs-extra')
-
-// Continue to end of file to see the rest of the dependencies. The ones at the
-// end are there as they require a reference to this class.
-// (This is a limitation of Node requires. See https://stackoverflow.com/a/21334734)
+const Configuration = require('./lib/Configuration')
+const Account = require('./lib/Account')
 
 class AcmeHttp01 {
   //
@@ -47,15 +45,14 @@ class AcmeHttp01 {
     }
     AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod = false
 
-    if (settingsPath === null) {
-      settingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01')
-    }
-    fs.mkdirpSync(settingsPath)
-    this._settingsPath = settingsPath
+    // Save the settings path in the Configuration static class. Any other classes that need access
+    // to the settings path can acquire an instance of it instead of having to maintain either circular
+    // references to this main class or to keep injecting references to it between each other.
+    Configuration.settingsPath = settingsPath
   }
 
   async init () {
-    this.account = await Account.getSharedInstance(this.settingsPath)
+    this.account = await Account.getSharedInstance()
 
     // console.log(`Account received. kid = ${this.account.kid}`)
 
@@ -64,15 +61,6 @@ class AcmeHttp01 {
     // console.log('Graceful exit. (This module is still under initial development.)')
   }
 
-  get settingsPath ()      { return this._settingsPath                                   }
-  set settingsPath (value) { throw new Error('The .settingsPath property is read-only.') }
 }
 
 module.exports = AcmeHttp01
-
-// Dependencies that need to have a reference to this class (e.g., to get the settingsPath),
-// should be required here at the end, _after_ the module.exports line so that they do not
-// crash due to accessing an empty placeholder object.
-// (This is a limitation of Node requires. See https://stackoverflow.com/a/21334734)
-
-const Account = require('./lib/Account')

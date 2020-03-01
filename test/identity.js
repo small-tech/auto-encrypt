@@ -11,29 +11,33 @@ const os = require('os')
 const path = require('path')
 const fs = require('fs-extra')
 const jose = require('jose')
+
+const Configuration = require('../lib/Configuration')
 const Identity = require('../lib/Identity')
 
 test('Identity', t => {
-  t.plan = 19
+  t.plan = 16
 
   //
-  // Setup: create testing paths and ensure that an identity does not already exist at those paths.
+  // Setup: Ensure we are starting from a fresh Identity instance, create testing paths,
+  // and ensure that an identity does not already exist at those paths.
   //
+  Identity.instance = null 
   const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
   const testIdentityFilePath = path.join(testSettingsPath, 'identity.pem')
   fs.removeSync(testSettingsPath)
 
+  Configuration.settingsPath = testSettingsPath
+
   // Test singleton identity creation.
   t.throws(() => { new Identity() }, /Identity is a singleton/, 'Identity class cannot be directly instantiated')
-  const identity = Identity.getSharedInstance(testSettingsPath)
-  const identity2 = Identity.getSharedInstance() // Not specifying the path should not affect subsequent calls.
+
+  const identity = Identity.getSharedInstance()
   t.strictEquals(Identity.instance, identity, 'there is only one copy of the identity singleton instance (1)')
+  const identity2 = Identity.getSharedInstance()
   t.strictEquals(identity, identity2, 'there is only one copy of the identity singleton instance (2)')
 
   // Test identity creation and persistence.
-  t.strictEquals(identity.settingsPath, testSettingsPath, 'custom settings path should be used')
-  t.throws(() => { identity.settingsPath = 'this is not allowed' }, 'settingsPath property is read-only')
-  t.true(fs.existsSync(testSettingsPath), 'the test settings path should be created')
   t.strictEquals(identity.filePath, testIdentityFilePath, 'the identity file path should be correct')
   t.true(fs.existsSync(identity.filePath), 'the identity PEM file exists')
 

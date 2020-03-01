@@ -3,9 +3,12 @@ const util = require('util')
 const Directory = require('../lib/Directory')
 
 test('Directory' /*, {skip: true} */, async t => {
-  t.plan = 24
+  t.plan = 23
 
-  t.strictEquals(Directory.instance, null, 'directory singleton instance is null to begin with')
+  //
+  // Null out the Directory singleton instance so we know we’re starting with a fresh instance.
+  //
+  Directory.instance = null
 
   // Test singleton instantiation bypass attempt error.
   t.throws(() => { new Directory() }, /Directory is a singleton/, 'Directory class cannot be directly instantiated')
