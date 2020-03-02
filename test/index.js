@@ -32,7 +32,7 @@ test('AcmeHttp01', async t => {
   // Test singleton creation.
   t.throws(() => { new AcmeHttp01() }, /AcmeHttp01 is a singleton/, 'AcmeHttp01 class cannot be directly instantiated')
 
-  const acmeHttp01 = await AcmeHttp01.getSharedInstance(testSettingsPath)
+  const acmeHttp01 = await AcmeHttp01.getSharedInstance(['dev.ar.al', 'dev2.ar.al'], testSettingsPath)
 
   t.strictEquals(AcmeHttp01.instance, acmeHttp01, 'there is only one copy of the AcmeHttp01 singleton instance (1)')
 

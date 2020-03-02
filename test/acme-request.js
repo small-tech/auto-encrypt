@@ -19,7 +19,13 @@ test('AcmeRequest', async t => {
   t.strictEquals(protectedHeader.kid, (await Account.getSharedInstance()).kid, 'account kid should be in protected header by default')
 
   // Test call failure.
-  const preparedRequest = await (new AcmeRequest()).prepare('custom-command', {aPayload: true}, /* useKid = */ true, /* url = */ 'http://localhost:3132')
+  const preparedRequest = await (new AcmeRequest()).prepare(
+    /* command =      */ 'custom-command',
+    /* payload =      */ {aPayload: true},
+    /* useKid =       */ true,
+    /* successCodes = */ [200],
+    /* url =          */ 'http://localhost:3132'
+  )
 
   const server = http.createServer((request, response) => {
     response.statusCode = 500

@@ -16,12 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-const os = require('os')
-const path = require('path')
-const fs = require('fs-extra')
 const Configuration = require('./lib/Configuration')
 const Account = require('./lib/Account')
 const Order = require('./lib/Order')
+const Authorisation = require('./lib/Authorisation')
+
+const asyncForEach = require('./lib/async-foreach')
 
 class AcmeHttp01 {
   //
@@ -30,16 +30,16 @@ class AcmeHttp01 {
   static instance = null
   static isBeingInstantiatedViaSingletonFactoryMethod = false
 
-  static async getSharedInstance (settingsPath = null) {
+  static async getSharedInstance (domains, settingsPath = null) {
     if (AcmeHttp01.instance === null) {
       AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod = true
-      AcmeHttp01.instance = new AcmeHttp01(settingsPath)
+      AcmeHttp01.instance = new AcmeHttp01(domains, settingsPath)
       await AcmeHttp01.instance.init()
     }
     return AcmeHttp01.instance
   }
 
-  constructor (settingsPath = null) {
+  constructor (domains, settingsPath = null) {
     // Ensure singleton access.
     if (AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod === false) {
       throw new Error('AcmeHttp01 is a singleton. Please instantiate using the AcmeHttp01.getSharedInstance([settingsPath<str>]) method.')
@@ -50,11 +50,24 @@ class AcmeHttp01 {
     // to the settings path can acquire an instance of it instead of having to maintain either circular
     // references to this main class or to keep injecting references to it between each other.
     Configuration.settingsPath = settingsPath
+
+    this.domains = domains
   }
 
   async init () {
     this.account = await Account.getSharedInstance()
-    this.order = await Order.getSharedInstance(['dev.ar.al', 'dev2.ar.al'])
+    this.order = await Order.getSharedInstance(this.domains)
+
+    const authorisations = []
+    // We’ve got the order back. Download all the authorisations.
+    await asyncForEach(
+      this.order.authorisations,
+      async authorisationUrl => {
+        const authorisation = await Authorisation.getSharedInstance(authorisationUrl)
+        console.log(authorisation)
+        authorisations.push(authorisation)
+      }
+    )
   }
 }
 
