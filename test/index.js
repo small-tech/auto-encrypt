@@ -7,12 +7,25 @@ const test = require('tape')
 const AcmeHttp01 = require('../index')
 const Configuration = require('../lib/Configuration')
 
+const Directory = require('../lib/Directory')
+const Identity = require('../lib/Identity')
+const Account = require('../lib/Account')
+const Order = require('../lib/Order')
+const Nonce = require('../lib/Nonce')
+
 test('AcmeHttp01', async t => {
   t.plan(4)
 
   //
-  // Setup: create testing paths and ensure that an identity does not already exist at those paths.
+  // Setup: nullify all singleton instances to ensure we start with a clean state and
+  // create testing paths and ensure that an identity does not already exist at those paths.
   //
+  Directory.instance = null
+  Identity.instance = null
+  Account.instance = null
+  Order.instance = null
+  Nonce.freshNonce = null
+
   const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
   fs.removeSync(testSettingsPath)
 
