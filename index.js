@@ -21,6 +21,7 @@ const path = require('path')
 const fs = require('fs-extra')
 const Configuration = require('./lib/Configuration')
 const Account = require('./lib/Account')
+const Order = require('./lib/Order')
 
 class AcmeHttp01 {
   //
@@ -53,14 +54,8 @@ class AcmeHttp01 {
 
   async init () {
     this.account = await Account.getSharedInstance()
-
-    // console.log(`Account received. kid = ${this.account.kid}`)
-
-    // TODO
-
-    // console.log('Graceful exit. (This module is still under initial development.)')
+    this.order = await Order.getSharedInstance(['dev.ar.al', 'dev2.ar.al'])
   }
-
 }
 
 module.exports = AcmeHttp01
