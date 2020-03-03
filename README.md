@@ -24,10 +24,22 @@ All files                       |     93.4 |     91.3 |    81.97 |     93.3 |   
 
 (For the latest state, run `npm run coverage`)
 
+## A note on Linux and the security farce that is “privileged ports”
+
+Linux has an outdated feature dating from the mainframe days that requires a process that wants to bind to ports < 1024 to have elevated privileges. While this was a security feature in the days of dumb terminals, today it is a security anti-feature. (macOS has dropped this requirement as of macOS Mojave.)
+
+On Linux, ensure your Node process has the right to bind to so-called “privileged” ports by issuing the following command before use:
+
+```sh
+sudo setcap cap_net_bind_service=+ep $(which node)
+```
+
+If you are wrapping your Node app into an executable binary using a module like [Nexe](https://github.com/nexe/nexe), you will have to ensure that every build of your app has that capability set. For an example of how we do this in [Site.js](https://sitejs.org), [see this listing](https://source.ind.ie/site.js/app/blob/master/bin/lib/ensure.js#L124).
+
 ## Copyright
 
 &copy; 2020 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
 
 ## License
 
-AGPL version 3.0 or later.
+[AGPL version 3.0 or later.](https://www.gnu.org/licenses/agpl-3.0.en.html)
