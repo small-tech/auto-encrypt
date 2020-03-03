@@ -10,7 +10,7 @@ const AcmeHttp01 = require('./index')
 
 async function main () {
   // newAccount
-  const acmeHttp01 = await AcmeHttp01.getSharedInstance(['dev.ar.al'])
+  const acmeHttp01 = await AcmeHttp01.getSharedInstance(['dev.ar.al', 'www.dev.ar.al'])
 }
 
 main()
