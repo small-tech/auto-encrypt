@@ -57,17 +57,6 @@ class AcmeHttp01 {
   async init () {
     this.account = await Account.getSharedInstance()
     this.order = await Order.getSharedInstance(this.domains)
-
-    const authorisations = []
-    // We’ve got the order back. Download all the authorisations.
-    await asyncForEach(
-      this.order.authorisations,
-      async authorisationUrl => {
-        const authorisation = await Authorisation.getSharedInstance(authorisationUrl)
-        console.log(authorisation)
-        authorisations.push(authorisation)
-      }
-    )
   }
 }
 
