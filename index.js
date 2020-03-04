@@ -19,9 +19,6 @@
 const Configuration = require('./lib/Configuration')
 const Account = require('./lib/Account')
 const Order = require('./lib/Order')
-const Authorisation = require('./lib/Authorisation')
-
-const asyncForEach = require('./lib/async-foreach')
 
 class AcmeHttp01 {
   //

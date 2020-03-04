@@ -8,7 +8,7 @@ const AcmeHttp01 = require('../index')
 const Configuration = require('../lib/Configuration')
 
 const Directory = require('../lib/Directory')
-const Identity = require('../lib/Identity')
+const AccountIdentity = require('../lib/AccountIdentity')
 const Account = require('../lib/Account')
 const Order = require('../lib/Order')
 const Nonce = require('../lib/Nonce')
@@ -21,7 +21,8 @@ test('AcmeHttp01', async t => {
   // create testing paths and ensure that an identity does not already exist at those paths.
   //
   Directory.instance = null
-  Identity.instance = null
+  AccountIdentity.instance = null
+  CertificateIdentity.instance = null
   Account.instance = null
   Order.instance = null
   Nonce.freshNonce = null
