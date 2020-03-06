@@ -1,11 +1,12 @@
 {
-  "name": "@small-tech/acme-http-01",
+  "name": "@small-tech/auto-encrypt",
   "version": "1.0.0",
-  "description": "Small ACME library for provisioning certificates using http-01 challenges",
+  "description": "Automatically provisions and renews Let’s Encrypt TLS certificates for Node.js https servers (including Express.js, etc.)",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
-    "coverage": "nyc tape test/*.js | tap-nyc"
+    "coverage": "nyc tape test/*.js | tap-nyc",
+    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose --debug"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
@@ -16,6 +17,7 @@
     "jose": "^1.24.0"
   },
   "devDependencies": {
+    "jsdoc": "^3.6.3",
     "nyc": "^14.1.1",
     "tap-nyc": "^1.0.3",
     "tap-spec": "^5.0.0",

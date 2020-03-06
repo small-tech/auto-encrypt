@@ -14,19 +14,23 @@ npm i @small-tech/auto-encrypt
 
 ## Usage
 
-Instead of passing an `options` object to the `https.createServer([options][, listener])` method, pass the return value of a call to the `autoEncrypt()` function.
+Instead of passing an `options` object directly to the `https.createServer([options][, listener])` method, pass the return value of a call to this module to it.
 
 ```js
-autoEncrypt({
+const autoEncrypt = require('@small-tech/auto-encrypt')
+
+const options = autoEncrypt({
   domains: [domain1, domain2, /* … */],
   options: { /* https server options */},
   settingsPath: '/custom/settings/path'
 })
+
+// Pass the options object to https.createServer()
 ```
 
 ### Parameter object
 
-The `autoEncrypt()` function takes a single parameter object as its only argument. This object can contain the following properties:
+The Auto Encrypt function takes a single parameter object as its only argument. This object can contain the following properties:
 
   - `domains` (array of strings): Names to provision Let’s Encrypt certificates for.
   - `options` (object; _optional_): Standard `https` server options.

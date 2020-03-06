@@ -23,6 +23,7 @@ const Certificate = require('./lib/Certificate')
  * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
  * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
  * the Server Name Indication (SNI) callback
+ * @function autoEncrypt
  *
  * @param {Object}   parameterObject
  * @param {String[]} parameterObject.domains        Domain names to provision TLS certificates for.
