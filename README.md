@@ -2,6 +2,10 @@
 
 Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org) TLS certificates for [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
+## How it works
+
+The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be automatically renewed 30 days before their expiry date.
+
 ## Install
 
 ```sh
@@ -10,17 +14,27 @@ npm i @small-tech/auto-encrypt
 
 ## Usage
 
+Instead of passing an `options` object to the `https.createServer([options][, listener])` method, pass the return value of a call to the `autoEncrypt()` function.
+
 ```js
-autoEncrypt([options], [settingsPath], domain0, domain1, …, domainN)
+autoEncrypt({
+  domains: [domain1, domain2, /* … */],
+  options: { /* https server options */},
+  settingsPath: '/custom/settings/path'
+})
 ```
 
-  - `options` (optional): any server options to be passed used when creating the `https` server.
-  - `settingsPath` (optional): a custom path to save the certificates and keys to (defaults to _~/.small-tech.org/auto-encrypt/_).
-  - `domain0, …, domainN`: one or more domains to automatically provision and renew Let’s Encrypt certificates for.
+### Parameter object
 
-## How it works
+The `autoEncrypt()` function takes a single parameter object as its only argument. This object can contain the following properties:
 
-The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be automatically renewed 30 days before their expiry date.
+  - `domains` (array of strings): Names to provision Let’s Encrypt certificates for.
+  - `options` (object; _optional_): Standard `https` server options.
+  - `settingsPath` (string; _optional_): a custom path to save the certificates and keys to (defaults to _~/.small-tech.org/auto-encrypt/_).
+
+### Return value
+
+The `autoEncrypt()` function returns an options object to be passed to the `https.createServer()` method.
 
 ## Examples
 
@@ -33,7 +47,10 @@ const autoEncrypt = require('@small-tech/auto-encrypt')
 const options = { /* custom options, if any */ }
 
 const server = https.createServer(
-  autoEncrypt(options, 'ar.al', 'www.ar.al'),
+  autoEncrypt({
+    options,
+    domains: ['ar.al', 'www.ar.al']
+  }),
   (request, response) => {
     response.end('Hello, world!')
   }
@@ -54,12 +71,21 @@ app.get('/', (request, response) => {
   response.end('Hello, world!')
 })
 
-const server = https.createServer(autoEncrypt(options, 'ar.al', 'www.ar.al'), app)
+const server = https.createServer(
+  autoEncrypt({ options, domains: ['ar.al', 'www.ar.al'] }),
+  app
+)
 ```
 
-## Related modules
+## Related projects
 
-  - For a drop-in Node.js https module replacement that has automatic development-time (localhost) certificates and automatic production certificates using Le Certificate,
+From lower-level to higher-level:
+
+  - For automatic trusted development-time (localhost) certificates in Node.js without browser errors via [mkcert](https://github.com/FiloSottile/mkcert), see [@small-tech/auto-encrypt-local]() __TODO: add URL after migrating the project (previously called nodecert)__.
+
+  - For a drop-in standard Node.js `https` module replacement with both automatic development-time (localhost) certificates via auto-encrypt-local and automatic production certificates via auto-encrypt, see [@small-tech/https](https://source.small-tech.org/site.js/lib/https).
+
+  - For a complete [small technology](https://small-tech.org/about/#small-technology) solution to develop, test, and deploy a secure static or dynamic personal web site with zero configuration, see [Site.js](https://sitejs.org).
 
 ## Coverage
 
@@ -97,7 +123,7 @@ If you are wrapping your Node app into an executable binary using a module like 
 
 ## Technical definition
 
-Implements the subset of [RFC 8555](https://tools.ietf.org/html/rfc8555) – Automatic Certificate Management Environment (ACME) – necessary for a client to support TLS certificate provisioning from [Let’s Encrypt](https://letsencrypt.org) using [HTTP-01 challenges](https://tools.ietf.org/html/rfc8555#section-8.3).
+Implements the subset of [RFC 8555](https://tools.ietf.org/html/rfc8555) – Automatic Certificate Management Environment (ACME) – necessary for a [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) server to provision [TLS certificates](https://en.wikipedia.org/wiki/Transport_Layer_Security) from [Let’s Encrypt](https://letsencrypt.org) using the [HTTP-01 challenge](https://tools.ietf.org/html/rfc8555#section-8.3) on first hit of an HTTPS route via use of the [Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication) (SNI) callback.
 
 ## Copyright
 

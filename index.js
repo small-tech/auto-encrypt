@@ -1,15 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// @small-tech/acme-http-01
+// @small-tech/auto-encrypt
+//
+// Automatically provisions and renews Let’s Encrypt TLS certificates for
+// Node.js https servers (including Express.js, etc.)
 //
 // Implements the subset of RFC 8555 – Automatic Certificate Management
-// Environment (ACME) – necessary for a client to support TLS certificate
-// provisioning from Let’s Encrypt using HTTP-01 challenges.
+// Environment (ACME) – necessary for a Node.js https server to provision TLS
+// certificates from Let’s Encrypt using the HTTP-01 challenge on first
+// hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 //
-// Note that where Boulder (Let’s Encrypt’s ACME implementation; the only one
-// that really matters) differs from the ACME spec, we will go with Let’s
-// Encrypt’s implementation.
-// https://github.com/letsencrypt/boulder/blob/master/docs/acme-divergences.md
 //
 // Copyright © 2020 Aral Balkan, Small Technology Foundation.
 // License: AGPLv3 or later.
@@ -17,44 +17,38 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 const Configuration = require('./lib/Configuration')
-const Account = require('./lib/Account')
-const Order = require('./lib/Order')
+const Certificate = require('./lib/Certificate')
 
-class AcmeHttp01 {
-  //
-  // Singleton access (async).
-  //
-  static instance = null
-  static isBeingInstantiatedViaSingletonFactoryMethod = false
+function autoEncrypt(parameterObject) {
 
-  static async getSharedInstance (domains, settingsPath = null) {
-    if (AcmeHttp01.instance === null) {
-      AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod = true
-      AcmeHttp01.instance = new AcmeHttp01(domains, settingsPath)
-      await AcmeHttp01.instance.init()
+  function throwRequiredParameterError () { throw new Error('parameter object must have a domains property')}
+
+  const domains = parameterObject.domains || throwRequiredParameterError()
+  const options = parameterObject.options || {}
+  const settingsPath = parameterObject.settingsPath || null
+
+  // Save the settings path in the Configuration static class. Any other classes that need access
+  // to the settings path can acquire an instance of it instead of having to maintain either circular
+  // references to this main class or to keep injecting references to it between each other.
+  Configuration.settingsPath = settingsPath
+
+  const certificate = Certificate.getSharedInstance()
+
+  options.SNICallback = async (serverName, callback) => {
+    console.log('SNI Callback', serverName, callback)
+
+    if (serverName in domains) {
+      const secureContext = await certificate.getSecureContext()
+      callback(null, secureContext)
+    } else {
+      console.log(` 🤨 Not responding to request for domain ${serverName} `)
+      callback()
     }
-    return AcmeHttp01.instance
   }
 
-  constructor (domains, settingsPath = null) {
-    // Ensure singleton access.
-    if (AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod === false) {
-      throw new Error('AcmeHttp01 is a singleton. Please instantiate using the AcmeHttp01.getSharedInstance([settingsPath<str>]) method.')
-    }
-    AcmeHttp01.isBeingInstantiatedViaSingletonFactoryMethod = false
+  // TODO: also add OCSP stapling
+  // https://source.ind.ie/site.js/spikes/acme-http-01/issues/1
 
-    // Save the settings path in the Configuration static class. Any other classes that need access
-    // to the settings path can acquire an instance of it instead of having to maintain either circular
-    // references to this main class or to keep injecting references to it between each other.
-    Configuration.settingsPath = settingsPath
-
-    this.domains = domains
-  }
-
-  async init () {
-    this.account = await Account.getSharedInstance()
-    this.order = await Order.getSharedInstance(this.domains)
-  }
 }
 
-module.exports = AcmeHttp01
+module.exports = autoEncrypt
