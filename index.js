@@ -19,6 +19,17 @@
 const Configuration = require('./lib/Configuration')
 const Certificate = require('./lib/Certificate')
 
+/**
+ * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
+ * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
+ * the Server Name Indication (SNI) callback
+ *
+ * @param {Object}   parameterObject
+ * @param {String[]} parameterObject.domains        Domain names to provision TLS certificates for.
+ * @param {Object}   [parameterObject.options]      Standard https server options.
+ * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/] Custom path to save certificates and keys to.
+ * @returns {Object} An options object to be passed to the https.createServer() method.
+ */
 function autoEncrypt(parameterObject) {
 
   function throwRequiredParameterError () { throw new Error('parameter object must have a domains property')}
