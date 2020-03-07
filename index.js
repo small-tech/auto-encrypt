@@ -35,6 +35,7 @@ function autoEncrypt(parameterObject) {
 
   function throwRequiredParameterError () { throw new Error('parameter object must have a domains property')}
 
+  const staging = parameterObject.staging || false
   const domains = parameterObject.domains || throwRequiredParameterError()
   const options = parameterObject.options || {}
   const settingsPath = parameterObject.settingsPath || null
@@ -43,6 +44,9 @@ function autoEncrypt(parameterObject) {
   // to the settings path can acquire an instance of it instead of having to maintain either circular
   // references to this main class or to keep injecting references to it between each other.
   Configuration.settingsPath = settingsPath
+
+  // Set the staging setting.
+  Configuration.staging = staging
 
   const certificate = Certificate.getSharedInstance()
 
