@@ -47,19 +47,24 @@ function autoEncrypt(parameterObject) {
   const certificate = Certificate.getSharedInstance()
 
   options.SNICallback = async (serverName, callback) => {
-    console.log('SNI Callback', serverName, callback)
-
-    if (serverName in domains) {
-      const secureContext = await certificate.getSecureContext()
+    if (domains.includes(serverName)) {
+      const secureContext = await certificate.getSecureContext(domains)
+      if (secureContext === null) {
+        console.log(' ⏳ We’re busy provisioning certificates and rejecting calls at the moment. ')
+        callback()
+        return
+      }
       callback(null, secureContext)
     } else {
-      console.log(` 🤨 Not responding to request for domain ${serverName} `)
+      console.log(` 🤨 [@small-tech/auto-connect] SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`)
       callback()
     }
   }
 
   // TODO: also add OCSP stapling
   // https://source.ind.ie/site.js/spikes/acme-http-01/issues/1
+
+  return options
 
 }
 
