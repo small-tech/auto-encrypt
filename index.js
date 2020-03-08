@@ -2,8 +2,8 @@
 //
 // @small-tech/auto-encrypt
 //
-// Automatically provisions and renews Let’s Encrypt TLS certificates for
-// Node.js https servers (including Express.js, etc.)
+// Automatically provisions and renews Let’s Encrypt™ TLS certificates for
+// Node.js® https servers (including Express.js, etc.)
 //
 // Implements the subset of RFC 8555 – Automatic Certificate Management
 // Environment (ACME) – necessary for a Node.js https server to provision TLS
@@ -28,6 +28,7 @@ const Certificate = require('./lib/Certificate')
  * @param {Object}   parameterObject
  * @param {String[]} parameterObject.domains        Domain names to provision TLS certificates for.
  * @param {Object}   [parameterObject.options]      Standard https server options.
+ * @param {Boolean}     [parameterObject.staging]      If true, the Let’s Encrypt staging servers will be used (default is false).
  * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/] Custom path to save certificates and keys to.
  * @returns {Object} An options object to be passed to the https.createServer() method.
  */

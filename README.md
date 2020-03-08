@@ -1,6 +1,6 @@
 # Auto Encrypt
 
-Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org) TLS certificates for [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
+Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org)™ TLS certificates for [Node.js](https://nodejs.org)® [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
 ## How it works
 
@@ -34,6 +34,7 @@ The Auto Encrypt function takes a single parameter object as its only argument. 
 
   - `domains` (array of strings): Names to provision Let’s Encrypt certificates for.
   - `options` (object; _optional_): Standard `https` server options.
+  - `staging` (boolean; _optional_): If `true`, the [Let’s Encrypt staging environment](https://letsencrypt.org/docs/staging-environment/) will be used (default is `false`).
   - `settingsPath` (string; _optional_): a custom path to save the certificates and keys to (defaults to _~/.small-tech.org/auto-encrypt/_).
 
 ### Return value

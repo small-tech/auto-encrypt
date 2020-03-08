@@ -1,7 +1,7 @@
 {
   "name": "@small-tech/auto-encrypt",
   "version": "1.0.0",
-  "description": "Automatically provisions and renews Let’s Encrypt TLS certificates for Node.js https servers (including Express.js, etc.)",
+  "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js | tap-spec",
