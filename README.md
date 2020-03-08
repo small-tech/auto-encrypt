@@ -82,9 +82,20 @@ const server = https.createServer(
 )
 ```
 
+## Client details
+
+Auto Encrypt is does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname and it automatically renews your certificate from thereon.
+
+Auto Encrypt __does not_ and __will not__:
+
+  - Implement wildcard certificates. For most [small tech](https://small-tech.org/about/#small-technology) needs (personal web sites and web apps), you will likely need no more than two domains (the root domain and, due to historic and conventional reasons, the www subdomain). You will definitely not need more than the 100 domains that are supported per certificate. If you do, chances are you are looking to use Auto Encrypt in a startup or corporate setting, which is not what its for.
+
+  - Implement DNS-01 or any other methods that cannot be fully automated.
+
+
 ## Staging and production server behaviour and rate limits
 
-By default, Auto Encrypt will use the Let’s Encrypt production environment. This is most likely what you want as it means that your HTTPS server will Just Work™, provisioning its TLS certificate automatically the first time the server is hit via its hostname and from thereon automatically renewing its certificate.
+By default, Auto Encrypt will use the Let’s Encrypt production environment. This is most likely what you want as it means that your HTTPS server will Just Work™, provisioning its TLS certificate automatically the first time the server is hit via its hostname and from thereon automatically renewing the certificate a month ahead of its expiry date.
 
 However, be aware that the production server has [rate limits](https://letsencrypt.org/docs/rate-limits/).
 
