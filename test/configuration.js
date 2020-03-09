@@ -9,7 +9,7 @@ test('Configuration', t => {
   //
   // Setup: create testing paths and ensure that an identity does not already exist at those paths.
   //
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
+  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(testSettingsPath)
 
   Configuration.settingsPath = testSettingsPath
@@ -17,7 +17,7 @@ test('Configuration', t => {
   t.true(fs.existsSync(testSettingsPath), 'the test settings path should be created')
 
   // Check that the default (non-testing) settings path works.
-  const defaultSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01')
+  const defaultSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt')
   Configuration.settingsPath = null
 
   t.strictEquals(Configuration.settingsPath, defaultSettingsPath, 'the default settings path is set as expected')

@@ -25,7 +25,7 @@ test('Identity', t => {
   // and ensure that an identity does not already exist at those paths.
   //
   Identity.instance = null
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
+  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   const testIdentityFilePath = path.join(testSettingsPath, 'identity.pem')
   fs.removeSync(testSettingsPath)
 

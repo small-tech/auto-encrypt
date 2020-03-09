@@ -144,9 +144,9 @@ A complete [small technology](https://small-tech.org/about/#small-technology) to
 File                            |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |
 --------------------------------|----------|----------|----------|----------|-------------------|
 All files                       |     93.4 |     91.3 |    81.97 |     93.3 |                   |
-  acme-http-01                   |      100 |      100 |      100 |      100 |                   |
+  auto-encrypt                   |      100 |      100 |      100 |      100 |                   |
   index.js                      |      100 |      100 |      100 |      100 |                   |
-  acme-http-01/lib               |    92.61 |       90 |       80 |    92.53 |                   |
+  auto-encrypt/lib               |    92.61 |       90 |       80 |    92.53 |                   |
   Account.js                    |      100 |      100 |      100 |      100 |                   |
   AcmeRequest.js                |      100 |       80 |      100 |      100 |                25 |
   Configuration.js              |      100 |      100 |      100 |      100 |                   |
@@ -154,7 +154,7 @@ All files                       |     93.4 |     91.3 |    81.97 |     93.3 |   
   Identity.js                   |      100 |      100 |      100 |      100 |                   |
   Nonce.js                      |      100 |      100 |      100 |      100 |                   |
   Order.js                      |    56.67 |       50 |    21.43 |    56.67 |... 54,55,56,61,73 |
-  acme-http-01/lib/acme-requests |    93.75 |      100 |      100 |    93.33 |                   |
+  auto-encrypt/lib/acme-requests |    93.75 |      100 |      100 |    93.33 |                   |
   NewAccountRequest.js          |      100 |      100 |      100 |      100 |                   |
   NewOrderRequest.js            |    88.89 |      100 |      100 |     87.5 |                27 |
 

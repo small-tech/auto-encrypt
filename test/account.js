@@ -11,7 +11,7 @@ test('Account', async t => {
   //
   // Setup: use a fresh test settings path.
   //
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
+  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(testSettingsPath)
 
   Configuration.settingsPath = testSettingsPath

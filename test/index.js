@@ -27,7 +27,7 @@ test('AcmeHttp01', async t => {
   Order.instance = null
   Nonce.freshNonce = null
 
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'acme-http-01', 'test')
+  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(testSettingsPath)
 
   // Test singleton creation.
