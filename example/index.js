@@ -32,7 +32,6 @@ let options = { /* custom http server options, if any (we don’t have any in th
 
 options = autoEncrypt({
   options,
-  staging: true,
   domains: [os.hostname()]
 })
 

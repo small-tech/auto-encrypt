@@ -42,13 +42,10 @@ function autoEncrypt(parameterObject) {
   const options = parameterObject.options || {}
   const settingsPath = parameterObject.settingsPath || null
 
-  // Save the settings path in the Configuration static class. Any other classes that need access
-  // to the settings path can acquire an instance of it instead of having to maintain either circular
-  // references to this main class or to keep injecting references to it between each other.
-  Configuration.settingsPath = settingsPath
-
-  // Set the staging setting.
-  Configuration.staging = staging
+  Configuration.initialise({
+    settingsPath,
+    staging
+  })
 
   const certificate = Certificate.getSharedInstance()
 
@@ -71,7 +68,6 @@ function autoEncrypt(parameterObject) {
   // https://source.small-tech.org/site.js/lib/auto-encrypt/issues/1
 
   return options
-
 }
 
 module.exports = autoEncrypt
