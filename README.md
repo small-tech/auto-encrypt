@@ -2,6 +2,8 @@
 
 Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org)™ TLS certificates for [Node.js](https://nodejs.org)® [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
+> __Like this? Fund us!__ Small Technology Foundation is a tiny, independent, two-person not-for-profit. We exist in part thanks to patronage by people like you. If you share our vision and want to support our work, please [become a patron or donate to us today](https://small-tech.org/) and help us continue to exist.
+
 ## How it works
 
 The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be automatically renewed 30 days before their expiry date.
@@ -107,11 +109,20 @@ If you do use the staging environment, be aware that browsers will reject the st
 
 From lower-level to higher-level:
 
-  - For automatic trusted development-time (localhost) certificates in Node.js without browser errors via [mkcert](https://github.com/FiloSottile/mkcert), see [@small-tech/auto-encrypt-local]() __TODO: add URL after migrating the project (previously called nodecert)__.
+### [@small-tech/auto-encrypt-localhost]()
 
-  - For a drop-in standard Node.js `https` module replacement with both automatic development-time (localhost) certificates via auto-encrypt-local and automatic production certificates via auto-encrypt, see [@small-tech/https](https://source.small-tech.org/site.js/lib/https).
+Automatically provision trusted development-time (localhost) certificates in Node.js without browser errors via [mkcert](https://github.com/FiloSottile/mkcert).  __TODO: add URL after migrating the project (previously called nodecert)__.
 
-  - For a complete [small technology](https://small-tech.org/about/#small-technology) solution to develop, test, and deploy a secure static or dynamic personal web site with zero configuration, see [Site.js](https://sitejs.org).
+### [@small-tech/https]()
+
+A drop-in standard Node.js `https` module replacement with both automatic development-time (localhost) certificates via Auto Encrypt Localhost and automatic production certificates via Auto Encrypt, see [@small-tech/https](https://source.small-tech.org/site.js/lib/https).
+
+### [Site.js](https://sitejs.org)
+
+A complete [small technology](https://small-tech.org/about/#small-technology) tool to develop, test, and deploy a secure static or dynamic personal web site or app with zero configuration.
+
+> __Like this? Fund us!__ Small Technology Foundation is a tiny, independent, two-person not-for-profit. We exist in part thanks to patronage by people like you. If you share our vision and want to support our work, please [become a patron or donate to us today](https://small-tech.org/) and help us continue to exist.
+
 
 ## Coverage
 
