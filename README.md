@@ -82,6 +82,18 @@ const server = https.createServer(
 )
 ```
 
+## Like this? Fund us!
+
+[Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
+
+We exist in part thanks to patronage by people like you. If you share [our vision](https://small-tech.org/about/#small-technology) and want to support our work, please [become a patron or donate to us](https://small-tech.org/fund-us) today and help us continue to exist.
+
+## Audience
+
+This is [small technology](https://small-tech.org/about/#small-technology).
+
+If you’re evaluating this for a “startup” or an enterprise, let us save you some time: this is not the right tool for you. This tool is for individual developers to build personal web sites and apps for themselves and for others in a non-colonial manner that respects the human rights of the people who use them.
+
 ## Client details
 
 Auto Encrypt is does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname and it automatically renews your certificate from thereon.
@@ -107,20 +119,25 @@ If you do use the staging environment, be aware that browsers will reject the st
 
 From lower-level to higher-level:
 
-### [@small-tech/auto-encrypt-localhost](https://source.small-tech.org/site.js/lib/auto-encrypt-localhost)
+### Auto Encrypt Localhost
+
+  - Source: https://source.small-tech.org/site.js/lib/auto-encrypt-localhost
+  - Package: [@small-tech/auto-encrypt-localhost](https://www.npmjs.com/package/@small-tech/auto-encrypt-localhost)
 
 Automatically provision trusted development-time (localhost) certificates in Node.js without browser errors via [mkcert](https://github.com/FiloSottile/mkcert).  __TODO: add URL after migrating the project (previously called nodecert)__.
 
-### [@small-tech/https](https://source.small-tech.org/site.js/lib/https)
+### HTTPS
 
-A drop-in standard Node.js `https` module replacement with both automatic development-time (localhost) certificates via Auto Encrypt Localhost and automatic production certificates via Auto Encrypt, see [@small-tech/https](https://source.small-tech.org/site.js/lib/https).
+  - Source: https://source.small-tech.org/site.js/lib/https
+  - Package: [@small-tech/https](https://www.npmjs.com/package/@small-tech/https)
 
-### [Site.js](https://sitejs.org)
+A drop-in [standard Node.js HTTPS module](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) replacement with both automatic development-time (localhost) certificates via Auto Encrypt Localhost and automatic production certificates via Auto Encrypt.
 
-A complete [small technology](https://small-tech.org/about/#small-technology) tool to develop, test, and deploy a secure static or dynamic personal web site or app with zero configuration.
+### Site.js
 
-> __Like this? Fund us!__ Small Technology Foundation is a tiny, independent, two-person not-for-profit. We exist in part thanks to patronage by people like you. If you share our vision and want to support our work, please [become a patron or donate to us today](https://small-tech.org/) and help us continue to exist.
+  - Web site: https://sitejs.org
 
+A complete [small technology](https://small-tech.org/about/#small-technology) tool for developing, testing, and deploying a secure static or dynamic personal web site or app with zero configuration.
 
 ## Coverage
 
@@ -159,6 +176,12 @@ If you are wrapping your Node app into an executable binary using a module like 
 ## Technical definition
 
 Implements the subset of [RFC 8555](https://tools.ietf.org/html/rfc8555) – Automatic Certificate Management Environment (ACME) – necessary for a [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) server to provision [TLS certificates](https://en.wikipedia.org/wiki/Transport_Layer_Security) from [Let’s Encrypt](https://letsencrypt.org) using the [HTTP-01 challenge](https://tools.ietf.org/html/rfc8555#section-8.3) on first hit of an HTTPS route via use of the [Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication) (SNI) callback.
+
+## Like this? Fund us!
+
+[Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
+
+We exist in part thanks to patronage by people like you. If you share [our vision](https://small-tech.org/about/#small-technology) and want to support our work, please [become a patron or donate to us](https://small-tech.org/fund-us) today and help us continue to exist.
 
 ## Copyright
 
