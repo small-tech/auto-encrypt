@@ -36,6 +36,7 @@ function autoEncrypt(parameterObject) {
 
   function throwRequiredParameterError () { throw new Error('parameter object must have a domains property')}
 
+  if (parameterObject == undefined) { parameterObject = {} }
   const staging = parameterObject.staging || false
   const domains = parameterObject.domains || throwRequiredParameterError()
   const options = parameterObject.options || {}
@@ -67,7 +68,7 @@ function autoEncrypt(parameterObject) {
   }
 
   // TODO: also add OCSP stapling
-  // https://source.ind.ie/site.js/spikes/acme-http-01/issues/1
+  // https://source.small-tech.org/site.js/lib/auto-encrypt/issues/1
 
   return options
 
