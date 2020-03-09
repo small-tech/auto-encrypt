@@ -2,13 +2,11 @@
 
 Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org)™ TLS certificates for [Node.js](https://nodejs.org)® [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
-> __Like this? Fund us!__ Small Technology Foundation is a tiny, independent, two-person not-for-profit. We exist in part thanks to patronage by people like you. If you share our vision and want to support our work, please [become a patron or donate to us today](https://small-tech.org/) and help us continue to exist.
-
 ## How it works
 
 The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be automatically renewed 30 days before their expiry date.
 
-## Install
+## Installation
 
 ```sh
 npm i @small-tech/auto-encrypt
@@ -109,11 +107,11 @@ If you do use the staging environment, be aware that browsers will reject the st
 
 From lower-level to higher-level:
 
-### [@small-tech/auto-encrypt-localhost]()
+### [@small-tech/auto-encrypt-localhost](https://source.small-tech.org/site.js/lib/auto-encrypt-localhost)
 
 Automatically provision trusted development-time (localhost) certificates in Node.js without browser errors via [mkcert](https://github.com/FiloSottile/mkcert).  __TODO: add URL after migrating the project (previously called nodecert)__.
 
-### [@small-tech/https]()
+### [@small-tech/https](https://source.small-tech.org/site.js/lib/https)
 
 A drop-in standard Node.js `https` module replacement with both automatic development-time (localhost) certificates via Auto Encrypt Localhost and automatic production certificates via Auto Encrypt, see [@small-tech/https](https://source.small-tech.org/site.js/lib/https).
 
