@@ -44,14 +44,15 @@ function autoEncrypt(parameterObject) {
 
   Configuration.initialise({
     settingsPath,
-    staging
+    staging,
+    domains
   })
 
   const certificate = Certificate.getSharedInstance()
 
   options.SNICallback = async (serverName, callback) => {
     if (domains.includes(serverName)) {
-      const secureContext = await certificate.getSecureContext(domains)
+      const secureContext = await certificate.getSecureContext()
       if (secureContext === null) {
         console.log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment. ')
         callback()
