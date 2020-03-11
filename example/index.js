@@ -28,11 +28,14 @@ const autoEncrypt = require('../index')
 
 console.log('\n 🌄 Auto Encrypt “Hello, world!” Example \n')
 
-let options = { /* custom http server options, if any (we don’t have any in this example). */ }
+let options = {
+  /* Custom http server options, if any, go here (we don’t have any in this
+    example, so we could just not have passed this empty object at all). */
+}
 
 options = autoEncrypt({
   options,
-  staging: true,
+  staging: false,                                  // This is the default, set to true to use LE staging environment.
   domains: [os.hostname(), `www.${os.hostname()}`]
 })
 
