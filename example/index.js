@@ -35,8 +35,8 @@ let options = {
 
 options = autoEncrypt({
   options,
-  staging: false,                                  // This is the default, set to true to use LE staging environment.
-  domains: [os.hostname(), `www.${os.hostname()}`]
+  staging: true,                                  // This is the default, set to true to use LE staging environment.
+  domains: [os.hostname()]
 })
 
 const server = https.createServer(options, (request, response) => {
