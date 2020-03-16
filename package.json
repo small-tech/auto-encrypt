@@ -15,7 +15,8 @@
     "bent": "file:../../forks/bent",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "server-destroy": "^1.0.1"
   },
   "devDependencies": {
     "jsdoc": "^3.6.3",
