@@ -54,7 +54,7 @@ function autoEncrypt(parameterObject) {
     if (domains.includes(serverName)) {
       const secureContext = await certificate.getSecureContext()
       if (secureContext === null) {
-        console.log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment. ')
+        console.log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment.')
         callback()
         return
       }
