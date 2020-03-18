@@ -35,7 +35,7 @@ let options = {
 
 options = autoEncrypt({
   options,
-  staging: false,          // This is the default, set to true to use LE staging environment.
+  staging: true,          // This is the default, set to true to use LE staging environment.
   domains: [os.hostname()]
 })
 
