@@ -177,6 +177,17 @@ If you are wrapping your Node app into an executable binary using a module like 
 
 Implements the subset of [RFC 8555](https://tools.ietf.org/html/rfc8555) – Automatic Certificate Management Environment (ACME) – necessary for a [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) server to provision [TLS certificates](https://en.wikipedia.org/wiki/Transport_Layer_Security) from [Let’s Encrypt](https://letsencrypt.org) using the [HTTP-01 challenge](https://tools.ietf.org/html/rfc8555#section-8.3) on first hit of an HTTPS route via use of the [Server Name Indication](https://en.wikipedia.org/wiki/Server_Name_Indication) (SNI) callback.
 
+## A note on coding conventions
+
+The code uses TC39 class fields with the following naming conventions for private fields:
+
+```js
+#property     // safe property access (either via accessor or where property is both safe to get and set)
+#_property    // unsafe  property access (should only be used in accessors)
+```
+
+(Documenting these here as private class fields (hashnames) are relatively new as of this writing and may not be familiar to some. The use of the underscore to differentiate direct property access from mediated access via an accessor is also a project convention.)
+
 ## Like this? Fund us!
 
 [Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
