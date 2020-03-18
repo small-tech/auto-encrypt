@@ -143,23 +143,7 @@ A complete [small technology](https://small-tech.org/about/#small-technology) to
 
 ## Coverage
 
-File                            |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |
---------------------------------|----------|----------|----------|----------|-------------------|
-All files                       |     93.4 |     91.3 |    81.97 |     93.3 |                   |
-  auto-encrypt                   |      100 |      100 |      100 |      100 |                   |
-  index.js                      |      100 |      100 |      100 |      100 |                   |
-  auto-encrypt/lib               |    92.61 |       90 |       80 |    92.53 |                   |
-  Account.js                    |      100 |      100 |      100 |      100 |                   |
-  AcmeRequest.js                |      100 |       80 |      100 |      100 |                25 |
-  Configuration.js              |      100 |      100 |      100 |      100 |                   |
-  Directory.js                  |      100 |      100 |      100 |      100 |                   |
-  Identity.js                   |      100 |      100 |      100 |      100 |                   |
-  Nonce.js                      |      100 |      100 |      100 |      100 |                   |
-  Order.js                      |    56.67 |       50 |    21.43 |    56.67 |... 54,55,56,61,73 |
-  auto-encrypt/lib/acme-requests |    93.75 |      100 |      100 |    93.33 |                   |
-  NewAccountRequest.js          |      100 |      100 |      100 |      100 |                   |
-  NewOrderRequest.js            |    88.89 |      100 |      100 |     87.5 |                27 |
-
+__The tests are currently broken and in the process of being overhauled following some major development work.__
 
 (For the latest state, run `npm run coverage`)
 
