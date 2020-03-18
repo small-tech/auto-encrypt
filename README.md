@@ -186,7 +186,7 @@ The code uses TC39 class fields with the following naming conventions for privat
 #_property    // unsafe  property access (should only be used in accessors)
 ```
 
-(Documenting these here as private class fields (hashnames) are relatively new as of this writing and may not be familiar to some. The use of the underscore to differentiate direct property access from mediated access via an accessor is also a project convention.)
+(Documenting these here as private class fields (hashnames) are relatively new as of this writing and may not be familiar to some. The use of the underscore to differentiate direct property access from mediated access via an accessor is a project convention.)
 
 ## Like this? Fund us!
 
