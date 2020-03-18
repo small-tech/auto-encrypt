@@ -1,5 +1,7 @@
 # Auto Encrypt
 
+__Under heavy development and not officially released yet. Play with it if you want to but please don’t use it in production yet.__
+
 Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org) TLS certificates for [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
 ## How it works
