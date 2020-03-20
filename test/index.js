@@ -8,6 +8,7 @@ const test = require('tape')
 const autoEncrypt = require('../index')
 const Configuration = require('../lib/Configuration')
 
+const Certificate = require('../lib/Certificate')
 const Directory = require('../lib/Directory')
 const AccountIdentity = require('../lib/AccountIdentity')
 const Account = require('../lib/Account')
@@ -28,22 +29,22 @@ function setup() {
 
 
 test('autoEncrypt', async t => {
-  t.plan(7)
+  t.plan(11)
 
   setup()
 
-  t.throws(() => { autoEncrypt() }, /^RequiredParameterError/,'throws if parameter object mising domains property')
+  t.throws(() => { autoEncrypt() }, /^RequiredParameterError/,'throws if parameter object missing domains property')
   t.throws(() => { autoEncrypt({ domains: [] }) }, /^DomainsArrayIsEmptyError/, 'throws if domains array is empty')
 
   const hostname = os.hostname()
-  const options = autoEncrypt({domains: [hostname], settingsPath: testSettingsPath})
+  const options = autoEncrypt({domains: [hostname], staging: true, settingsPath: testSettingsPath})
 
   t.strictEquals('{ SNICallback: [AsyncFunction] }', util.inspect(options), 'options object has the shape we expect')
 
-  const expectedTestSettingsPath = path.join(testSettingsPath, 'production')
+  const expectedTestSettingsPath = path.join(testSettingsPath, 'staging')
   const expectedCertificatePath = path.join(expectedTestSettingsPath, hostname)
 
-  t.strictEquals(false, Configuration.staging, 'default value for staging is false')
+  t.strictEquals(true, Configuration.staging, 'staging is true')    // TODO: test default state of  false later
   t.ok(fs.existsSync(expectedCertificatePath), 'certificate path should exist')
 
   //
@@ -61,6 +62,39 @@ test('autoEncrypt', async t => {
       reject(error)
     }
   })
+
+  const secureContext = await new Promise((resolve, reject) => {
+    // This (first valid) call to SNICallback should succeed in provisioning a Let’s Encrypt certificate
+    // and getting a secure context back. This first call will take a while as it provisions certificates
+    // using the Let’s Encrypt staging servers.
+    try {
+      options.SNICallback(hostname, (error, secureContext) => {
+        t.strictEquals(error, null, 'error should be null')
+        // As this is the call that should end later, we resolve the promise here.
+        resolve(secureContext)
+      })
+    } catch (error) {
+      reject(error)
+    }
+
+    // This (second valid) call to SNICallback will happen right after the first when the first call should be
+    // busy provisioning the Let’s Encrypt certificate. It should return an error, accordingly.
+    // This call should return immediately.
+    try {
+      options.SNICallback(hostname, (error, secureContext) => {
+        t.ok(util.inspect(error).startsWith('Error [BusyProvisioningCertificateError]'), 'requests are rejected while TLS certificates are being provisioned')
+        t.notOk(secureContext, 'secure context is not truthy when SNI rejects a request')
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+
+  t.strictEquals(util.inspect(secureContext), 'SecureContext { context: SecureContext {} }', 'the shape of returned secure context object is as we expect')
+
+  // Since we have a daily renewal check interval active on the certificate, the test will not exit.
+  // So we must manually remove this interval.
+  Certificate.getSharedInstance().stopCheckingForRenewal()
 
   // TODO: Move these to Configuration test.
   // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
