@@ -57,14 +57,18 @@ function autoEncrypt(parameterObject) {
     if (domains.includes(serverName)) {
       const secureContext = await certificate.getSecureContext()
       if (secureContext === null) {
-        log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment.')
-        callback()
+        const errorMessage = 'We’re busy provisioning TLS certificates and rejecting all other calls at the moment.'
+        const error = newError('BusyProvisioningCertificateError', errorMessage)
+        log(` ⏳ [@small-tech/auto-connect] ${errorMessage}`)
+        callback(error)
         return
       }
       callback(null, secureContext)
     } else {
-      log(` 🤨 [@small-tech/auto-connect] SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`)
-      callback()
+      const errorMessage = `SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`
+      const error = newError('SNIIgnoreUnknownDomainError', errorMessage)
+      log(` 🤨 [@small-tech/auto-connect] ${errorMessage}`)
+      callback(error)
     }
   }
 
@@ -76,15 +80,15 @@ function autoEncrypt(parameterObject) {
 
 module.exports = autoEncrypt
 
-function throwError (name, message) {
+function newError (name, message) {
   const error = new Error(message)
   error.name = name
-  throw error
+  return error
 }
 
 function throwRequiredParameterError () {
-  throwError ('RequiredParameterError', 'parameter object must have a domains property')
+  throw newError('RequiredParameterError', 'parameter object must have a domains property')
 }
 function throwDomainsArrayIsEmptyError () {
-  throwError('DomainsArrayIsEmptyError', 'the domains array must contain at least one domain')
+  throw newError('DomainsArrayIsEmptyError', 'the domains array must contain at least one domain')
 }
