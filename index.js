@@ -34,13 +34,15 @@ const Certificate = require('./lib/Certificate')
  */
 function autoEncrypt(parameterObject) {
 
-  function throwRequiredParameterError () { throw new Error('parameter object must have a domains property')}
-
   if (parameterObject == undefined) { parameterObject = {} }
   const staging = parameterObject.staging || false
   const domains = parameterObject.domains || throwRequiredParameterError()
   const options = parameterObject.options || {}
   const settingsPath = parameterObject.settingsPath || null
+
+  if (domains.length === 0) {
+    throwDomainsArrayIsEmptyError()
+  }
 
   Configuration.initialise({
     settingsPath,
@@ -72,3 +74,16 @@ function autoEncrypt(parameterObject) {
 }
 
 module.exports = autoEncrypt
+
+function throwError (name, message) {
+  const error = new Error(message)
+  error.name = name
+  throw error
+}
+
+function throwRequiredParameterError () {
+  throwError ('RequiredParameterError', 'parameter object must have a domains property')
+}
+function throwDomainsArrayIsEmptyError () {
+  throwError('DomainsArrayIsEmptyError', 'the domains array must contain at least one domain')
+}
