@@ -45,6 +45,8 @@ test('autoEncrypt', async t => {
   t.strictEquals(false, Configuration.staging, 'default value for staging is false')
   t.ok(fs.existsSync(expectedCertificatePath), 'certificate path should exist')
 
+  // TODO: Call the SNICallback and test the results.
+
   // TODO: Move these to Configuration test.
   // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
   // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
