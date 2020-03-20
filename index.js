@@ -18,6 +18,7 @@
 
 const Configuration = require('./lib/Configuration')
 const Certificate = require('./lib/Certificate')
+const log = require('./lib/log')
 
 /**
  * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
@@ -56,13 +57,13 @@ function autoEncrypt(parameterObject) {
     if (domains.includes(serverName)) {
       const secureContext = await certificate.getSecureContext()
       if (secureContext === null) {
-        console.log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment.')
+        log(' ⏳ We’re busy provisioning TLS certificates and rejecting all other calls at the moment.')
         callback()
         return
       }
       callback(null, secureContext)
     } else {
-      console.log(` 🤨 [@small-tech/auto-connect] SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`)
+      log(` 🤨 [@small-tech/auto-connect] SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`)
       callback()
     }
   }

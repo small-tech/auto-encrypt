@@ -12,6 +12,8 @@ const AccountIdentity = require('../lib/AccountIdentity')
 const Account = require('../lib/Account')
 const Nonce = require('../lib/Nonce')
 
+let testSettingsPath
+
 function setup() {
   // Destroy all singleton instances, test paths, and app state so we start with a clean slate.
   Directory.destroySharedInstance()
@@ -19,18 +21,24 @@ function setup() {
   Account.destroySharedInstance()
   Nonce.destroy()
 
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
+  testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(testSettingsPath)
 }
 
 
 test('autoEncrypt', async t => {
-  t.plan(2)
+  t.plan(4)
 
   setup()
 
   t.throws(() => { autoEncrypt() }, /^RequiredParameterError/,'throws if parameter object mising domains property')
   t.throws(() => { autoEncrypt({ domains: [] }) }, /^DomainsArrayIsEmptyError/, 'throws if domains array is empty')
+
+  const options = autoEncrypt({domains: ['dev.ar.al'], settingsPath: testSettingsPath})
+
+  t.strictEquals(false, Configuration.staging, 'the default value for staging is false')
+  const expectedTestSettingsPath = path.join(testSettingsPath, 'production')
+  t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
 
   t.end()
 })
