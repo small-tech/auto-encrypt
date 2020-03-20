@@ -4,8 +4,8 @@
   "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/*.js | tap-spec",
-    "coverage": "nyc tape test/*.js | tap-nyc",
+    "test": "QUIET=true tape test/*.js | tap-spec",
+    "coverage": "QUIET=true nyc tape test/*.js | tap-nyc",
     "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose --debug"
   },
   "author": "Aral Balkan",
