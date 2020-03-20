@@ -1,6 +1,7 @@
 const os = require('os')
 const fs = require('fs-extra')
 const path = require('path')
+const util = require('util')
 
 const test = require('tape')
 
@@ -27,7 +28,7 @@ function setup() {
 
 
 test('autoEncrypt', async t => {
-  t.plan(4)
+  t.plan(5)
 
   setup()
 
@@ -36,9 +37,17 @@ test('autoEncrypt', async t => {
 
   const options = autoEncrypt({domains: ['dev.ar.al'], settingsPath: testSettingsPath})
 
-  t.strictEquals(false, Configuration.staging, 'the default value for staging is false')
+  t.strictEquals('{ SNICallback: [AsyncFunction] }', util.inspect(options), 'options object has the shape we expect')
+
   const expectedTestSettingsPath = path.join(testSettingsPath, 'production')
-  t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
+  const expectedCertificatePath = path.join(expectedTestSettingsPath, 'dev.ar.al')
+
+  t.strictEquals(false, Configuration.staging, 'default value for staging is false')
+  t.ok(fs.existsSync(expectedCertificatePath), 'certificate path should exist')
+
+  // TODO: Move these to Configuration test.
+  // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
+  // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
 
   t.end()
 })
