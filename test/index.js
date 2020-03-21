@@ -54,7 +54,7 @@ test('autoEncrypt', async t => {
   await new Promise((resolve, reject) => {
     try {
       options.SNICallback('invalid-server.name', (error, secureContext) => {
-        t.ok(util.inspect(error).startsWith('Error [SNIIgnoreUnsupportedDomainError]'), 'unknown domains are ignored by SNI')
+        t.strictEquals(error.symbol, Symbol.for('SNIIgnoreUnsupportedDomainError'), 'unknown domains are ignored by SNI')
         t.notOk(secureContext, 'secure context is not truthy when SNI ignores unknown domain')
         resolve()
       })
@@ -82,7 +82,7 @@ test('autoEncrypt', async t => {
     // This call should return immediately.
     try {
       options.SNICallback(hostname, (error, secureContext) => {
-        t.ok(util.inspect(error).startsWith('Error [BusyProvisioningCertificateError]'), 'requests are rejected while TLS certificates are being provisioned')
+        t.strictEquals(error.symbol, Symbol.for('BusyProvisioningCertificateError'), 'requests are rejected while TLS certificates are being provisioned')
         t.notOk(secureContext, 'secure context is not truthy when SNI rejects a request')
       })
     } catch (error) {
