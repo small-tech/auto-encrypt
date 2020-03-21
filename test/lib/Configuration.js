@@ -16,8 +16,9 @@ function throwsErrorOfType (func, errorSymbol) {
 }
 
 test('Configuration', t => {
-  // t.plan(4)
+  t.plan(16)
 
+  Configuration.reset()
   t.ok(throwsErrorOfType(
     () => { Configuration.initialise() },
     Symbol.for('UndefinedOrNullError')
@@ -60,21 +61,40 @@ test('Configuration', t => {
 
   const expectedSettingsPath = path.join(testSettingsPath, 'staging')
   t.strictEquals(Configuration.settingsPath, expectedSettingsPath, 'settings path set as expected')
-  t.true(fs.existsSync(expectedSettingsPath), 'settings path created as expected')
+  t.true(fs.existsSync(expectedSettingsPath), 'settings path is created as expected')
 
   const expectedCertificateDirectoryPath = path.join(expectedSettingsPath, 'dev.ar.al')
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPath, 'certificate directory path set as expected')
   t.true(fs.existsSync(expectedCertificateDirectoryPath), 'certificate directory path created as expected')
 
+  //
+  // Check that default (non-testing) settings paths work.
+  //
+  const defaultSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt')
 
-  // // Check that the default (non-testing) settings path works.
-  // const defaultSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt')
-  // Configuration.settingsPath = null
+  Configuration.reset()
+  const defaultStagingSettingsPath = path.join(defaultSettingsPath, 'staging')
+  Configuration.initialise({domains: ['dev.ar.al'], staging: true, settingsPath: null})
+  t.strictEquals(Configuration.settingsPath, defaultStagingSettingsPath, 'default staging settings path is set as expected')
+  t.true(fs.existsSync(defaultStagingSettingsPath), 'the default staging settings path is created')
 
-  // t.strictEquals(Configuration.settingsPath, defaultSettingsPath, 'the default settings path is set as expected')
-  // t.true(fs.existsSync(defaultSettingsPath), 'the default settings path should be created')
+  Configuration.reset()
+  const defaultProductionSettingsPath = path.join(defaultSettingsPath, 'production')
+  Configuration.initialise({domains: ['dev.ar.al'], staging: false, settingsPath: null})
+  t.strictEquals(Configuration.settingsPath, defaultProductionSettingsPath, 'default production settings path is set as expected')
+  t.true(fs.existsSync(defaultProductionSettingsPath), 'the default production settings path is created')
 
-  // t.throws(()=>{ new Configuration() }, /Configuration is a static class/, 'configuration is a static class')
+  // Attempting to directly set a configuration property should throw.
+  t.ok(throwsErrorOfType(
+    () => { Configuration.staging = true },
+    Symbol.for('ReadOnlyAccessorError')
+  ), 'attempt to set read-only property throws')
+
+  // Configuration is a static class. Trying to instantiate it should throw.
+  t.ok(throwsErrorOfType(
+    () => { new Configuration() },
+    Symbol.for('StaticClassCannotBeInstantiatedError')
+  ), 'attempt to initialise the Configuration static class throws')
 
   t.end()
 })
