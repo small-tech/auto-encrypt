@@ -18,6 +18,7 @@
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
 const mixSaferAndDRYerErrorHandlingInto = require('./lib/saferAndDRYerErrorHandlingMixin')
+const Pluralise                         = require('./lib/Pluralise')
 const log                               = require('./lib/log')
 
 /**
@@ -80,7 +81,7 @@ context.ERRORS = {
 
   [Symbol.for('SNIIgnoreUnsupportedDomainError')]:
     (serverName, domains) => {
-      return `SNI: Not responding to request for unsupported domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`
+      return `SNI: Not responding to request for unsupported domain ${serverName} (valid ${Pluralise.word('domain', domains)} ${Pluralise.isAre(domains)} ${domains}).`
     },
 }
 context.sniError = function (symbolName, callback, emoji, ...args) {
