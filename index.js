@@ -10,15 +10,15 @@
 // certificates from Let’s Encrypt using the HTTP-01 challenge on first
 // hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 //
-//
 // Copyright © 2020 Aral Balkan, Small Technology Foundation.
 // License: AGPLv3 or later.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-const Configuration = require('./lib/Configuration')
-const Certificate = require('./lib/Certificate')
-const log = require('./lib/log')
+const Configuration                     = require('./lib/Configuration')
+const Certificate                       = require('./lib/Certificate')
+const mixSaferAndDRYerErrorHandlingInto = require('./lib/saferAndDRYerErrorHandlingMixin')
+const log                               = require('./lib/log')
 
 /**
  * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
@@ -27,24 +27,23 @@ const log = require('./lib/log')
  * @function autoEncrypt
  *
  * @param {Object}   parameterObject
- * @param {String[]} parameterObject.domains        Domain names to provision TLS certificates for.
- * @param {Object}   [parameterObject.options={}]      Standard https server options.
- * @param {Boolean}     [parameterObject.staging=false]      If true, the Let’s Encrypt staging servers will be used.
+ * @param {String[]} parameterObject.domains         Domain names to provision TLS certificates for.
+ * @param {Object}   [parameterObject.options={}]    Standard https server options.
+ * @param {Boolean}  [parameterObject.staging=false] If true, the Let’s Encrypt staging servers will be used.
  * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/] Custom path to save certificates and keys to.
  * @returns {Object} An options object to be passed to the https.createServer() method.
  */
 function autoEncrypt(parameterObject) {
 
   if (parameterObject == undefined) { parameterObject = {} }
-  const staging = parameterObject.staging || false
-  const domains = parameterObject.domains || throwRequiredParameterError()
-  const options = parameterObject.options || {}
+
+  const domains      = parameterObject.domains
+  const staging      = parameterObject.staging      || false
+  const options      = parameterObject.options      || {}
   const settingsPath = parameterObject.settingsPath || null
 
-  if (domains.length === 0) {
-    throwDomainsArrayIsEmptyError()
-  }
-
+  // Initialise the configuration. This carries out robust validation of settings so
+  // we do not duplicate that effort here.
   Configuration.initialise({
     settingsPath,
     staging,
@@ -57,18 +56,12 @@ function autoEncrypt(parameterObject) {
     if (domains.includes(serverName)) {
       const secureContext = await certificate.getSecureContext()
       if (secureContext === null) {
-        const errorMessage = 'We’re busy provisioning TLS certificates and rejecting all other calls at the moment.'
-        const error = newError('BusyProvisioningCertificateError', errorMessage)
-        log(` ⏳ [@small-tech/auto-connect] ${errorMessage}`)
-        callback(error)
+        this.sniError('BusyProvisioningCertificateError', callback, '⏳')
         return
       }
       callback(null, secureContext)
     } else {
-      const errorMessage = `SNI: Not responding to request for domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`
-      const error = newError('SNIIgnoreUnknownDomainError', errorMessage)
-      log(` 🤨 [@small-tech/auto-connect] ${errorMessage}`)
-      callback(error)
+      this.sniError('SNIIgnoreUnsupportedDomainError', callback, '🤨', serverName, domains)
     }
   }
 
@@ -78,17 +71,23 @@ function autoEncrypt(parameterObject) {
   return options
 }
 
-module.exports = autoEncrypt
+// Since autoEncrypt is a function and not a class/instance, we mix in the error
+// handling into a separate context object that we bind the autoEncrypt function to.
+const context = {}
+context.ERRORS = {
+  [Symbol.for('BusyProvisioningCertificateError')]:
+    () => 'We’re busy provisioning TLS certificates and rejecting all other calls at the moment.',
 
-function newError (name, message) {
-  const error = new Error(message)
-  error.name = name
-  return error
+  [Symbol.for('SNIIgnoreUnsupportedDomainError')]:
+    (serverName, domains) => {
+      return `SNI: Not responding to request for unsupported domain ${serverName} (valid domain${domains.length > 1 ? 's are' : ' is'} ${domains}).`
+    },
+}
+context.sniError = function (symbolName, callback, emoji, ...args) {
+  const error = Symbol.for(symbolName)
+  log(` ${emoji} [@small-tech/auto-connect] ${this.ERRORS[error](...args)}`)
+  callback(this.newError(error, ...args))
 }
 
-function throwRequiredParameterError () {
-  throw newError('RequiredParameterError', 'parameter object must have a domains property')
-}
-function throwDomainsArrayIsEmptyError () {
-  throw newError('DomainsArrayIsEmptyError', 'the domains array must contain at least one domain')
-}
+mixSaferAndDRYerErrorHandlingInto(context)
+module.exports = autoEncrypt.bind(context)

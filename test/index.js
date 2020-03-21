@@ -33,8 +33,8 @@ test('autoEncrypt', async t => {
 
   setup()
 
-  t.throws(() => { autoEncrypt() }, /^RequiredParameterError/,'throws if parameter object missing domains property')
-  t.throws(() => { autoEncrypt({ domains: [] }) }, /^DomainsArrayIsEmptyError/, 'throws if domains array is empty')
+  t.throws(() => { autoEncrypt() }, /^UndefinedOrNullError/,'throws if parameter object missing domains property')
+  t.throws(() => { autoEncrypt({ domains: [] }) }, /^Configuration.domainsArrayIsNotAnArrayOfStringsError/, 'throws if domains array is empty')
 
   const hostname = os.hostname()
   const options = autoEncrypt({domains: [hostname], staging: true, settingsPath: testSettingsPath})
@@ -54,7 +54,7 @@ test('autoEncrypt', async t => {
   await new Promise((resolve, reject) => {
     try {
       options.SNICallback('invalid-server.name', (error, secureContext) => {
-        t.ok(util.inspect(error).startsWith('Error [SNIIgnoreUnknownDomainError]'), 'unknown domains are ignored by SNI')
+        t.ok(util.inspect(error).startsWith('Error [SNIIgnoreUnsupportedDomainError]'), 'unknown domains are ignored by SNI')
         t.notOk(secureContext, 'secure context is not truthy when SNI ignores unknown domain')
         resolve()
       })
