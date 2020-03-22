@@ -17,7 +17,7 @@ function throwsErrorOfType (func, errorSymbol) {
 }
 
 test('Configuration', t => {
-  t.plan(24)
+  t.plan(34)
 
   Configuration.reset()
   t.ok(throwsErrorOfType(
@@ -89,6 +89,42 @@ test('Configuration', t => {
   .certificateIdentityPath : Path to private key for certificate     /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate-identity.pem`)
 
   t.strictEquals(dehydrate(util.inspect(Configuration)), dehydratedExpectedInspectionString, 'the inspection string is as expected')
+
+  //
+  // Also test certificate directory path is created properly when configuration
+  // has 2-4 domains and more than 4 domains.
+  //
+
+  Configuration.reset()
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org'], staging: true, settingsPath: testSettingsPath })
+  const expectedCertificateDirectoryPathForTwoDomains = path.join(expectedSettingsPath, 'ar.al--and--small-tech.org')
+  t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForTwoDomains, 'certificate directory path set as expected for two domains')
+  t.true(fs.existsSync(expectedCertificateDirectoryPathForTwoDomains), 'certificate directory path created as expected for two domains')
+
+  Configuration.reset()
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org'], staging: true, settingsPath: testSettingsPath })
+  const expectedCertificateDirectoryPathForThreeDomains = path.join(expectedSettingsPath, 'ar.al--small-tech.org--and--sitejs.org')
+  t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForThreeDomains, 'certificate directory path set as expected for two domains')
+  t.true(fs.existsSync(expectedCertificateDirectoryPathForThreeDomains), 'certificate directory path created as expected for three domains')
+
+  Configuration.reset()
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi'], staging: true, settingsPath: testSettingsPath })
+  const expectedCertificateDirectoryPathForFourDomains = path.join(expectedSettingsPath, 'ar.al--small-tech.org--sitejs.org--and--better.fyi')
+  t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForFourDomains, 'certificate directory path set as expected for four domains')
+  t.true(fs.existsSync(expectedCertificateDirectoryPathForFourDomains), 'certificate directory path created as expected for two domains')
+
+  Configuration.reset()
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi', 'laurakalbag.com'], staging: true, settingsPath: testSettingsPath })
+  const expectedStartOfCertificateDirectoryPath = path.join(expectedSettingsPath, 'ar.al--small-tech.org--and--3--others')
+
+  const lastSeparatorIndex = Configuration.certificateDirectoryPath.lastIndexOf('--')
+  const startOfCertificateDirectoryPath = Configuration.certificateDirectoryPath.slice(0, lastSeparatorIndex)
+  const endOfCertificateDirectoryPath = Configuration.certificateDirectoryPath.slice(lastSeparatorIndex+2)
+
+  t.strictEquals(startOfCertificateDirectoryPath, expectedStartOfCertificateDirectoryPath, 'start of certificate directory path is as expected for more than four domains')
+  t.strictEquals(endOfCertificateDirectoryPath.length, 64, 'certificate directory path ends with 64 character hash')
+  t.ok(endOfCertificateDirectoryPath.match(/^[a-f\d]*?$/), 'certificate directory path ends with hexadecimal hash')
+  t.true(fs.existsSync(Configuration.certificateDirectoryPath), 'certificate directory path created as expected for two domains')
 
   //
   // Check that default (non-testing) settings paths work.
