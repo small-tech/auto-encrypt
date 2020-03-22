@@ -96,9 +96,5 @@ test('autoEncrypt', async t => {
   // So we must manually remove this interval.
   Certificate.getSharedInstance().stopCheckingForRenewal()
 
-  // TODO: Move these to Configuration test.
-  // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
-  // t.strictEquals(expectedTestSettingsPath, Configuration.settingsPath, 'custom settings path is as expected')
-
   t.end()
 })
