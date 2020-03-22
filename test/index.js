@@ -28,7 +28,7 @@ function setup() {
 }
 
 
-test.skip('autoEncrypt', async t => {
+test('autoEncrypt', async t => {
   t.plan(11)
 
   setup()
