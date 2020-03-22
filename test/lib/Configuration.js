@@ -17,7 +17,7 @@ function throwsErrorOfType (func, errorSymbol) {
 }
 
 test('Configuration', t => {
-  t.plan(37)
+  t.plan(38)
 
   Configuration.reset()
   t.ok(throwsErrorOfType(
@@ -95,6 +95,11 @@ test('Configuration', t => {
   .certificateIdentityPath : Path to private key for certificate     /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate-identity.pem`)
 
   t.strictEquals(dehydrate(util.inspect(Configuration)), dehydratedExpectedInspectionString, 'the inspection string is as expected')
+
+  Configuration.reset()
+  const dehydratedExpectedInspectionStringForUninitialisedConfiguration = dehydrate(`# Configuration (static class)
+  A single location for shared configuration (e.g., settings paths) Not initialised. Use Configuration.initialise() method to initialise.`)
+  t.strictEquals(dehydrate(util.inspect(Configuration)), dehydratedExpectedInspectionStringForUninitialisedConfiguration, 'the inspection string for uninitialised Configuration is as expected')
 
   //
   // Also test certificate directory path is created properly when configuration
