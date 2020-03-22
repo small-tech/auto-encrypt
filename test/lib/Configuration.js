@@ -17,7 +17,7 @@ function throwsErrorOfType (func, errorSymbol) {
 }
 
 test('Configuration', t => {
-  t.plan(34)
+  t.plan(37)
 
   Configuration.reset()
   t.ok(throwsErrorOfType(
@@ -44,6 +44,12 @@ test('Configuration', t => {
   ), 'missing settings.settingsPath throws')
 
   Configuration.reset()
+  t.ok(throwsErrorOfType(
+    () => { Configuration.staging },
+    Symbol.for('NullError')
+  ), 'attempt to access property of uninitialised Configuration throws')
+
+  Configuration.reset()
   t.doesNotThrow(
     () => { Configuration.initialise({domains: ['dev.ar.al'], staging: true, settingsPath: null}) },
     'settings.settingsPath = null does not throw'
@@ -56,15 +62,15 @@ test('Configuration', t => {
   ), 'domains must be an array of string or else it throws')
 
   Configuration.reset()
-  const testSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(testSettingsPath)
-  Configuration.initialise({ domains: ['dev.ar.al'], staging: true, settingsPath: testSettingsPath })
+  const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
+  fs.removeSync(customSettingsPath)
+  Configuration.initialise({ domains: ['dev.ar.al'], staging: true, settingsPath: customSettingsPath })
 
-  const expectedSettingsPath = path.join(testSettingsPath, 'staging')
-  t.strictEquals(Configuration.settingsPath, expectedSettingsPath, 'settings path set as expected')
-  t.true(fs.existsSync(expectedSettingsPath), 'settings path is created as expected')
+  const expectedCustomStagingSettingsPath = path.join(customSettingsPath, 'staging')
+  t.strictEquals(Configuration.settingsPath, expectedCustomStagingSettingsPath, 'settings path set as expected')
+  t.true(fs.existsSync(expectedCustomStagingSettingsPath), 'settings path is created as expected')
 
-  const expectedCertificateDirectoryPath = path.join(expectedSettingsPath, 'dev.ar.al')
+  const expectedCertificateDirectoryPath = path.join(expectedCustomStagingSettingsPath, 'dev.ar.al')
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPath, 'certificate directory path set as expected')
   t.true(fs.existsSync(expectedCertificateDirectoryPath), 'certificate directory path created as expected')
 
@@ -96,26 +102,26 @@ test('Configuration', t => {
   //
 
   Configuration.reset()
-  Configuration.initialise({ domains: ['ar.al', 'small-tech.org'], staging: true, settingsPath: testSettingsPath })
-  const expectedCertificateDirectoryPathForTwoDomains = path.join(expectedSettingsPath, 'ar.al--and--small-tech.org')
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org'], staging: true, settingsPath: customSettingsPath })
+  const expectedCertificateDirectoryPathForTwoDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--and--small-tech.org')
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForTwoDomains, 'certificate directory path set as expected for two domains')
   t.true(fs.existsSync(expectedCertificateDirectoryPathForTwoDomains), 'certificate directory path created as expected for two domains')
 
   Configuration.reset()
-  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org'], staging: true, settingsPath: testSettingsPath })
-  const expectedCertificateDirectoryPathForThreeDomains = path.join(expectedSettingsPath, 'ar.al--small-tech.org--and--sitejs.org')
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org'], staging: true, settingsPath: customSettingsPath })
+  const expectedCertificateDirectoryPathForThreeDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--and--sitejs.org')
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForThreeDomains, 'certificate directory path set as expected for two domains')
   t.true(fs.existsSync(expectedCertificateDirectoryPathForThreeDomains), 'certificate directory path created as expected for three domains')
 
   Configuration.reset()
-  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi'], staging: true, settingsPath: testSettingsPath })
-  const expectedCertificateDirectoryPathForFourDomains = path.join(expectedSettingsPath, 'ar.al--small-tech.org--sitejs.org--and--better.fyi')
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi'], staging: true, settingsPath: customSettingsPath })
+  const expectedCertificateDirectoryPathForFourDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--sitejs.org--and--better.fyi')
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPathForFourDomains, 'certificate directory path set as expected for four domains')
   t.true(fs.existsSync(expectedCertificateDirectoryPathForFourDomains), 'certificate directory path created as expected for two domains')
 
   Configuration.reset()
-  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi', 'laurakalbag.com'], staging: true, settingsPath: testSettingsPath })
-  const expectedStartOfCertificateDirectoryPath = path.join(expectedSettingsPath, 'ar.al--small-tech.org--and--3--others')
+  Configuration.initialise({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi', 'laurakalbag.com'], staging: true, settingsPath: customSettingsPath })
+  const expectedStartOfCertificateDirectoryPath = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--and--3--others')
 
   const lastSeparatorIndex = Configuration.certificateDirectoryPath.lastIndexOf('--')
   const startOfCertificateDirectoryPath = Configuration.certificateDirectoryPath.slice(0, lastSeparatorIndex)
@@ -125,6 +131,12 @@ test('Configuration', t => {
   t.strictEquals(endOfCertificateDirectoryPath.length, 64, 'certificate directory path ends with 64 character hash')
   t.ok(endOfCertificateDirectoryPath.match(/^[a-f\d]*?$/), 'certificate directory path ends with hexadecimal hash')
   t.true(fs.existsSync(Configuration.certificateDirectoryPath), 'certificate directory path created as expected for two domains')
+
+  // Check the production path with custom settings path.
+  Configuration.reset()
+  Configuration.initialise({ domains: ['dev.ar.al'], staging: false, settingsPath: customSettingsPath })
+  const expectedCustomProductionSettingsPath = path.join(customSettingsPath, 'production')
+  t.strictEquals(Configuration.settingsPath, expectedCustomProductionSettingsPath)
 
   //
   // Check that default (non-testing) settings paths work.
@@ -156,6 +168,12 @@ test('Configuration', t => {
     () => { new Configuration() },
     Symbol.for('StaticClassCannotBeInstantiatedError')
   ), 'attempt to initialise the Configuration static class throws')
+
+  // Trying to re-initialise an already-initialised Configuration should fail.
+  t.ok(throwsErrorOfType(
+    () => { Configuration.initialise({domains: ['dev.ar.al'], staging: true, settingsPath: null}) },
+    Symbol.for('Configuration.alreadyInitialisedError')
+  ), 'attempt to reinitialise Configuration throws')
 
   t.end()
 })
