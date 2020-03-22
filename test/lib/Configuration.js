@@ -1,7 +1,8 @@
-const os = require('os')
-const fs = require('fs-extra')
-const path = require('path')
-const test = require('tape')
+const os            = require('os')
+const fs            = require('fs-extra')
+const path          = require('path')
+const util          = require('util')
+const test          = require('tape')
 const Configuration = require('../../lib/Configuration')
 
 function throwsErrorOfType (func, errorSymbol) {
@@ -16,7 +17,7 @@ function throwsErrorOfType (func, errorSymbol) {
 }
 
 test('Configuration', t => {
-  t.plan(16)
+  t.plan(24)
 
   Configuration.reset()
   t.ok(throwsErrorOfType(
@@ -67,6 +68,28 @@ test('Configuration', t => {
   t.strictEquals(Configuration.certificateDirectoryPath, expectedCertificateDirectoryPath, 'certificate directory path set as expected')
   t.true(fs.existsSync(expectedCertificateDirectoryPath), 'certificate directory path created as expected')
 
+  // Check the inspection string.
+  const dehydrate = h => h.replace(/\s/g, '')
+  const dehydratedExpectedInspectionString = dehydrate(`
+  # Configuration (static class)
+
+  A single location for shared configuration (e.g., settings paths)
+
+  ## Properties
+
+  Property                   Description                             Value
+  -------------------------- --------------------------------------- ---------------------------------------
+  .staging                 : Use Let’s Encrypt (LE) staging servers? true
+  .domains                 : Domains in certificate                  dev.ar.al
+  .settingsPath            : Top-level settings path                 /home/aral/.small-tech.org/auto-encrypt/test/staging
+  .accountPath             : Path to LE account details JSON file    /home/aral/.small-tech.org/auto-encrypt/test/staging/account.json
+  .accountIdentityPath     : Path to private key for LE account      /home/aral/.small-tech.org/auto-encrypt/test/staging/account-identity.pem
+  .certificateDirectoryPath: Path to certificate directory           /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al
+  .certificatePath         : Path to certificate file                /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate.pem
+  .certificateIdentityPath : Path to private key for certificate     /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate-identity.pem`)
+
+  t.strictEquals(dehydrate(util.inspect(Configuration)), dehydratedExpectedInspectionString, 'the inspection string is as expected')
+
   //
   // Check that default (non-testing) settings paths work.
   //
@@ -85,10 +108,12 @@ test('Configuration', t => {
   t.true(fs.existsSync(defaultProductionSettingsPath), 'the default production settings path is created')
 
   // Attempting to directly set a configuration property should throw.
-  t.ok(throwsErrorOfType(
-    () => { Configuration.staging = true },
-    Symbol.for('ReadOnlyAccessorError')
-  ), 'attempt to set read-only property throws')
+  ;['staging', 'domains', 'settingsPath', 'accountPath', 'accountIdentityPath', 'certificatePath', 'certificateDirectoryPath', 'certificateIdentityPath'].forEach(setter => {
+    t.ok(throwsErrorOfType(
+      () => { Configuration[setter] = true },
+      Symbol.for('ReadOnlyAccessorError')
+    ), `attempt to set read-only property ${setter} throws`)
+  })
 
   // Configuration is a static class. Trying to instantiate it should throw.
   t.ok(throwsErrorOfType(
