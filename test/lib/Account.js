@@ -14,6 +14,7 @@ test('Account', async t => {
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
 
+  Configuration.reset()
   Configuration.initialise({ domains: ['dev.ar.al'], staging: true, settingsPath: customSettingsPath })
 
   const customStagingSettingsPath = path.join(customSettingsPath, 'staging')
@@ -25,6 +26,7 @@ test('Account', async t => {
   ), 'Account class cannot be directly instantiated')
 
   // Set up a fresh account
+  Account.destroySharedInstance()
   const account = await Account.getSharedInstance()
 
   // Ensure that the account file exists.
@@ -44,12 +46,14 @@ test('Account', async t => {
     Symbol.for('ReadOnlyAccessorError')
   ),'account.kid is a read-only property as expected')
 
+  const originalAccountKid = account.kid
+
   // Null out the singleton instance and create a new instance to test account
   // information being loaded from disk on subsequent instantiations.
-  Account.instance = null
+  Account.destroySharedInstance()
 
-  const account2 = await Account.getSharedInstance(customSettingsPath)
-  t.strictEquals(account2.kid, account.kid, 'the account information is loaded from disk next time around')
+  const account2 = await Account.getSharedInstance()
+  t.strictEquals(account2.kid, originalAccountKid, 'the account information is loaded from disk next time around')
 
   t.end()
 })
