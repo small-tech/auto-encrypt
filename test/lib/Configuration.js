@@ -46,7 +46,7 @@ test('Configuration', t => {
   Configuration.reset()
   t.ok(throwsErrorOfType(
     () => { Configuration.staging },
-    Symbol.for('NullError')
+    Symbol.for('Configuration.notInitialisedError')
   ), 'attempt to access property of uninitialised Configuration throws')
 
   Configuration.reset()
