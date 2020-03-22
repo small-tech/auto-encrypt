@@ -1,20 +1,10 @@
-const os            = require('os')
-const fs            = require('fs-extra')
-const path          = require('path')
-const util          = require('util')
-const test          = require('tape')
-const Configuration = require('../../lib/Configuration')
-
-function throwsErrorOfType (func, errorSymbol) {
-  try {
-    func()
-  } catch (error) {
-    // Is the error of the type requested?
-    return error.symbol === errorSymbol
-  }
-  // Did not throw when it was supposed to.
-  return false
-}
+const os                               = require('os')
+const fs                               = require('fs-extra')
+const path                             = require('path')
+const util                             = require('util')
+const test                             = require('tape')
+const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
+const Configuration                    = require('../../lib/Configuration')
 
 test('Configuration', t => {
   t.plan(38)
@@ -75,7 +65,6 @@ test('Configuration', t => {
   t.true(fs.existsSync(expectedCertificateDirectoryPath), 'certificate directory path created as expected')
 
   // Check the inspection string.
-  const dehydrate = h => h.replace(/\s/g, '')
   const dehydratedExpectedInspectionString = dehydrate(`
   # Configuration (static class)
 
