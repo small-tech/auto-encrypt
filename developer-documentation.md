@@ -4,15 +4,11 @@ This documentation includes the implementation details of Auto Encrypt and is in
 
 If you just want to use Auto Encrypt, please see the public API, as documented in the [README](readme.md).
 
----
-
 ## Like this? Fund us!
 
 [Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
 
 We exist in part thanks to patronage by people like you. If you share [our vision](https://small-tech.org/about/#small-technology) and want to support our work, please [become a patron or donate to us](https://small-tech.org/fund-us) today and help us continue to exist.
-
----
 
 ## Classes
 
@@ -204,15 +200,11 @@ references that might cause the app to not exit.
 
 **Kind**: static method of [<code>autoEncrypt</code>](#autoEncrypt)  
 
----
-
 ## Like this? Fund us!
 
 [Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
 
 We exist in part thanks to patronage by people like you. If you share [our vision](https://small-tech.org/about/#small-technology) and want to support our work, please [become a patron or donate to us](https://small-tech.org/fund-us) today and help us continue to exist.
-
----
 
 ## Copyright
 
