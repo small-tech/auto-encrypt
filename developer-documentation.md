@@ -36,12 +36,16 @@ the Server Name Indication (SNI) callback</p>
 
 * [Certificate](#Certificate)
     * [new Certificate(domains)](#new_Certificate_new)
-    * [.getSecureContext()](#Certificate+getSecureContext) ⇒ <code>tls.SecureContext</code>
-    * [.createSecureContext()](#Certificate+createSecureContext)
-    * [.provisionCertificate()](#Certificate+provisionCertificate)
-    * [.checkForRenewal()](#Certificate+checkForRenewal)
-    * [.startCheckingForRenewal([alsoCheckNow])](#Certificate+startCheckingForRenewal)
-    * [.stopCheckingForRenewal()](#Certificate+stopCheckingForRenewal)
+    * _async_
+        * [.getSecureContext()](#Certificate+getSecureContext) ⇒ <code>Promise</code>
+        * [.createSecureContext(renewCertificate)](#Certificate+createSecureContext) ⇒ <code>Promise</code> ℗
+        * [.provisionCertificate()](#Certificate+provisionCertificate) ⇒ <code>Promise</code> ℗
+        * [.renewCertificate()](#Certificate+renewCertificate) ⇒ <code>Promise</code> ℗
+        * [.checkForRenewal()](#Certificate+checkForRenewal) ⇒ <code>Promise</code> ℗
+    * _sync_
+        * [.init(domains)](#Certificate+init) ℗
+        * [.startCheckingForRenewal([alsoCheckNow])](#Certificate+startCheckingForRenewal) ℗
+        * [.stopCheckingForRenewal()](#Certificate+stopCheckingForRenewal) ℗
 
 <a name="new_Certificate_new"></a>
 
@@ -51,56 +55,100 @@ Represents a Let’s Encrypt TLS certificate.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| domains | <code>Array.&lt;String&gt;</code> | The domains this certificate covers. |
+| domains | <code>Array.&lt;String&gt;</code> | List of domains this certificate covers. |
 
 <a name="Certificate+getSecureContext"></a>
 
-### certificate.getSecureContext() ⇒ <code>tls.SecureContext</code>
+### certificate.getSecureContext() ⇒ <code>Promise</code>
 Get a SecureContext that can be used in an SNICallback.
 
 **Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: async  
+**Fulfil**: <code>tls.SecureContext</code>  
 <a name="Certificate+createSecureContext"></a>
 
-### certificate.createSecureContext()
+### certificate.createSecureContext(renewCertificate) ⇒ <code>Promise</code> ℗
 Creates and caches a secure context, provisioning a TLS certificate in the process, if necessary.
 
 **Kind**: instance method of [<code>Certificate</code>](#Certificate)  
-<a name="Certificate+provisionCertificate"></a>
-
-### certificate.provisionCertificate()
-Provisions a new Let’s Encrypt TLS certificate, persists it, and checks for
-renewals on it every day, starting with the next day.
-
-**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
-<a name="Certificate+checkForRenewal"></a>
-
-### certificate.checkForRenewal()
-Checks if the certificate needs to be renewed (if it is within 30 days of its expiry date) and, if so, renews it.
-
-**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
-<a name="Certificate+startCheckingForRenewal"></a>
-
-### certificate.startCheckingForRenewal([alsoCheckNow])
-Starts checking for certificate renewals every 24 hours.
-
-**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: async  
+**Access**: private  
+**Fulfil**: <code>(no value)</code> Fulfils immediately if certificate exists and does not need to be renewed; otherwise fulfils when certificate has been provisioned.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [alsoCheckNow] | <code>boolean</code> | <code>false</code> | If true, will also immediately check for renewal when the function is called (use this when loading a previously-provisioned and persisted certificate from disk). |
+| renewCertificate | <code>Boolean</code> | <code>false</code> | If true, will start the process of renewing the certificate                                   (but will continue to return the existing certificate until it is ready). |
+
+<a name="Certificate+provisionCertificate"></a>
+
+### certificate.provisionCertificate() ⇒ <code>Promise</code> ℗
+Provisions a new Let’s Encrypt TLS certificate, persists it, and starts checking for
+renewals on it every day, starting with the next day.
+
+**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: async  
+**Access**: private  
+**Fulfil**: <code>(no value)</code> Fulfils once a certificate has been provisioned.  
+<a name="Certificate+renewCertificate"></a>
+
+### certificate.renewCertificate() ⇒ <code>Promise</code> ℗
+Starts the certificate renewal process by requesting the creation of a fresh secure context.
+
+**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: async  
+**Access**: private  
+**Fulfil**: <code>(no value)</code> Resolves once certificate is renewed and new secure context created and cached.  
+<a name="Certificate+checkForRenewal"></a>
+
+### certificate.checkForRenewal() ⇒ <code>Promise</code> ℗
+Checks if the certificate needs to be renewed (if it is within 30 days of its expiry date) and, if so, renews it. While the method is async, the result is not awaited on usage. Instead, it is a fire-and-forget method that’s called via a daily interval.
+
+**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: async  
+**Access**: private  
+**Fulfil**: <code>(no value)</code> Either immediately if certificate doesn’t need renewal or once certificate has been renewed.  
+<a name="Certificate+init"></a>
+
+### certificate.init(domains) ℗
+Implement initialisation details (called by the constructor).
+
+**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: sync  
+**Access**: private  
+
+| Param | Type |
+| --- | --- |
+| domains | <code>Array.&lt;String&gt;</code> | 
+
+<a name="Certificate+startCheckingForRenewal"></a>
+
+### certificate.startCheckingForRenewal([alsoCheckNow]) ℗
+Starts checking for certificate renewals every 24 hours.
+
+**Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: sync  
+**Access**: private  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [alsoCheckNow] | <code>boolean</code> | <code>false</code> | If true, will also immediately check for renewal when the function is                                       called (use this when loading a previously-provisioned and persisted                                       certificate from disk). |
 
 <a name="Certificate+stopCheckingForRenewal"></a>
 
-### certificate.stopCheckingForRenewal()
+### certificate.stopCheckingForRenewal() ℗
 Stops the timer that checks for renewal daily. Use this during housekeeping before destroying this object.
 
 **Kind**: instance method of [<code>Certificate</code>](#Certificate)  
+**Category**: sync  
+**Access**: private  
 <a name="Configuration"></a>
 
 ## Configuration
 **Kind**: global class  
 
 * [Configuration](#Configuration)
+    * [.Configuration](#Configuration.Configuration) ℗
+        * [new Configuration()](#new_Configuration.Configuration_new)
     * [.domains](#Configuration.domains) : <code>Array.&lt;String&gt;</code>
     * [.settingsPath](#Configuration.settingsPath) : <code>String</code>
     * [.accountPath](#Configuration.accountPath) : <code>String</code>
@@ -109,6 +157,16 @@ Stops the timer that checks for renewal daily. Use this during housekeeping befo
     * [.certificateDirectoryPath](#Configuration.certificateDirectoryPath) : <code>String</code>
     * [.certificateIdentityPath](#Configuration.certificateIdentityPath) : <code>String</code>
     * [.initialise(settings)](#Configuration.initialise)
+
+<a name="Configuration.Configuration"></a>
+
+### Configuration.Configuration ℗
+**Kind**: static class of [<code>Configuration</code>](#Configuration)  
+**Access**: private  
+<a name="new_Configuration.Configuration_new"></a>
+
+#### new Configuration()
+Do not use. Configuration is a static class.
 
 <a name="Configuration.domains"></a>
 
