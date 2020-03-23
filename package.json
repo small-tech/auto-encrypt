@@ -6,7 +6,7 @@
   "scripts": {
     "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "generate-readme": "node_modules/.bin/jsdoc2md --template README.hbs --files index.js --files lib/*.js > README.md"
+    "generate-developer-documentation": "node_modules/.bin/jsdoc2md --template developer-documentation.hbs --files index.js --files lib/*.js > developer-documentation.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
