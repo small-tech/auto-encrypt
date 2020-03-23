@@ -8,7 +8,6 @@ const test = require('tape')
 const autoEncrypt = require('../index')
 const Configuration = require('../lib/Configuration')
 
-const Certificate = require('../lib/Certificate')
 const Directory = require('../lib/Directory')
 const AccountIdentity = require('../lib/AccountIdentity')
 const Account = require('../lib/Account')
@@ -92,9 +91,10 @@ test('autoEncrypt', async t => {
 
   t.strictEquals(util.inspect(secureContext), 'SecureContext { context: SecureContext {} }', 'the shape of returned secure context object is as we expect')
 
-  // Since we have a daily renewal check interval active on the certificate, the test will not exit.
-  // So we must manually remove this interval.
-  Certificate.getSharedInstance().stopCheckingForRenewal()
+  // Tell autoEncrypt that the app is about to exit to give it time to perform housekeeping.
+  // (Since we have a daily renewal check interval active on the certificate, it must remove this or else
+  // it will stop the app from exiting.)
+  autoEncrypt.prepareForAppExit()
 
   t.end()
 })

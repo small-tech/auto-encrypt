@@ -51,7 +51,10 @@ function autoEncrypt(parameterObject) {
     domains
   })
 
-  const certificate = Certificate.getSharedInstance()
+  const certificate = new Certificate(domains)
+
+  // Also save a reference in the context so it can be used by the prepareForAppExit() method.
+  this.certificate = certificate
 
   options.SNICallback = async (serverName, callback) => {
     if (domains.includes(serverName)) {
@@ -70,6 +73,16 @@ function autoEncrypt(parameterObject) {
   // https://source.small-tech.org/site.js/lib/auto-encrypt/issues/1
 
   return options
+}
+
+/**
+ * Prepare autoEncrypt for app exit. Perform necessary clean-up and remove any
+ * references that might cause the app to not exit.
+ *
+ * @function autoEncrypt.prepareForAppExit
+ */
+function prepareForAppExit () {
+  this.certificate.stopCheckingForRenewal()
 }
 
 // Since autoEncrypt is a function and not a class/instance, we mix in the error
@@ -91,4 +104,14 @@ context.sniError = function (symbolName, callback, emoji, ...args) {
 }
 
 mixSaferAndDRYerErrorHandlingInto(context)
-module.exports = autoEncrypt.bind(context)
+
+const boundAutoEncrypt = autoEncrypt.bind(context)
+const boundPrepareForAppExit = prepareForAppExit.bind(context)
+
+// Add prepare for app exit as a function to the autoEncrypt function
+// and we’re going to write it into the same context object. The reason
+// I’m not exporting multiple functions or wrapping this up in a class
+// is to keep the end use API as simple as possible.
+boundAutoEncrypt.prepareForAppExit = boundPrepareForAppExit
+
+module.exports = boundAutoEncrypt
