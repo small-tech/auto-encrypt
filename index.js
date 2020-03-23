@@ -1,19 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-//
-// @small-tech/auto-encrypt
-//
-// Automatically provisions and renews Let’s Encrypt™ TLS certificates for
-// Node.js® https servers (including Express.js, etc.)
-//
-// Implements the subset of RFC 8555 – Automatic Certificate Management
-// Environment (ACME) – necessary for a Node.js https server to provision TLS
-// certificates from Let’s Encrypt using the HTTP-01 challenge on first
-// hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
-//
-// Copyright © 2020 Aral Balkan, Small Technology Foundation.
-// License: AGPLv3 or later.
-//
-////////////////////////////////////////////////////////////////////////////////
+/**
+ * Automatically provisions and renews Let’s Encrypt™ TLS certificates for
+ * Node.js® https servers (including Express.js, etc.)
+ *
+ * Implements the subset of RFC 8555 – Automatic Certificate Management
+ * Environment (ACME) – necessary for a Node.js https server to provision TLS
+ * certificates from Let’s Encrypt using the HTTP-01 challenge on first
+ * hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
+ *
+ * @module @small-tech/auto-encrypt
+ * @copyright © 2020 Aral Balkan, Small Technology Foundation.
+ * @license AGPLv3 or later.
+ */
 
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
@@ -25,7 +22,9 @@ const log                               = require('./lib/log')
  * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
  * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
  * the Server Name Indication (SNI) callback
+ *
  * @function autoEncrypt
+ * @alias module:@small-tech/auto-encrypt
  *
  * @param {Object}   parameterObject
  * @param {String[]} parameterObject.domains         Domain names to provision TLS certificates for.
