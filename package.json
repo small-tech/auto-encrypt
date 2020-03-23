@@ -6,7 +6,7 @@
   "scripts": {
     "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose --debug"
+    "generate-readme": "node_modules/.bin/jsdoc2md --template README.hbs --files index.js --files lib/*.js > README.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "jsdoc": "^3.6.3",
+    "jsdoc-to-markdown": "^5.0.3",
     "nyc": "^14.1.1",
     "tap-nyc": "^1.0.3",
     "tap-spec": "^5.0.0",
