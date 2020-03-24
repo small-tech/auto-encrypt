@@ -30,7 +30,9 @@ const log                               = require('./lib/log')
  * @param {String[]} parameterObject.domains         Domain names to provision TLS certificates for.
  * @param {Object}   [parameterObject.options={}]    Standard https server options.
  * @param {Boolean}  [parameterObject.staging=false] If true, the Let’s Encrypt staging servers will be used.
- * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/] Custom path to save certificates and keys to.
+ * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/]
+ *                   Custom path to save certificates and keys to.
+ *
  * @returns {Object} An options object to be passed to the https.createServer() method.
  */
 function autoEncrypt(parameterObject) {
