@@ -7,7 +7,7 @@
     "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-debug": "tape 'test/**/*.js' | tap-spec",
     "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "generate-developer-documentation": "node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files index.js --files lib/*.js > developer-documentation.md"
+    "generate-developer-documentation": "node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",

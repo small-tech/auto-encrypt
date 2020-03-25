@@ -21,12 +21,28 @@ Environment (ACME) – necessary for a Node.js https server to provision TLS
 certificates from Let’s Encrypt using the HTTP-01 challenge on first
 hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 </dd>
+<dt><a href="#module_lib/AcmeRequest">lib/AcmeRequest</a></dt>
+<dd><p>Abstract base request class for carrying out signed ACME requests over HTTPS.</p>
+</dd>
 <dt><a href="#module_lib/Certificate">lib/Certificate</a></dt>
 <dd><p>Represents a Let’s Encrypt TLS certificate.</p>
 </dd>
 <dt><a href="#module_lib/Configuration">lib/Configuration</a></dt>
 <dd><p>Global configuration static class. Use initialise() method to populate.</p>
 </dd>
+</dl>
+
+## Typedefs
+
+<dl>
+<dt><a href="#PreparedRequest">PreparedRequest</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#ProtectedHeader">ProtectedHeader</a></dt>
+<dd></dd>
+<dt><a href="#HttpsHeaders">HttpsHeaders</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#ResponseObject">ResponseObject</a></dt>
+<dd></dd>
 </dl>
 
 <a name="module_@small-tech/auto-encrypt"></a>
@@ -59,6 +75,83 @@ the Server Name Indication (SNI) callback
 | [parameterObject.options] | <code>Object</code> | <code>{}</code> | Standard https server options. |
 | [parameterObject.staging] | <code>Boolean</code> | <code>false</code> | If true, the Let’s Encrypt staging servers will be used. |
 | [parameterObject.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Custom path to save certificates and keys to. |
+
+<a name="module_lib/AcmeRequest"></a>
+
+## lib/AcmeRequest
+Abstract base request class for carrying out signed ACME requests over HTTPS.
+
+**License**: AGPLv3 or later.  
+**Copyright**: Copyright © 2020 Aral Balkan, Small Technology Foundation.  
+
+* [lib/AcmeRequest](#module_lib/AcmeRequest)
+    * [AcmeRequest](#exp_module_lib/AcmeRequest--AcmeRequest) ⏏
+        * [.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON])](#module_lib/AcmeRequest--AcmeRequest+execute) ⇒ <code>types.ResponseObject</code>
+        * [._execute(preparedRequest, parseResponseBodyAsJSON)](#module_lib/AcmeRequest--AcmeRequest+_execute) ⇒ <code>types.ResponseObject</code>
+        * [.getBuffer(stream)](#module_lib/AcmeRequest--AcmeRequest+getBuffer) ⇒ <code>Buffer</code>
+        * [.prepare(command, payload, useKid, [successCodes], [url])](#module_lib/AcmeRequest--AcmeRequest+prepare) ⇒ <code>types.PreparedRequest</code>
+
+<a name="exp_module_lib/AcmeRequest--AcmeRequest"></a>
+
+### AcmeRequest ⏏
+Abstract base request class for carrying out signed ACME requests over HTTPS.
+
+**Kind**: Exported class  
+<a name="module_lib/AcmeRequest--AcmeRequest+execute"></a>
+
+#### acmeRequest.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON]) ⇒ <code>types.ResponseObject</code>
+Executes a remote Let’s Encrypt command and either returns the result or throws.
+
+**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| command | <code>String</code> |  | Name of Let’s Encrypt command to invoke as used by [Directory](Directory)                                                (sans 'Url' suffix). e.g. 'newAccount', 'newOrder', etc. |
+| payload | <code>Object</code> \| <code>String</code> |  | Either an object to use as the payload or, if there is no payload,                                                an empty string. |
+| useKid | <code>Boolean</code> | <code>true</code> | Should the request use a Key ID (true) or, a public JWK (false).                                                (See RFC 8555 § 6.2 Request Authentication) |
+| [successCodes] | <code>Array.&lt;Number&gt;</code> | <code>[200]</code> | Optional array of codes that signals success. Any other code throws. |
+| [url] | <code>String</code> | <code></code> | If specified, will use this URL directly, ignoring the value in                                                the command parameter. |
+| [parseResponseBodyAsJSON] | <code>Boolean</code> | <code>true</code> | Should the request body be parsed as JSON (true) or should                                                       the native response object be returned (false). |
+
+<a name="module_lib/AcmeRequest--AcmeRequest+_execute"></a>
+
+#### acmeRequest.\_execute(preparedRequest, parseResponseBodyAsJSON) ⇒ <code>types.ResponseObject</code>
+Executes a prepared request.
+
+**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| preparedRequest | <code>types.PreparedRequest</code> | The prepared request, ready to be executed. |
+| parseResponseBodyAsJSON | <code>Boolean</code> | Should the request body be parsed as JSON (true) or should                                                        the native response object be returned (false). |
+
+<a name="module_lib/AcmeRequest--AcmeRequest+getBuffer"></a>
+
+#### acmeRequest.getBuffer(stream) ⇒ <code>Buffer</code>
+Concatenates the output of a stream and returns a buffer. Taken from the bent module.
+
+**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+**Returns**: <code>Buffer</code> - The concatenated output of the Node stream.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| stream | <code>stream</code> | A Node stream. |
+
+<a name="module_lib/AcmeRequest--AcmeRequest+prepare"></a>
+
+#### acmeRequest.prepare(command, payload, useKid, [successCodes], [url]) ⇒ <code>types.PreparedRequest</code>
+Separate the preparation of a request from the execution of it so we can easily test
+that different request configurations conform to our expectations.
+
+**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| command | <code>String</code> |  | Name of Let’s Encrypt command to invoke as used by [Directory](Directory)                                             (sans 'Url' suffix). e.g. 'newAccount', 'newOrder', etc. |
+| payload | <code>Object</code> \| <code>String</code> |  | Either an object to use as the payload or, if there is no payload,                                             an empty string. |
+| useKid | <code>Boolean</code> |  | Should the request use a Key ID (true) or, a public JWK (false).                                             (See RFC 8555 § 6.2 Request Authentication) |
+| [successCodes] | <code>Array.&lt;Number&gt;</code> | <code>[200]</code> | Optional array of codes that signals success. Any other code throws. |
+| [url] | <code>String</code> | <code></code> | If specified, will use this URL directly, ignoring the value in                                             the command parameter. |
 
 <a name="module_lib/Certificate"></a>
 
@@ -280,6 +373,56 @@ Initialise the configuration. Must be called before accessing settings. May be c
 | settings.domains | <code>Array.&lt;String&gt;</code> | List of domains that Auto Encrypt will manage TLS certificates for. |
 | settings.staging | <code>Boolean</code> | Should we use Let’s Encrypt’s staging (true) or production servers (false). |
 | settings.settingsPath | <code>String</code> | The root settings paths to use. Uses default path if value is null. |
+
+<a name="PreparedRequest"></a>
+
+## PreparedRequest : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| protectedHeader | [<code>ProtectedHeader</code>](#ProtectedHeader) | JSON Web Signature (JWS) Protected Header                                                                      (See RFC 7515 § A.6.1) |
+| signedRequest | <code>JWS.FlattenedJWS</code> | Flattened JWS |
+| httpsRequest | <code>bent.RequestFunction.&lt;bent.ValidResponse&gt;</code> | Asynchronous HTTPs request,                                                                      ready to be executed. |
+| httpsHeaders | [<code>HttpsHeaders</code>](#HttpsHeaders) | Hardcoded HTTPS headers. |
+
+<a name="ProtectedHeader"></a>
+
+## ProtectedHeader
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| alg | <code>String</code> | Hardcoded to 'RS256', currently the only algorithm supported by Let’s Encrypt (LE). |
+| nonce | <code>String</code> | [Nonce](Nonce) (a value that’s used only once to thwart replay attacks). |
+| url | <code>String</code> | URL of the command on Let’s Encrypt’s servers. |
+| kid | <code>String</code> | Key ID returned by LE (per RFC 8555 § 6.2, set either this or jwk, not both). |
+| jwk | <code>JWKRSAKey</code> | Public JWK (per RFC 8555 § 6.2, set either this or jwk, not both). |
+
+<a name="HttpsHeaders"></a>
+
+## HttpsHeaders : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| 'Content-Type' | <code>String</code> | Hardcoded to 'application/jose+json' |
+| 'User-Agent' | <code>String</code> | Hardcoded to 'small-tech.org-acme/1.0.0 node/12.16.0' |
+| 'Accept-Language | <code>String</code> | Hardcoded to 'en-US' |
+
+<a name="ResponseObject"></a>
+
+## ResponseObject
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| headers | <code>Object</code> | Native HTTPS response headers object. |
+| body | <code>Object</code> \| <code>String</code> | The response body as a native object or as a string. |
 
 
 ## Like this? Fund us!
