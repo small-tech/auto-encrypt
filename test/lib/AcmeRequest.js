@@ -4,7 +4,8 @@ const jose                                                         = require('jo
 const AcmeRequest                                                  = require('../../lib/AcmeRequest')
 const Account                                                      = require('../../lib/Account')
 const AccountIdentity                                              = require('../../lib/AccountIdentity')
-const { setupStagingConfigurationWithOneDomainAtTestSettingsPath } = require('../../lib/test-helpers')
+const { setupStagingConfigurationWithOneDomainAtTestSettingsPath,
+        httpServerWithResponse }                                   = require('../../lib/test-helpers')
 
 test('AcmeRequest', async t => {
   // t.plan(4)
@@ -40,20 +41,17 @@ test('AcmeRequest', async t => {
     /* payload =      */ {aPayload: true},
     /* useKid =       */ true,
     /* successCodes = */ [200],
-    /* url =          */ 'http://localhost:3132'
+    /* url =          */ 'http://localhost:1234'
   )
 
-  const server = http.createServer((request, response) => {
-    response.statusCode = 500
-    response.end()
-  })
-  server.listen(3132)
+  let server
+  server = await httpServerWithResponse({statusCode: 500, body: ''})
 
   try {
-    await (new AcmeRequest())._execute(preparedRequest)
+    await (new AcmeRequest())._execute(preparedRequest, /* parseResponseBodyAsJSON */ true)
     t.fail()
   } catch (error) {
-    t.pass('unexpected server response code should throw')
+    t.strictEquals(error.symbol, Symbol.for('AcmeRequest.requestError'), 'unexpected server response code should throw')
   }
 
   server.close()
@@ -61,20 +59,13 @@ test('AcmeRequest', async t => {
   //
   // Test: parseBodyAsJSON = false
   //
-  const server2 = http.createServer((request, response) => {
-    response.statusCode = 200
-    response.end('not json')
-  })
-  server2.listen(3132)
+  server = await httpServerWithResponse({statusCode: 200, body: 'not json'})
 
   let response
-  try {
-    response = await (new AcmeRequest()).execute('custom-command', {aPayload: true}, true, [200], 'http://localhost:3132', false)
-  } catch (error) {
-    console.log(error)
-  }
+  response = await (new AcmeRequest()).execute('custom-command', {aPayload: true}, true, [200], 'http://localhost:1234', false)
   t.strictEquals(response.body, 'not json', 'body is not JSON as expected')
-  server2.close()
+
+  server.close()
 
   t.end()
 })
