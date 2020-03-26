@@ -18,7 +18,7 @@ test('Configuration', t => {
   Configuration.reset()
   t.ok(throwsErrorOfType(
     () => { Configuration.initialise({staging: true, settingsPath: null}) },
-    Symbol.for('UndefinedOrNullError')
+    Symbol.for('Configuration.domainsArrayIsNotAnArrayOfStringsError')
   ), 'missing settings.domains throws')
 
   Configuration.reset()
@@ -31,7 +31,7 @@ test('Configuration', t => {
   t.ok(throwsErrorOfType(
     () => { Configuration.initialise({domains: ['dev.ar.al'], staging: true}) },
     Symbol.for('UndefinedError')
-  ), 'missing settings.settingsPath throws')
+  ), 'undefined settings.settingsPath throws')
 
   Configuration.reset()
   t.ok(throwsErrorOfType(

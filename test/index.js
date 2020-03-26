@@ -5,7 +5,11 @@ const util                                          = require('util')
 const test                                          = require('tape')
 const autoEncrypt                                   = require('../index')
 const Configuration                                 = require('../lib/Configuration')
-const { destroySingletons, createTestSettingsPath } = require('../lib/test-helpers')
+const {
+  destroySingletons,
+  createTestSettingsPath,
+  throwsErrorOfType
+}                                                   = require('../lib/test-helpers')
 
 function setup() {
   // Destroy all singleton instances, test paths, and app state so we start with a clean slate.
@@ -14,12 +18,11 @@ function setup() {
 }
 
 test('autoEncrypt', async t => {
-  t.plan(11)
+  t.plan(10)
 
   setup()
 
-  t.throws(() => { autoEncrypt() }, /^UndefinedOrNullError/,'throws if parameter object missing domains property')
-  t.throws(() => { autoEncrypt({ domains: [] }) }, /^Configuration.domainsArrayIsNotAnArrayOfStringsError/, 'throws if domains array is empty')
+  t.ok(throwsErrorOfType(() => { autoEncrypt() }, Symbol.for('UndefinedOrNullError')), 'throws if parameter object is missing')
 
   const hostname = os.hostname()
   const options = autoEncrypt({domains: [hostname], staging: true, settingsPath: testSettingsPath})
