@@ -28,18 +28,15 @@ const autoEncrypt = require('../index')
 
 console.log('\n 🌄 Auto Encrypt “Hello, world!” Example \n')
 
-let options = {
+options = {
   /* Custom http server options, if any, go here (we don’t have any in this
     example, so we could just not have passed this empty object at all). */
+
+  staging: false,          // The default is true (production). We want to use LE staging environment.
+  domains: [os.hostname()]
 }
 
-options = autoEncrypt({
-  options,
-  staging: false,          // This is the default, set to true to use LE staging environment.
-  domains: [os.hostname()]
-})
-
-const server = https.createServer(options, (request, response) => {
+const server = https.createServer(autoEncrypt(options), (request, response) => {
   response.end('Hello, world!')
 })
 
