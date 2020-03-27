@@ -60,15 +60,8 @@ function autoEncrypt(_options) {
   delete options.staging
   delete options.settingsPath
 
-  // Initialise the configuration. This carries out robust validation of settings so
-  // we do not duplicate that effort here.
-  Configuration.initialise({
-    settingsPath,
-    staging,
-    domains
-  })
-
-  const certificate = new Certificate(domains)
+  const configuration = new Configuration({ settingsPath, staging, domains })
+  const certificate = new Certificate(configuration)
 
   // Also save a reference in the context so it can be used by the prepareForAppExit() method.
   this.certificate = certificate
