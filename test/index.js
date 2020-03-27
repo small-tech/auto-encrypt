@@ -18,13 +18,28 @@ function setup() {
 }
 
 test('autoEncrypt', async t => {
-  t.plan(10)
+  t.plan(12)
 
   setup()
 
-  t.ok(throwsErrorOfType(() => { autoEncrypt() }, Symbol.for('UndefinedOrNullError')), 'throws if parameter object is missing')
-
   const hostname = os.hostname()
+  const expectedDefaultDomains = [hostname, `www.${hostname}`]
+  const expectedDefaultStaging = false
+  const expectedDefaultSettingsPath =
+
+  autoEncrypt()
+
+  t.deepEquals(Configuration.domains, expectedDefaultDomains, 'default domains array set as expected')
+  t.strictEquals(Configuration.staging, expectedDefaultStaging, 'default staging value set as expected')
+  t.strictEquals(Configuration.settingsPath, Configuration.defaultPathFor('production'), 'default settings path value set as expected')
+
+  // Tell autoEncrypt that the app is about to exit to give it time to perform housekeeping.
+  // (Since we have a daily renewal check interval active on the certificate, it must remove this or else
+  // it will stop the app from exiting.)
+  autoEncrypt.prepareForAppExit()
+
+  setup()
+
   const options = autoEncrypt({domains: [hostname], staging: true, settingsPath: testSettingsPath})
 
   t.strictEquals('{ SNICallback: [AsyncFunction] }', util.inspect(options), 'options object has the shape we expect')
@@ -80,9 +95,6 @@ test('autoEncrypt', async t => {
 
   t.strictEquals(util.inspect(secureContext), 'SecureContext { context: SecureContext {} }', 'the shape of returned secure context object is as we expect')
 
-  // Tell autoEncrypt that the app is about to exit to give it time to perform housekeeping.
-  // (Since we have a daily renewal check interval active on the certificate, it must remove this or else
-  // it will stop the app from exiting.)
   autoEncrypt.prepareForAppExit()
 
   t.end()

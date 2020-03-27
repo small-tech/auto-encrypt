@@ -12,6 +12,7 @@
  * @license AGPLv3 or later.
  */
 
+const os                                = require('os')
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
 const Pluralise                         = require('./lib/Pluralise')
@@ -32,27 +33,32 @@ const throws = new Throws({
 /**
  * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
  * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
- * the Server Name Indication (SNI) callback
+ * the Server Name Indication (SNI) callback.
  *
  * @function autoEncrypt
  * @alias module:@small-tech/auto-encrypt
  *
- * @param {Object}   parameterObject
- * @param {String[]} parameterObject.domains         Domain names to provision TLS certificates for.
- * @param {Object}   [parameterObject.options={}]    Standard https server options.
- * @param {Boolean}  [parameterObject.staging=false] If true, the Let’s Encrypt staging servers will be used.
- * @param {String}   [parameterObject.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
+ * @param {Object}   [options]               Optional HTTPS options object with optional additional
+ *                                           Auto Encrypt-specific configuration settings.
+ * @param {String[]} [options.domains]       Domain names to provision TLS certificates for. If missing, defaults to
+ *                                           the hostname of the current computer and its www prefixed subdomain.
+ * @param {Boolean}  [options.staging=false] If true, the Let’s Encrypt staging servers will be used.
+ * @param {String}   [options.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
  *
  * @returns {Object} An options object to be passed to the https.createServer() method.
  */
-function autoEncrypt(parameterObject = throws.ifMissing()) {
 
-  if (parameterObject == undefined) { parameterObject = {} }
+function autoEncrypt(_options) {
 
-  const domains      = parameterObject.domains
-  const staging      = parameterObject.staging      || false
-  const options      = parameterObject.options      || {}
-  const settingsPath = parameterObject.settingsPath || null
+  const options      = _options             || {}
+  const domains      = options.domains      || [os.hostname(), `www.${os.hostname()}`]
+  const staging      = options.staging      || false
+  const settingsPath = options.settingsPath || null
+
+  // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
+  delete options.domains
+  delete options.staging
+  delete options.settingsPath
 
   // Initialise the configuration. This carries out robust validation of settings so
   // we do not duplicate that effort here.

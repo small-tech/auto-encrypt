@@ -16,19 +16,22 @@ npm i @small-tech/auto-encrypt
 
 ## Usage
 
-Instead of passing an `options` object directly to the `https.createServer([options][, listener])` method, pass the return value of a call to this module to it.
+Instead of passing an `options` object directly to the `https.createServer([options][, listener])` method, pass the return value of a call to this module with the options object as its only argument to it. e.g.,
 
 ```js
 const autoEncrypt = require('@small-tech/auto-encrypt')
 
-const options = autoEncrypt({
-  domains: [domain1, domain2, /* … */],
-  options: { /* https server options */},
+const options = {
+  // Regular HTTPS server and TLS server options, if any, go here.
+
+  // Optional Auto Encrypt options:
+  domains: ['first.domain', 'second.domain', /* … */],
+  staging: true,
   settingsPath: '/custom/settings/path'
-})
+}
 
 // Pass the options object to https.createServer()
-
+const server = https.createServer(autoEncrypt(options), listener)
 // …
 
 // Then, when you’re ready to exit your app,
@@ -36,18 +39,30 @@ const options = autoEncrypt({
 autoEncrypt.prepareForExit()
 ```
 
-### Parameter object
+If you don’t have custom HTTPS/TLS options to set for your server and you don’t want to customise the default behaviour of Auto Encrypt, you don’t even have to pass in an `options` object.
 
-The Auto Encrypt function takes a single parameter object as its only argument. This object can contain the following properties:
+Auto Encrypt uses the following defaults:
 
-  - `domains` (array of strings): Names to provision Let’s Encrypt certificates for.
-  - `options` (object; _optional_): Standard `https` server options.
-  - `staging` (boolean; _optional_): If `true`, the [Let’s Encrypt staging environment](https://letsencrypt.org/docs/staging-environment/) will be used (default is `false`).
-  - `settingsPath` (string; _optional_): a custom path to save the certificates and keys to (defaults to _~/.small-tech.org/auto-encrypt/_).
+  - `domains`: the hostname of the current computer and the www subdomain at that hostname.
+  - `staging`: false; it will use the production server (which has [rate limits](https://letsencrypt.org/docs/rate-limits/)).
+  - `settingsPath`: _~/.small-tech.org/auto-encrypt/_
+
+So the following is a perfectly-valid minimal example of a secure production server using Auto Encrypt:
+
+```js
+const os
+const autoEncrypt = require('@small-tech/auto-encrypt')
+const server = https.createServer(autoEncrypt(), (request, response) => {
+  response.end('Hello, world')
+server.listen(() => console.log('HTTPS server is running on (www.)${os.hostname()}.))
+})
+```
+
+(Caveat: See note on [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports)).
 
 ### Return value
 
-The `autoEncrypt()` function returns an options object to be passed to the `https.createServer()` method.
+The `autoEncrypt()` function returns an options object to be passed as the first argument to the `https.createServer()` method.
 
 For implementation details, please see the [developer documentation](developer-documentation.md).
 
@@ -59,13 +74,8 @@ For implementation details, please see the [developer documentation](developer-d
 const https = require('https')
 const autoEncrypt = require('@small-tech/auto-encrypt')
 
-const options = { /* custom options, if any */ }
-
 const server = https.createServer(
-  autoEncrypt({
-    options,
-    domains: ['ar.al', 'www.ar.al']
-  }),
+  autoEncrypt({ domains: ['dev.ar.al'] }),
   (request, response) => {
     response.end('Hello, world!')
   }
@@ -79,15 +89,13 @@ const express = require('express')
 const https = require('https')
 const autoEncrypt = require('@small-tech/auto-encrypt')
 
-const options = { /* custom options, if any */ }
-
 const app = express()
 app.get('/', (request, response) => {
   response.end('Hello, world!')
 })
 
 const server = https.createServer(
-  autoEncrypt({ options, domains: ['ar.al', 'www.ar.al'] }),
+  autoEncrypt({ domains: ['dev.ar.al'] }),
   app
 )
 ```
@@ -106,7 +114,7 @@ If you’re evaluating this for a “startup” or an enterprise, let us save yo
 
 ## Client details
 
-Auto Encrypt is does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname and it automatically renews your certificate from thereon.
+Auto Encrypt does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname and it automatically renews your certificate from thereon.
 
 Auto Encrypt __does not_ and __will not__:
 
