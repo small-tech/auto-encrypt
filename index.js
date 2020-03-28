@@ -16,8 +16,8 @@ const os                                = require('os')
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
 const Pluralise                         = require('./lib/Pluralise')
-const Throws                            = require('./lib/Throws')
-const log                               = require('./lib/log')
+const Throws                            = require('./lib/util/Throws')
+const log                               = require('./lib/util/log')
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
