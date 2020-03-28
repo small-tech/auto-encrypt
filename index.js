@@ -15,7 +15,7 @@
 const os                                = require('os')
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
-const Pluralise                         = require('./lib/Pluralise')
+const Pluralise                         = require('./lib/util/Pluralise')
 const Throws                            = require('./lib/util/Throws')
 const log                               = require('./lib/util/log')
 

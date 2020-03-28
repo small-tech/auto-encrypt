@@ -1,5 +1,5 @@
 const test = require('tape')
-const Pluralise = require('../../lib/Pluralise')
+const Pluralise = require('../../lib/util/Pluralise')
 
 test('Pluralise', t => {
   t.plan(5)
