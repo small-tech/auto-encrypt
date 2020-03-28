@@ -32,7 +32,7 @@ options = {
   /* Custom http server options, if any, go here (we don’t have any in this
     example, so we could just not have passed this empty object at all). */
 
-  staging: false,          // The default is true (production). We want to use LE staging environment.
+  staging: true,          // The default is true (production). We want to use LE staging environment.
   domains: [os.hostname()]
 }
 
