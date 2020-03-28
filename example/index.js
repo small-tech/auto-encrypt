@@ -33,7 +33,7 @@ options = {
     example, so we could just not have passed this empty object at all). */
 
   staging: true,          // The default is true (production). We want to use LE staging environment.
-  domains: [os.hostname()]
+  domains: [os.hostname(), `www.${os.hostname()}`]
 }
 
 const server = https.createServer(autoEncrypt(options), (request, response) => {
