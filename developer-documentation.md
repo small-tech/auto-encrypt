@@ -10,6 +10,19 @@ If you just want to use Auto Encrypt, please see the public API, as documented i
 
 We exist in part thanks to patronage by people like you. If you share [our vision](https://small-tech.org/about/#small-technology) and want to support our work, please [become a patron or donate to us](https://small-tech.org/fund-us) today and help us continue to exist.
 
+## Requirements
+
+Auto Encrypt is supported on:
+
+  - __Node:__ LTS (currently 12.16.1).
+  - __ECMAScript:__ [ES2019](https://node.green/#ES2019)
+
+## Overview of relationships
+
+![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
+
+Generated using [dependency cruiser](https://github.com/sverweij/dependency-cruiser).
+
 ## Modules
 
 <dl>
@@ -28,8 +41,17 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 <dd><p>Represents a Let’s Encrypt TLS certificate.</p>
 </dd>
 <dt><a href="#module_lib/Configuration">lib/Configuration</a></dt>
-<dd><p>Global configuration static class. Use initialise() method to populate.</p>
+<dd><p>Global configuration class. Use initialise() method to populate.</p>
 </dd>
+</dl>
+
+## Classes
+
+<dl>
+<dt><a href="#CertificateIdentity">CertificateIdentity</a> ⇐ <code>Identity</code></dt>
+<dd></dd>
+<dt><a href="#Order">Order</a></dt>
+<dd></dd>
 </dl>
 
 ## Typedefs
@@ -60,21 +82,20 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 **Copyright**: © 2020 Aral Balkan, Small Technology Foundation.  
 <a name="module_@small-tech/auto-encrypt..autoEncrypt"></a>
 
-### @small-tech/auto-encrypt~autoEncrypt(parameterObject) ⇒ <code>Object</code>
+### @small-tech/auto-encrypt~autoEncrypt([options]) ⇒ <code>Object</code>
 Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
 https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
-the Server Name Indication (SNI) callback
+the Server Name Indication (SNI) callback.
 
 **Kind**: inner method of [<code>@small-tech/auto-encrypt</code>](#module_@small-tech/auto-encrypt)  
 **Returns**: <code>Object</code> - An options object to be passed to the https.createServer() method.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| parameterObject | <code>Object</code> |  |  |
-| parameterObject.domains | <code>Array.&lt;String&gt;</code> |  | Domain names to provision TLS certificates for. |
-| [parameterObject.options] | <code>Object</code> | <code>{}</code> | Standard https server options. |
-| [parameterObject.staging] | <code>Boolean</code> | <code>false</code> | If true, the Let’s Encrypt staging servers will be used. |
-| [parameterObject.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Custom path to save certificates and keys to. |
+| [options] | <code>Object</code> |  | Optional HTTPS options object with optional additional                                           Auto Encrypt-specific configuration settings. |
+| [options.domains] | <code>Array.&lt;String&gt;</code> |  | Domain names to provision TLS certificates for. If missing, defaults to                                           the hostname of the current computer and its www prefixed subdomain. |
+| [options.staging] | <code>Boolean</code> | <code>false</code> | If true, the Let’s Encrypt staging servers will be used. |
+| [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
 
 <a name="module_lib/AcmeRequest"></a>
 
@@ -106,12 +127,12 @@ Executes a remote Let’s Encrypt command and either returns the result or throw
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| command | <code>String</code> |  | Name of Let’s Encrypt command to invoke as used by [Directory](Directory)                                                (sans 'Url' suffix). e.g. 'newAccount', 'newOrder', etc. |
-| payload | <code>Object</code> \| <code>String</code> |  | Either an object to use as the payload or, if there is no payload,                                                an empty string. |
-| useKid | <code>Boolean</code> | <code>true</code> | Should the request use a Key ID (true) or, a public JWK (false).                                                (See RFC 8555 § 6.2 Request Authentication) |
-| [successCodes] | <code>Array.&lt;Number&gt;</code> | <code>[200]</code> | Optional array of codes that signals success. Any other code throws. |
-| [url] | <code>String</code> | <code></code> | If specified, will use this URL directly, ignoring the value in                                                the command parameter. |
-| [parseResponseBodyAsJSON] | <code>Boolean</code> | <code>true</code> | Should the request body be parsed as JSON (true) or should                                                       the native response object be returned (false). |
+| command | <code>String</code> |  | Name of [Directory](Directory) command to invoke e.g. 'newAccount' |
+| payload | <code>Object</code> \| <code>String</code> |  | Object to use as payload. For no payload, pass empty string. |
+| useKid | <code>Boolean</code> | <code>true</code> | Use Key ID (true) or public JWK (false) (see RFC 8555 § 6.2). |
+| [successCodes] | <code>Array.&lt;Number&gt;</code> | <code>[200]</code> | Return codes accepted as success. Any other code throws. |
+| [url] | <code>String</code> | <code></code> | If specified, use this URL, ignoring the command parameter. |
+| [parseResponseBodyAsJSON] | <code>Boolean</code> | <code>true</code> | Parse response body as JSON (true) or as string (false). |
 
 <a name="module_lib/AcmeRequest--AcmeRequest+_execute"></a>
 
@@ -163,7 +184,8 @@ Represents a Let’s Encrypt TLS certificate.
 
 * [lib/Certificate](#module_lib/Certificate)
     * [Certificate](#exp_module_lib/Certificate--Certificate) ⏏
-        * [new Certificate(domains)](#new_module_lib/Certificate--Certificate_new)
+        * [new Certificate(configuration)](#new_module_lib/Certificate--Certificate_new)
+        * [.attemptToRecoverFromFailedRenewalAttemptIfNecessary()](#module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary)
         * _async_
             * [.getSecureContext()](#module_lib/Certificate--Certificate+getSecureContext) ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
             * [.createSecureContext(renewCertificate)](#module_lib/Certificate--Certificate+createSecureContext) ⇒ <code>Promise</code> ℗
@@ -171,7 +193,6 @@ Represents a Let’s Encrypt TLS certificate.
             * [.renewCertificate()](#module_lib/Certificate--Certificate+renewCertificate) ⇒ <code>Promise</code> ℗
             * [.checkForRenewal()](#module_lib/Certificate--Certificate+checkForRenewal) ⇒ <code>Promise</code> ℗
         * _sync_
-            * [.init(domains)](#module_lib/Certificate--Certificate+init) ℗
             * [.startCheckingForRenewal([alsoCheckNow])](#module_lib/Certificate--Certificate+startCheckingForRenewal) ℗
             * [.stopCheckingForRenewal()](#module_lib/Certificate--Certificate+stopCheckingForRenewal) ℗
 
@@ -183,12 +204,23 @@ Represents a Let’s Encrypt TLS certificate.
 **Kind**: Exported class  
 <a name="new_module_lib/Certificate--Certificate_new"></a>
 
-#### new Certificate(domains)
+#### new Certificate(configuration)
+Creates an instance of Certificate.
+
 
 | Param | Type | Description |
 | --- | --- | --- |
-| domains | <code>Array.&lt;String&gt;</code> | List of domains this certificate covers. |
+| configuration | <code>Configuration</code> | Configuration instance. |
 
+<a name="module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary"></a>
+
+#### certificate.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+Check if certificate-identity.pem.old or certificate.pem.old files exist.
+If they do, it means that something went wrong while  certificate was trying to be
+renewed. So restore them and use them and hopefully the next renewal attempt will
+succeed or at least buy the administrator of the server some time to fix the issue.
+
+**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
 <a name="module_lib/Certificate--Certificate+getSecureContext"></a>
 
 #### certificate.getSecureContext() ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
@@ -244,19 +276,6 @@ method that’s called via a daily interval.
                    has been renewed.  
 **Category**: async  
 **Access**: private  
-<a name="module_lib/Certificate--Certificate+init"></a>
-
-#### certificate.init(domains) ℗
-Implement initialisation details (called by the constructor).
-
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
-**Category**: sync  
-**Access**: private  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| domains | <code>Array.&lt;String&gt;</code> | List of domains this certificate covers. |
-
 <a name="module_lib/Certificate--Certificate+startCheckingForRenewal"></a>
 
 #### certificate.startCheckingForRenewal([alsoCheckNow]) ℗
@@ -281,91 +300,32 @@ Stops the timer that checks for renewal daily. Use this during housekeeping befo
 <a name="module_lib/Configuration"></a>
 
 ## lib/Configuration
-Global configuration static class. Use initialise() method to populate.
+Global configuration class. Use initialise() method to populate.
 
 **License**: AGPLv3 or later.  
 **Copyright**: © 2020 Aral Balkan, Small Technology Foundation.  
 
 * [lib/Configuration](#module_lib/Configuration)
     * [Configuration](#exp_module_lib/Configuration--Configuration) ⏏
-        * [new Configuration()](#new_module_lib/Configuration--Configuration_new)
-        * [.domains](#module_lib/Configuration--Configuration.domains) : <code>Array.&lt;String&gt;</code>
-        * [.settingsPath](#module_lib/Configuration--Configuration.settingsPath) : <code>String</code>
-        * [.accountPath](#module_lib/Configuration--Configuration.accountPath) : <code>String</code>
-        * [.accountIdentityPath](#module_lib/Configuration--Configuration.accountIdentityPath) : <code>String</code>
-        * [.certificatePath](#module_lib/Configuration--Configuration.certificatePath) : <code>String</code>
-        * [.certificateDirectoryPath](#module_lib/Configuration--Configuration.certificateDirectoryPath) : <code>String</code>
-        * [.certificateIdentityPath](#module_lib/Configuration--Configuration.certificateIdentityPath) : <code>String</code>
-        * _initialiser_
-            * [.initialise(settings)](#module_lib/Configuration--Configuration.initialise)
+        * [new Configuration(settings)](#new_module_lib/Configuration--Configuration_new)
+        * [.staging](#module_lib/Configuration--Configuration+staging) : <code>Array.&lt;String&gt;</code>
+        * [.domains](#module_lib/Configuration--Configuration+domains) : <code>Array.&lt;String&gt;</code>
+        * [.settingsPath](#module_lib/Configuration--Configuration+settingsPath) : <code>String</code>
+        * [.accountPath](#module_lib/Configuration--Configuration+accountPath) : <code>String</code>
+        * [.accountIdentityPath](#module_lib/Configuration--Configuration+accountIdentityPath) : <code>String</code>
+        * [.certificatePath](#module_lib/Configuration--Configuration+certificatePath) : <code>String</code>
+        * [.certificateDirectoryPath](#module_lib/Configuration--Configuration+certificateDirectoryPath) : <code>String</code>
+        * [.certificateIdentityPath](#module_lib/Configuration--Configuration+certificateIdentityPath) : <code>String</code>
 
 <a name="exp_module_lib/Configuration--Configuration"></a>
 
 ### Configuration ⏏
 **Kind**: Exported class  
-**Access**: private  
 <a name="new_module_lib/Configuration--Configuration_new"></a>
 
-#### new Configuration()
-Do not use. Configuration is a static class.
-
-<a name="module_lib/Configuration--Configuration.domains"></a>
-
-#### Configuration.domains : <code>Array.&lt;String&gt;</code>
-The list of domains supported by the current certificate.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.settingsPath"></a>
-
-#### Configuration.settingsPath : <code>String</code>
-The root settings path. There is a different root settings path for staging and production modes.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.accountPath"></a>
-
-#### Configuration.accountPath : <code>String</code>
-Path to the account.json file that contains the Key Id that uniquely identifies and authorises your account
-in the absence of a JWT (see RFC 8555 § 6.2. Request Authentication).
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.accountIdentityPath"></a>
-
-#### Configuration.accountIdentityPath : <code>String</code>
-The path to the account-identity.pem file that contains the private key for the account.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.certificatePath"></a>
-
-#### Configuration.certificatePath : <code>String</code>
-The path to the certificate.pem file that contains the certificate chain provisioned from Let’s Encrypt.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.certificateDirectoryPath"></a>
-
-#### Configuration.certificateDirectoryPath : <code>String</code>
-The directory the certificate and certificate identity (private key) PEM files are stored in.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.certificateIdentityPath"></a>
-
-#### Configuration.certificateIdentityPath : <code>String</code>
-The path to the certificate-identity.pem file that holds the private key for the TLS certificate.
-
-**Kind**: static property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Read only**: true  
-<a name="module_lib/Configuration--Configuration.initialise"></a>
-
-#### Configuration.initialise(settings)
+#### new Configuration(settings)
 Initialise the configuration. Must be called before accessing settings. May be called more than once.
 
-**Kind**: static method of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
-**Category**: initialiser  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -373,6 +333,112 @@ Initialise the configuration. Must be called before accessing settings. May be c
 | settings.domains | <code>Array.&lt;String&gt;</code> | List of domains that Auto Encrypt will manage TLS certificates for. |
 | settings.staging | <code>Boolean</code> | Should we use Let’s Encrypt’s staging (true) or production servers (false). |
 | settings.settingsPath | <code>String</code> | The root settings paths to use. Uses default path if value is null. |
+
+<a name="module_lib/Configuration--Configuration+staging"></a>
+
+#### configuration.staging : <code>Array.&lt;String&gt;</code>
+Should we use Let’s Encrypt’s staging (true) or production servers (false).
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+domains"></a>
+
+#### configuration.domains : <code>Array.&lt;String&gt;</code>
+List of domains that Auto Encrypt will manage TLS certificates for.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+settingsPath"></a>
+
+#### configuration.settingsPath : <code>String</code>
+The root settings path. There is a different root settings path for staging and production modes.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+accountPath"></a>
+
+#### configuration.accountPath : <code>String</code>
+Path to the account.json file that contains the Key Id that uniquely identifies and authorises your account
+in the absence of a JWT (see RFC 8555 § 6.2. Request Authentication).
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+accountIdentityPath"></a>
+
+#### configuration.accountIdentityPath : <code>String</code>
+The path to the account-identity.pem file that contains the private key for the account.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+certificatePath"></a>
+
+#### configuration.certificatePath : <code>String</code>
+The path to the certificate.pem file that contains the certificate chain provisioned from Let’s Encrypt.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+certificateDirectoryPath"></a>
+
+#### configuration.certificateDirectoryPath : <code>String</code>
+The directory the certificate and certificate identity (private key) PEM files are stored in.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="module_lib/Configuration--Configuration+certificateIdentityPath"></a>
+
+#### configuration.certificateIdentityPath : <code>String</code>
+The path to the certificate-identity.pem file that holds the private key for the TLS certificate.
+
+**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Read only**: true  
+<a name="CertificateIdentity"></a>
+
+## CertificateIdentity ⇐ <code>Identity</code>
+**Kind**: global class  
+**Extends**: <code>Identity</code>  
+**License**: AGPLv3 or later  
+**Copyright**: Aral Balkan, Small Technology Foundation  
+
+* [CertificateIdentity](#CertificateIdentity) ⇐ <code>Identity</code>
+    * [new CertificateIdentity()](#new_CertificateIdentity_new)
+    * [.CertificateIdentity](#CertificateIdentity.CertificateIdentity)
+        * [new CertificateIdentity(configuration)](#new_CertificateIdentity.CertificateIdentity_new)
+
+<a name="new_CertificateIdentity_new"></a>
+
+### new CertificateIdentity()
+Generates, stores, loads, and saves the certificate identity. The default
+certificate identity file path is:
+
+~/.small-tech.org/auto-encrypt/certificate-identity.pem
+
+<a name="CertificateIdentity.CertificateIdentity"></a>
+
+### CertificateIdentity.CertificateIdentity
+**Kind**: static class of [<code>CertificateIdentity</code>](#CertificateIdentity)  
+<a name="new_CertificateIdentity.CertificateIdentity_new"></a>
+
+#### new CertificateIdentity(configuration)
+Creates an instance of CertificateIdentity.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| configuration | <code>Configuration</code> | (Required) Configuration instance. |
+
+<a name="Order"></a>
+
+## Order
+**Kind**: global class  
+<a name="new_Order_new"></a>
+
+### new Order(configuration)
+Creates an instance of Order.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| configuration | <code>Configuration</code> | (Required) Configuration instance. |
 
 <a name="PreparedRequest"></a>
 
