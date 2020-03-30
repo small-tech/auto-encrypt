@@ -56,6 +56,14 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 <dd></dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#csrAsPem">csrAsPem(domains, key)</a> ⇒ <code>String</code></dt>
+<dd><p>Create a CSR given a list of domains and a Jose JWK.rsaKey.</p>
+</dd>
+</dl>
+
 ## Typedefs
 
 <dl>
@@ -441,6 +449,19 @@ Creates an instance of Order.
 | Param | Type | Description |
 | --- | --- | --- |
 | configuration | <code>Configuration</code> | (Required) Configuration instance. |
+
+<a name="csrAsPem"></a>
+
+## csrAsPem(domains, key) ⇒ <code>String</code>
+Create a CSR given a list of domains and a Jose JWK.rsaKey.
+
+**Kind**: global function  
+**Returns**: <code>String</code> - A CSR in PEM format.  
+
+| Param | Type |
+| --- | --- |
+| domains | <code>Array.&lt;String&gt;</code> | 
+| key | <code>JWK.rsaKey</code> | 
 
 <a name="PreparedRequest"></a>
 
