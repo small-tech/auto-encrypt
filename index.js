@@ -15,9 +15,9 @@
 const os                                = require('os')
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
-const Pluralise                         = require('./lib/Pluralise')
-const Throws                            = require('./lib/Throws')
-const log                               = require('./lib/log')
+const Pluralise                         = require('./lib/util/Pluralise')
+const Throws                            = require('./lib/util/Throws')
+const log                               = require('./lib/util/log')
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
@@ -60,15 +60,8 @@ function autoEncrypt(_options) {
   delete options.staging
   delete options.settingsPath
 
-  // Initialise the configuration. This carries out robust validation of settings so
-  // we do not duplicate that effort here.
-  Configuration.initialise({
-    settingsPath,
-    staging,
-    domains
-  })
-
-  const certificate = new Certificate(domains)
+  const configuration = new Configuration({ settingsPath, staging, domains })
+  const certificate = new Certificate(configuration)
 
   // Also save a reference in the context so it can be used by the prepareForAppExit() method.
   this.certificate = certificate

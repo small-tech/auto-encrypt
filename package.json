@@ -7,19 +7,21 @@
     "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-debug": "tape 'test/**/*.js' | tap-spec",
     "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "generate-developer-documentation": "node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
+    "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
+    "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@small-tech/rsa-csr": "^1.0.0",
     "bent": "https://github.com/aral/bent/",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
     "moment": "^2.24.0",
+    "node-forge": "^0.9.1",
     "server-destroy": "^1.0.1"
   },
   "devDependencies": {
+    "dependency-cruiser": "^8.1.0",
     "jsdoc": "^3.6.3",
     "jsdoc-to-markdown": "^5.0.3",
     "nyc": "^14.1.1",
