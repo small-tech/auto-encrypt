@@ -23,8 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const os = require('os')
-const https = require('https')
-const autoEncrypt = require('../index')
+const AutoEncrypt = require('../index')
 
 console.log('\n 🌄 Auto Encrypt “Hello, world!” Example \n')
 
@@ -36,7 +35,7 @@ options = {
   domains: [os.hostname(), `www.${os.hostname()}`]
 }
 
-const server = https.createServer(autoEncrypt(options), (request, response) => {
+const server = AutoEncrypt.https.createServer(options, (request, response) => {
   response.end('Hello, world!')
 })
 
