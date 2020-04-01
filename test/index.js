@@ -1,10 +1,11 @@
-const fs = require('fs')
-const tls = require("tls")
-const os          = require('os')
-const https       = require('https')
-const AutoEncrypt = require('..')
-const bent        = require('bent')
-const test        = require('tape')
+const fs                         = require('fs')
+const tls                        = require("tls")
+const os                         = require('os')
+const https                      = require('https')
+const AutoEncrypt                = require('..')
+const bent                       = require('bent')
+const test                       = require('tape')
+const { createTestSettingsPath } = require('../lib/test-helpers')
 
 const httpsGetString = bent('GET', 'string')
 
@@ -14,8 +15,14 @@ monkeyPatchTlsToAcceptLetsEncryptStagingCertificate()
 
 test('Auto Encrypt', async t => {
 
+  const testSettingsPath = createTestSettingsPath()
+
   const hostname = os.hostname()
-  const server = AutoEncrypt.https.createServer({ domains: [hostname], staging: true }, (request, response) => {
+  const server = AutoEncrypt.https.createServer({
+    domains: [hostname],
+    staging: true,
+    settingsPath: testSettingsPath
+  }, (request, response) => {
     response.end('ok')
   })
 
