@@ -1,8 +1,8 @@
 # Auto Encrypt
 
-__Under heavy development and not officially released yet. Play with it if you want to but please don’t use it in production yet.__
+__Under heavy development and not officially released yet. Play with it if you want to but please don’t use it in production.__
 
-Automatically provisions and renews [Let’s Encrypt](https://letsencrypt.org) TLS certificates for [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
+Adds [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) and automatic provisioning and renewal of [Let’s Encrypt](https://letsencrypt.org) TLS certificates to [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
 ## How it works
 
@@ -14,9 +14,55 @@ The first time your web site is hit, it will take a couple of seconds to load as
 npm i @small-tech/auto-encrypt
 ```
 
-## Usage
+## Basic usage
 
-Instead of passing an `options` object directly to the `https.createServer([options][, listener])` method, pass the return value of a call to this module with the options object as its only argument to it. e.g.,
+1. Import the module:
+
+    ```js
+    const AutoEncrypt = require('@small-tech/auto-encrypt')
+    ```
+
+2. Prefix your server creation code with a reference to the Auto Encrypt class:
+
+    ```https.createServer()``` → ```AutoEncrypt.https.createServer()```
+
+3. Before exiting your app, shut down Auto Encrypt:
+
+    ```js
+    AutoEncrypt.shutdown()
+    ```
+
+### Basic usage example
+
+The following code creates an HTTPS server running on port 443 with [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) that automatically provisions and renews TLS certificates from [Let’s Encrypt](https://letsencrypt.org) for the domains _&lt;hostname&gt;_ and _www.&lt;hostname&gt;_.
+
+
+```js
+const AutoEncrypt = require('@small-tech/auto-encrypt')
+
+const server = AutoEncrypt.https.createServer((request, response) => {
+  response.end('Hello, world')
+})
+
+server.listen(() => {
+  console.log(`Auto-encrypted HTTPS server is running at ${os.hostname()} and www.${os.hostname()}.`)
+})
+
+// …
+
+// Before exiting your app:
+AutoEncrypt.shutdown()
+```
+
+Note that on Linux, ports 80 and 443 require special privileges. Please see [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports). If you just need a Node web server that handles all that and more for you (or to see how to implement privilege escalation seamlesly in your own servers, see [Site.js](https://sitejs.org)).
+
+## Configuration
+
+You can customise the default configuration by adding Auto Encrypt-specific options to the options object you pass to the Node `https` server.
+
+You can specify the domains you want the certificate to support, whether the Let’s Encrypt staging server should be used instead of the default production server (useful during development and testing), and to specify a custom settings path for your Let’s Encrypt account and certificate information to be stored in.
+
+### Configuration Example
 
 ```js
 const autoEncrypt = require('@small-tech/auto-encrypt')
@@ -31,73 +77,71 @@ const options = {
 }
 
 // Pass the options object to https.createServer()
-const server = https.createServer(autoEncrypt(options), listener)
-// …
+const server = AutoEncrypt.https.createServer(options, listener)
 
-// Then, when you’re ready to exit your app,
-// give auto-encrypt the chance to perform housekeeping:
-autoEncrypt.prepareForExit()
+// …
 ```
 
-If you don’t have custom HTTPS/TLS options to set for your server and you don’t want to customise the default behaviour of Auto Encrypt, you don’t even have to pass in an `options` object.
+### Default options
 
-Auto Encrypt uses the following defaults:
+Here is the full list of Auto Encrypt options (all optional) and their defaults:
 
   - `domains`: the hostname of the current computer and the www subdomain at that hostname.
   - `staging`: false; it will use the production server (which has [rate limits](https://letsencrypt.org/docs/rate-limits/)).
   - `settingsPath`: _~/.small-tech.org/auto-encrypt/_
 
-So the following is a perfectly-valid minimal example of a secure production server using Auto Encrypt:
+## Making a graceful exit
 
-```js
-const os
-const autoEncrypt = require('@small-tech/auto-encrypt')
-const server = https.createServer(autoEncrypt(), (request, response) => {
-  response.end('Hello, world')
-server.listen(() => console.log('HTTPS server is running on (www.)${os.hostname()}.))
-})
-```
+When you’re ready to exit your app, you must call the `AutoEncrypt.shutdown()` method. This will allow Auto Encrypt to perform housekeeping and to destroy its certificate check update interval which, if not destroyed, will prevent your app from exiting.
 
-(Caveat: See note on [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports)).
+## Developer documentation
 
-### Return value
-
-The `autoEncrypt()` function returns an options object to be passed as the first argument to the `https.createServer()` method.
-
-For implementation details, please see the [developer documentation](developer-documentation.md).
+If you want to help improve Auto Encrypt or better understand how it is structured and operates, please see the [developer documentation](developer-documentation.md).
 
 ## Examples
 
 ### Regular https
 
 ```js
-const https = require('https')
-const autoEncrypt = require('@small-tech/auto-encrypt')
+const AutoEncrypt = require('@small-tech/auto-encrypt')
 
-const server = https.createServer(
-  autoEncrypt({ domains: ['dev.ar.al'] }),
-  (request, response) => {
+const server = AutoEncrypt.https.createServer({ domains: ['dev.ar.al'] }, (request, response) => {
     response.end('Hello, world!')
-  }
-)
+})
+
+server.listen(() => {
+  console.log('Auto-encrypted HTTPS server is running at https://dev.ar.al')
+})
+
+// …
+
+AutoEncrypt.shutdown()
 ```
 
 ### Express.js
 
 ```js
 const express = require('express')
-const https = require('https')
-const autoEncrypt = require('@small-tech/auto-encrypt')
+const AutoEncrypt = require('@small-tech/auto-encrypt')
 
 const app = express()
 app.get('/', (request, response) => {
   response.end('Hello, world!')
 })
 
-const server = https.createServer(
+const server = AutoEncrypt.https.createServer(
   autoEncrypt({ domains: ['dev.ar.al'] }),
   app
 )
+
+server.listen(() => {
+  console.log('Auto-encrypted Express server is running at https://dev.ar.al')
+})
+
+
+// …
+
+AutoEncrypt.shutdown()
 ```
 
 ## Like this? Fund us!
@@ -114,7 +158,7 @@ If you’re evaluating this for a “startup” or an enterprise, let us save yo
 
 ## Client details
 
-Auto Encrypt does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname and it automatically renews your certificate from thereon.
+Auto Encrypt does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname, serves it using OCSP Stapling, and automatically renews your certificate thereafter.
 
 Auto Encrypt __does not_ and __will not__:
 
