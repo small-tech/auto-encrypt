@@ -32,15 +32,26 @@ const throws = new Throws({
     }
 })
 
+/**
+ * Auto Encrypt is a static class. Please do not instantiate.
+ *
+ * Use: AutoEncrypt.https.createServer(…)
+ *
+ * @alias module:@small-tech/auto-encrypt
+ * @hideconstructor
+ */
 class AutoEncrypt {
-  //
-  // By aliasing the https property to the AutoEncrypt static class itself, we enable
-  // people to add AutoEncrypt to their existing apps by requiring the module
-  // and prefixing their https.createServer(…) line with AutoEncrypt:
-  //
-  // const AutoEncrypt = require('auto-encrypt')
-  // const server = AutoEncrypt.https.createServer(…)
-  //
+  /**
+   * By aliasing the https property to the AutoEncrypt static class itself, we enable
+   * people to add AutoEncrypt to their existing apps by requiring the module
+   * and prefixing their https.createServer(…) line with AutoEncrypt:
+   *
+   * @example const AutoEncrypt = require('auto-encrypt')
+   * const server = AutoEncrypt.https.createServer()
+   *
+   * @readonly
+   * @static
+   */
   static get https () { return AutoEncrypt }
 
   /**
@@ -48,9 +59,7 @@ class AutoEncrypt {
    * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
    * the Server Name Indication (SNI) callback.
    *
-   * @function createServer
-   * @alias module:@small-tech/auto-encrypt
-   *
+   * @static
    * @param {Object}   [options]               Optional HTTPS options object with optional additional
    *                                           Auto Encrypt-specific configuration settings.
    * @param {String[]} [options.domains]       Domain names to provision TLS certificates for. If missing, defaults to
@@ -58,7 +67,7 @@ class AutoEncrypt {
    * @param {Boolean}  [options.staging=false] If true, the Let’s Encrypt staging servers will be used.
    * @param {String}   [options.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
    *
-   * @returns {Object} An options object to be passed to the https.createServer() method.
+   * @returns {https.Server} The server instance returned by Node’s https.createServer() method.
    */
   static createServer(_options, _listener) {
     const listener       = _listener              || null
@@ -103,9 +112,22 @@ class AutoEncrypt {
   }
 
   /**
+   * Shut Auto Encrypt down. Do this before app exit. Performs necessary clean-up and removes
+   * any references that might cause the app to not exit.
+   */
+  static shutdown () {
+    this.certificate.stopCheckingForRenewal()
+  }
+
+  //
+  // Private.
+  //
+
+  /**
    * Adds Online Certificate Status Protocol (OCSP) stapling (also known as TLS Certificate Status Request extension)
    * support to the passed server instance.
    *
+   * @private
    * @param {https.Server} server HTTPS server instance without OCSP Stapling support.
    * @returns {https.Server} HTTPS server instance with OCSP Stapling support.
    */
@@ -156,14 +178,8 @@ class AutoEncrypt {
     return server
   }
 
-  /**
-   * Prepare autoEncrypt for app exit. Perform necessary clean-up and remove any
-   * references that might cause the app to not exit.
-   *
-   * @function autoEncrypt.prepareForAppExit
-   */
-  prepareForAppExit () {
-    this.certificate.stopCheckingForRenewal()
+  constructor () {
+    throws.error(Symbol.from('StaticClassCannotBeInstantiatedError'))
   }
 }
 

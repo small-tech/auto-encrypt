@@ -90,15 +90,45 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 
 **License**: AGPLv3 or later.  
 **Copyright**: © 2020 Aral Balkan, Small Technology Foundation.  
-<a name="module_@small-tech/auto-encrypt..autoEncrypt"></a>
 
-### @small-tech/auto-encrypt~autoEncrypt([options]) ⇒ <code>Object</code>
+* [@small-tech/auto-encrypt](#module_@small-tech/auto-encrypt)
+    * [AutoEncrypt](#exp_module_@small-tech/auto-encrypt--AutoEncrypt) ⏏
+        * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
+        * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
+        * [.shutdown()](#module_@small-tech/auto-encrypt--AutoEncrypt.shutdown)
+        * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling) ⇒ <code>https.Server</code> ℗
+
+<a name="exp_module_@small-tech/auto-encrypt--AutoEncrypt"></a>
+
+### AutoEncrypt ⏏
+Auto Encrypt is a static class. Please do not instantiate.
+
+Use: AutoEncrypt.https.createServer(…)
+
+**Kind**: Exported class  
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt.https"></a>
+
+#### AutoEncrypt.https
+By aliasing the https property to the AutoEncrypt static class itself, we enable
+people to add AutoEncrypt to their existing apps by requiring the module
+and prefixing their https.createServer(…) line with AutoEncrypt:
+
+**Kind**: static property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Read only**: true  
+**Example**  
+```js
+const AutoEncrypt = require('auto-encrypt')
+const server = AutoEncrypt.https.createServer()
+```
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt.createServer"></a>
+
+#### AutoEncrypt.createServer([options]) ⇒ <code>https.Server</code>
 Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
 https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
 the Server Name Indication (SNI) callback.
 
-**Kind**: inner method of [<code>@small-tech/auto-encrypt</code>](#module_@small-tech/auto-encrypt)  
-**Returns**: <code>Object</code> - An options object to be passed to the https.createServer() method.  
+**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Returns**: <code>https.Server</code> - The server instance returned by Node’s https.createServer() method.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -106,6 +136,27 @@ the Server Name Indication (SNI) callback.
 | [options.domains] | <code>Array.&lt;String&gt;</code> |  | Domain names to provision TLS certificates for. If missing, defaults to                                           the hostname of the current computer and its www prefixed subdomain. |
 | [options.staging] | <code>Boolean</code> | <code>false</code> | If true, the Let’s Encrypt staging servers will be used. |
 | [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
+
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt.shutdown"></a>
+
+#### AutoEncrypt.shutdown()
+Shut Auto Encrypt down. Do this before app exit. Performs necessary clean-up and removes
+any references that might cause the app to not exit.
+
+**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling"></a>
+
+#### AutoEncrypt.addOcspStapling(server) ⇒ <code>https.Server</code> ℗
+Adds Online Certificate Status Protocol (OCSP) stapling (also known as TLS Certificate Status Request extension)
+support to the passed server instance.
+
+**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Returns**: <code>https.Server</code> - HTTPS server instance with OCSP Stapling support.  
+**Access**: private  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| server | <code>https.Server</code> | HTTPS server instance without OCSP Stapling support. |
 
 <a name="module_lib/AcmeRequest"></a>
 
