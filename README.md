@@ -16,6 +16,8 @@ npm i @small-tech/auto-encrypt
 
 ## Basic usage
 
+### Instructions
+
 1. Import the module:
 
     ```js
@@ -24,7 +26,10 @@ npm i @small-tech/auto-encrypt
 
 2. Prefix your server creation code with a reference to the Auto Encrypt class:
 
-    ```https.createServer()``` → ```AutoEncrypt.https.createServer()```
+    ```js
+    // https.createServer() becomes 👇
+    AutoEncrypt.https.createServer()
+    ```
 
 3. Before exiting your app, shut down Auto Encrypt:
 
@@ -32,7 +37,7 @@ npm i @small-tech/auto-encrypt
     AutoEncrypt.shutdown()
     ```
 
-### Basic usage example
+### Example
 
 The following code creates an HTTPS server running on port 443 with [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) that automatically provisions and renews TLS certificates from [Let’s Encrypt](https://letsencrypt.org) for the domains _&lt;hostname&gt;_ and _www.&lt;hostname&gt;_.
 
@@ -62,7 +67,7 @@ You can customise the default configuration by adding Auto Encrypt-specific opti
 
 You can specify the domains you want the certificate to support, whether the Let’s Encrypt staging server should be used instead of the default production server (useful during development and testing), and to specify a custom settings path for your Let’s Encrypt account and certificate information to be stored in.
 
-### Configuration Example
+### Example
 
 ```js
 const autoEncrypt = require('@small-tech/auto-encrypt')
