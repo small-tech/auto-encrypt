@@ -27,8 +27,8 @@ npm i @small-tech/auto-encrypt
 2. Prefix your server creation code with a reference to the Auto Encrypt class:
 
     ```js
-    // https.createServer() becomes 👇
-    AutoEncrypt.https.createServer()
+    // https.createServer(…) becomes
+    AutoEncrypt.https.createServer(…)
     ```
 
 3. Before exiting your app, shut down Auto Encrypt:
