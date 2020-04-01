@@ -1,101 +1,63 @@
-const os                                            = require('os')
-const fs                                            = require('fs-extra')
-const path                                          = require('path')
-const util                                          = require('util')
-const test                                          = require('tape')
-const autoEncrypt                                   = require('../index')
-const Configuration                                 = require('../lib/Configuration')
-const {
-  destroySingletons,
-  createTestSettingsPath,
-  throwsErrorOfType
-}                                                   = require('../lib/test-helpers')
+const fs = require('fs')
+const tls = require("tls")
+const os          = require('os')
+const https       = require('https')
+const AutoEncrypt = require('..')
+const bent        = require('bent')
+const test        = require('tape')
 
-function setup() {
-  // Destroy all singleton instances, test paths, and app state so we start with a clean slate.
-  destroySingletons()
-  createTestSettingsPath()
-}
+const httpsGetString = bent('GET', 'string')
 
-test('autoEncrypt', async t => {
-  t.plan(12)
+// Since we’re using the staging server, we monkey patch the TLS module to add
+// the Let’s Encrypt staging certificate to it.
+monkeyPatchTlsToAcceptLetsEncryptStagingCertificate()
 
-  setup()
+test('Auto Encrypt', async t => {
 
   const hostname = os.hostname()
-  const expectedDefaultDomains = [hostname, `www.${hostname}`]
-  const expectedDefaultStaging = false
-  const expectedDefaultSettingsPath =
-
-  autoEncrypt()
-
-  t.deepEquals(Configuration.domains, expectedDefaultDomains, 'default domains array set as expected')
-  t.strictEquals(Configuration.staging, expectedDefaultStaging, 'default staging value set as expected')
-  t.strictEquals(Configuration.settingsPath, Configuration.defaultPathFor('production'), 'default settings path value set as expected')
-
-  // Tell autoEncrypt that the app is about to exit to give it time to perform housekeeping.
-  // (Since we have a daily renewal check interval active on the certificate, it must remove this or else
-  // it will stop the app from exiting.)
-  autoEncrypt.prepareForAppExit()
-
-  setup()
-
-  const options = autoEncrypt({domains: [hostname], staging: true, settingsPath: testSettingsPath})
-
-  t.strictEquals('{ SNICallback: [AsyncFunction] }', util.inspect(options), 'options object has the shape we expect')
-
-  const expectedTestSettingsPath = path.join(testSettingsPath, 'staging')
-  const expectedCertificatePath = path.join(expectedTestSettingsPath, hostname)
-
-  t.strictEquals(true, Configuration.staging, 'staging is true')    // TODO: test default state of  false later
-  t.ok(fs.existsSync(expectedCertificatePath), 'certificate path should exist')
-
-  //
-  // Call the SNICallback and test the results. Each call to SNICallback simulates a hit on the server.
-  //
-
-  await new Promise((resolve, reject) => {
-    try {
-      options.SNICallback('invalid-server.name', (error, secureContext) => {
-        t.strictEquals(error.symbol, Symbol.for('SNIIgnoreUnsupportedDomainError'), 'unknown domains are ignored by SNI')
-        t.notOk(secureContext, 'secure context is not truthy when SNI ignores unknown domain')
-        resolve()
-      })
-    } catch (error) {
-      reject(error)
-    }
+  const server = AutoEncrypt.https.createServer({ domains: [hostname], staging: true }, (request, response) => {
+    response.end('ok')
   })
 
-  const secureContext = await new Promise((resolve, reject) => {
-    // This (first valid) call to SNICallback should succeed in provisioning a Let’s Encrypt certificate
-    // and getting a secure context back. This first call will take a while as it provisions certificates
-    // using the Let’s Encrypt staging servers.
-    try {
-      options.SNICallback(hostname, (error, secureContext) => {
-        t.strictEquals(error, null, 'error should be null')
-        // As this is the call that should end later, we resolve the promise here.
-        resolve(secureContext)
-      })
-    } catch (error) {
-      reject(error)
-    }
+  t.ok(server instanceof https.Server, 'https.Server instance returned as expected')
 
-    // This (second valid) call to SNICallback will happen right after the first when the first call should be
-    // busy provisioning the Let’s Encrypt certificate. It should return an error, accordingly.
-    // This call should return immediately.
-    try {
-      options.SNICallback(hostname, (error, secureContext) => {
-        t.strictEquals(error.symbol, Symbol.for('BusyProvisioningCertificateError'), 'requests are rejected while TLS certificates are being provisioned')
-        t.notOk(secureContext, 'secure context is not truthy when SNI rejects a request')
-      })
-    } catch (error) {
-      reject(error)
-    }
+  await new Promise ((resolve, reject) => {
+    server.listen(443, () => {
+      resolve()
+    })
   })
 
-  t.strictEquals(util.inspect(secureContext), 'SecureContext { context: SecureContext {} }', 'the shape of returned secure context object is as we expect')
+  const response = await httpsGetString(`https://${hostname}/`)
 
-  autoEncrypt.prepareForAppExit()
+  t.strictEquals(response, 'ok', 'response is as expected')
+
+  server.close()
+  AutoEncrypt.shutdown()
 
   t.end()
 })
+
+function monkeyPatchTlsToAcceptLetsEncryptStagingCertificate () {
+  // From https://medium.com/trabe/monkey-patching-tls-in-node-js-to-support-self-signed-certificates-with-custom-root-cas-25c7396dfd2a
+  const origCreateSecureContext = tls.createSecureContext
+
+  tls.createSecureContext = options => {
+    const context = origCreateSecureContext(options)
+
+    const pem = fs
+    .readFileSync("./test/fixtures/fakelerootx1.pem", { encoding: "ascii" })
+    .replace(/\r\n/g, "\n")
+
+    const certs = pem.match(/-----BEGIN CERTIFICATE-----\n[\s\S]+?\n-----END CERTIFICATE-----/g)
+
+    if (!certs) {
+      throw new Error(`Could not parse certificate ./rootCA.crt`)
+    }
+
+    certs.forEach(cert => {
+      context.context.addCACert(cert.trim())
+    })
+
+    return context
+  }
+}

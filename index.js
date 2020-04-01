@@ -162,7 +162,6 @@ class AutoEncrypt {
           if (error) return callback(error)
 
           if (cached !== false) {
-            console.log('OCSP from cache', cached.response.toString())
             return callback(null, cached.response)
           }
 
