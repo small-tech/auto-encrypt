@@ -18,11 +18,12 @@ test('Auto Encrypt', async t => {
   const testSettingsPath = createTestSettingsPath()
 
   const hostname = os.hostname()
-  const server = AutoEncrypt.https.createServer({
+  const options = {
     domains: [hostname],
     staging: true,
     settingsPath: testSettingsPath
-  }, (request, response) => {
+  }
+  const server = AutoEncrypt.https.createServer(options, (request, response) => {
     response.end('ok')
   })
 
@@ -39,6 +40,25 @@ test('Auto Encrypt', async t => {
   t.strictEquals(response, 'ok', 'response is as expected')
 
   server.close()
+  AutoEncrypt.shutdown()
+
+  // Create a second server. This time, it should get the certificate from disk.
+  const server2 = AutoEncrypt.https.createServer(options, (request, response) => {
+    response.end('ok')
+  })
+
+  t.ok(server2 instanceof https.Server, 'second https.Server instance returned as expected')
+
+  await new Promise ((resolve, reject) => {
+    server2.listen(443, () => {
+      resolve()
+    })
+  })
+
+  const response2 = await httpsGetString(`https://${hostname}/`)
+  t.strictEquals(response, 'ok', 'second response is as expected')
+
+  server2.close()
   AutoEncrypt.shutdown()
 
   t.end()
