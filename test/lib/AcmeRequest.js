@@ -55,7 +55,7 @@ test('AcmeRequest', async t => {
 
   // Request preparation with useKid = true should fail if account has not been set.
 
-  t.ok(throwsErrorOfTypeAsync(
+  t.ok(await throwsErrorOfTypeAsync(
     async () => {
       const { protectedHeader, signedRequest, httpsRequest, httpsHeaders } = await (new AcmeRequest()).prepare('newOrder', {aPayload: true}, /* useKid = */ true)
     },
