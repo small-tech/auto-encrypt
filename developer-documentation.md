@@ -31,7 +31,7 @@ npm test
 
 ![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
 
-__Not shown (for clarity):__ the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
+__Not shown (for clarity):__ the `util` namespace with helper modules (for logging, error handling, and an async `forEach` implementation), the `typedefs` namespace with JSDoc type definitions, and the `node_modules` namespace with third-party modules.
 
 Generated using [dependency cruiser](https://github.com/sverweij/dependency-cruiser).
 
