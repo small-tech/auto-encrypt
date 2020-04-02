@@ -28,7 +28,7 @@ async function setup() {
 }
 
 test('AcmeRequest', async t => {
-  t.plan(8)
+  t.plan(13)
 
   const { configuration, accountIdentity, directory } = await setup()
 
@@ -86,6 +86,39 @@ test('AcmeRequest', async t => {
   //
   const { aPayload } = jose.JWS.verify(signedRequest, accountIdentity.key)
   t.strictEquals(aPayload, true, 'Payload verifies from the JSON Web Signature')
+
+  //
+  // Test prepare method argument checking.
+  //
+
+  t.ok(await throwsErrorOfTypeAsync(
+    async () => await (new AcmeRequest()).prepare(),
+    Symbol.for('UndefinedOrNullError')
+  ), 'prepare method called without command throws')
+
+  t.ok(await throwsErrorOfTypeAsync(
+    async () => await (new AcmeRequest()).prepare('dummyCommand'),
+    Symbol.for('UndefinedOrNullError')
+  ), 'prepare method called without payload throws')
+
+  t.ok(await throwsErrorOfTypeAsync(
+    async () => await (new AcmeRequest()).prepare('dummyCommand', 'dummyPayload'),
+    Symbol.for('UndefinedOrNullError')
+  ), 'prepare method called without useKid throws')
+
+  //
+  // Test execute method argument checking.
+  //
+
+  t.ok(await throwsErrorOfTypeAsync(
+    async () => await (new AcmeRequest()).execute(),
+    Symbol.for('UndefinedOrNullError')
+  ), 'execute method called without command throws')
+
+  t.ok(await throwsErrorOfTypeAsync(
+    async () => await (new AcmeRequest()).execute('dummyCommand'),
+    Symbol.for('UndefinedOrNullError')
+  ), 'execute method called without payload throws')
 
   //
   // Test call failure.
