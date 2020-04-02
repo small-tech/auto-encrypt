@@ -23,17 +23,21 @@ async function setup() {
 }
 
 test('Account', async t => {
-  t.plan(5)
+  t.plan(6)
 
   const configuration = await setup()
 
-  // Test singleton creation.
+  //
+  // Test first access of account (account creation).
+  //
+
+  // Test factory method creation safeguard.
   t.ok(throwsErrorOfType(
     () => { new Account() },
     Symbol.for('MustBeInstantiatedViaAsyncFactoryMethodError')
   ), 'Account class cannot be directly instantiated')
 
-  const account = await Account.getInstanceAsync(configuration  )
+  const account = await Account.getInstanceAsync(configuration)
 
   // Ensure that the account file exists.
   t.true(fs.existsSync(configuration.accountPath), 'account file exists')
@@ -50,6 +54,14 @@ test('Account', async t => {
     () => { account.kid = 'this is not allowed' },
     Symbol.for('ReadOnlyAccessorError')
   ),'account.kid is a read-only property as expected')
+
+  //
+  // Test second access of account and onwards (return of account information from disk).
+  //
+
+  const accountFromDisk = await Account.getInstanceAsync(configuration)
+
+  t.strictEquals(accountFromDisk.kid, account.kid, 'second access onwards, account is returned from disk')
 
   t.end()
 })
