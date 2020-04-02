@@ -17,6 +17,16 @@ Auto Encrypt is supported on:
   - __Node:__ LTS (currently 12.16.1).
   - __ECMAScript:__ [ES2019](https://node.green/#ES2019)
 
+## Running the tests
+
+The tests use the Let’s Encrypt staging servers and require that your development machine is reachable from ```os.hostname()``` and ```www.${os.hostname()}```. You can either use a service like [ngrok](https://ngrok.com) to achieve this or spin up a quick VPS and run the tests, etc., there.
+
+To run the tests, just:
+
+```sh
+npm test
+```
+
 ## Overview of relationships
 
 ![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
