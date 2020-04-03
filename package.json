@@ -7,13 +7,16 @@
     "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-debug": "tape 'test/**/*.js' | tap-spec",
     "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "test-staging": "STAGING=true QUIET=true tape 'test/**/*.js' | tap-spec",
+    "test-staging-debug": "STAGING=true tape 'test/**/*.js' | tap-spec",
+    "coverage-staging": "STAGING=true QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^https|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "bent": "https://github.com/aral/bent/",
+    "bent": "^7.1.2",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
     "moment": "^2.24.0",

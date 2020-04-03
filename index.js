@@ -13,6 +13,8 @@
  */
 
 const os                                = require('os')
+const MonkeyPatchTls                    = require('./lib/MonkeyPatchTls')
+const LetsEncryptServer                 = require('./lib/LetsEncryptServer')
 const Configuration                     = require('./lib/Configuration')
 const Certificate                       = require('./lib/Certificate')
 const Pluralise                         = require('./lib/util/Pluralise')
@@ -41,6 +43,22 @@ const throws = new Throws({
  * @hideconstructor
  */
 class AutoEncrypt {
+
+  /**
+   * Enumeration.
+   *
+   * @property PRODUCTION Use the production server.
+   * @property STAGING Use the staging server.
+   * @property PEBBLE Use a local pebble testing server.
+   * @readonly
+   * @static
+   */
+  static server = {
+    PRODUCTION: 0,
+    STAGING: 1,
+    PEBBLE: 2,
+  }
+
   /**
    * By aliasing the https property to the AutoEncrypt static class itself, we enable
    * people to add AutoEncrypt to their existing apps by requiring the module
@@ -64,24 +82,40 @@ class AutoEncrypt {
    *                                           Auto Encrypt-specific configuration settings.
    * @param {String[]} [options.domains]       Domain names to provision TLS certificates for. If missing, defaults to
    *                                           the hostname of the current computer and its www prefixed subdomain.
-   * @param {Boolean}  [options.staging=false] If true, the Let’s Encrypt staging servers will be used.
+   * @param {Enum}     [options.server=AutoEncrypt.server.PRODUCTION] Let’s Encrypt server to use.
+   *                                                                  AutoEncrypt.server.PRODUCTION, ….STAGING,
+   *                                                                  or ….PEBBLE.
    * @param {String}   [options.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
    *
    * @returns {https.Server} The server instance returned by Node’s https.createServer() method.
    */
   static createServer(_options, _listener) {
-    const listener       = _listener              || null
-    const options        = _options               || {}
-    const domains        = options.domains        || [os.hostname(), `www.${os.hostname()}`]
-    const staging        = options.staging        || false
-    const settingsPath   = options.settingsPath   || null
+
+    const defaultDomains = [os.hostname(), `www.${os.hostname()}`]
+    const defaultPebbleDomains = ['localhost', 'pebble']
+
+    const options           = _options || {}
+    const letsEncryptServer = new LetsEncryptServer(options.server || AutoEncrypt.server.PRODUCTION)
+    const isPebble  = letsEncryptServer.type === AutoEncrypt.server.PEBBLE
+    const isStaging = letsEncryptServer.type === AutoEncrypt.server.STAGING
+
+    const listener          = _listener            || null
+    const domains           = options.domains      || isPebble ? defaultPebbleDomains : defaultDomains
+    const settingsPath      = options.settingsPath || null
 
     // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
     delete options.domains
-    delete options.staging
+    delete options.server
     delete options.settingsPath
 
-    const configuration = new Configuration({ settingsPath, staging, domains })
+    // If this is running with the staging or pebble server, have Node accept the corresponding root certificate
+    // so that attempts to reach the server (in case of pebble) and use the certificate (in case of both) will succeed.
+    // Note that this does not modify the system trust stores in any way and is only active for the current run of
+    // the Node process.
+    if (isPebble)  { MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE)  }
+    if (isStaging) { MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE) }
+
+    const configuration = new Configuration({ settingsPath, domains, letsEncryptServer})
     const certificate = new Certificate(configuration)
 
     // Also save a reference in the context so it can be used by the prepareForAppExit() method.

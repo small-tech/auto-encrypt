@@ -31,7 +31,7 @@ options = {
   /* Custom http server options, if any, go here (we don’t have any in this
     example, so we could just not have passed this empty object at all). */
 
-  staging: true,          // The default is true (production). We want to use LE staging environment.
+  server: AutoEncrypt.server.PEBBLE,                // (The default is .PRODUCTION.)
   domains: [os.hostname(), `www.${os.hostname()}`]
 }
 
