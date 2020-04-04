@@ -96,16 +96,20 @@ class AutoEncrypt {
       _options = {}
     }
 
-    const defaultDomains = [os.hostname(), `www.${os.hostname()}`]
-    const defaultPebbleDomains = ['localhost', 'pebble']
+    const defaultStagingAndProductionDomains = [os.hostname(), `www.${os.hostname()}`]
+    const defaultPebbleDomains               = ['localhost', 'pebble']
 
     const options           = _options || {}
     const letsEncryptServer = new LetsEncryptServer(options.server || AutoEncrypt.server.PRODUCTION)
-    const isPebble  = letsEncryptServer.type === AutoEncrypt.server.PEBBLE
-    const isStaging = letsEncryptServer.type === AutoEncrypt.server.STAGING
+    const isPebble          = letsEncryptServer.type === AutoEncrypt.server.PEBBLE
+    const isStaging         = letsEncryptServer.type === AutoEncrypt.server.STAGING
+
+    // Ignore any passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
+    if (isPebble) { _options.domains = null }
+    const defaultDomains = isPebble ? defaultPebbleDomains : defaultStagingAndProductionDomains
 
     const listener          = _listener            || null
-    const domains           = options.domains      || isPebble ? defaultPebbleDomains : defaultDomains
+    const domains           = options.domains      || defaultDomains
     const settingsPath      = options.settingsPath || null
 
     // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
@@ -193,9 +197,6 @@ class AutoEncrypt {
         if (uri === null) return callback()
 
         const request = ocsp.request.generate(certificate, issuer)
-
-        // Todo: CHECK: Does the cache.probe method expire the cache
-        // ===== before the OCSP response expires? []
 
         cache.probe(request.id, (error, cached) => {
           if (error) return callback(error)
