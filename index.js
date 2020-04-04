@@ -90,6 +90,11 @@ class AutoEncrypt {
    * @returns {https.Server} The server instance returned by Node’s https.createServer() method.
    */
   static createServer(_options, _listener) {
+    // The first parameter is optional. If omitted, the first argument, if any, is treated as the request listener.
+    if (typeof _options === 'function') {
+      _listener = _options
+      _options = {}
+    }
 
     const defaultDomains = [os.hostname(), `www.${os.hostname()}`]
     const defaultPebbleDomains = ['localhost', 'pebble']
