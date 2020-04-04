@@ -30,7 +30,7 @@ async function setup() {
   return { configuration, accountIdentity, directory }
 }
 
-test('AcmeRequest', async t => {
+test.skip('AcmeRequest', async t => {
   t.plan(13)
 
   const { configuration, accountIdentity, directory } = await setup()

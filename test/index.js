@@ -3,6 +3,7 @@ const https                      = require('https')
 const AutoEncrypt                = require('..')
 const bent                       = require('bent')
 const test                       = require('tape')
+const MonkeyPatchTls             = require('../lib/MonkeyPatchTls')
 const { createTestSettingsPath } = require('../lib/test-helpers')
 
 const httpsGetString = bent('GET', 'string')
@@ -17,7 +18,7 @@ test('Auto Encrypt', async t => {
   const testSettingsPath = createTestSettingsPath()
 
   const hostname = os.hostname()
-  const options = {
+  let options = {
     domains: [hostname],
     serverType: letsEncryptServerType,
     settingsPath: testSettingsPath
@@ -27,6 +28,11 @@ test('Auto Encrypt', async t => {
   })
 
   t.ok(server instanceof https.Server, 'https.Server instance returned as expected')
+
+  // Although Auto Encrypt monkey patches Node.js TLS to load the Pebble servers root certificate,
+  // in order to actually test our server, we also need to add the dynamically-generated Pebble CA’s
+  // root and intermediary certificates. That’s what this does.
+  await MonkeyPatchTls.toAcceptPebbleCARootAndIntermediary()
 
   await new Promise ((resolve, reject) => {
     server.listen(443, () => {
@@ -44,6 +50,13 @@ test('Auto Encrypt', async t => {
   AutoEncrypt.shutdown()
 
   // Create a second server. This time, it should get the certificate from disk.
+  // Note: recreating options object as original one was passed by reference and
+  // ===== no longer contains the initial settings.
+  options = {
+    domains: [hostname],
+    serverType: letsEncryptServerType,
+    settingsPath: testSettingsPath
+  }
   const server2 = AutoEncrypt.https.createServer(options, (request, response) => {
     response.end('ok')
   })

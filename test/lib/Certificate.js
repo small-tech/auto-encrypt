@@ -15,7 +15,7 @@ async function setup() {
   })
 }
 
-test('Certificate', async t => {
+test.skip('Certificate', async t => {
   setup()
 
   //

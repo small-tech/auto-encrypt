@@ -7,7 +7,7 @@ const LetsEncryptServer                = require('../../lib/LetsEncryptServer')
 const Configuration                    = require('../../lib/Configuration')
 const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
 
-test('Configuration', t => {
+test.skip('Configuration', t => {
   t.plan(34)
 
   const letsEncryptStagingServer = new LetsEncryptServer(LetsEncryptServer.type.STAGING)

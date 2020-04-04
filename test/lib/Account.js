@@ -11,12 +11,15 @@ const AcmeRequest           = require('../../lib/AcmeRequest')
 const LetsEncryptServer     = require('../../lib/LetsEncryptServer')
 
 async function setup() {
+
+  const server = new LetsEncryptServer(process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE)
+
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
 
   const configuration = new Configuration({
-    domains: ['dev.ar.al'],
-    server: new LetsEncryptServer(LetsEncryptServer.type.STAGING),
+    domains: process.env.STAGING ? [os.hostname()] : ['localhost'],
+    server,
     settingsPath: customSettingsPath
   })
   const accountIdentity = new AccountIdentity(configuration)
@@ -27,7 +30,7 @@ async function setup() {
   return configuration
 }
 
-test('Account', async t => {
+test.skip('Account', async t => {
   t.plan(6)
 
   const configuration = await setup()
