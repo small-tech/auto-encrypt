@@ -17,21 +17,11 @@ Auto Encrypt is supported on:
   - __Node:__ LTS (currently 12.16.1).
   - __ECMAScript:__ [ES2019](https://node.green/#ES2019)
 
-## Running the tests
-
-The tests use the Let’s Encrypt staging servers and require that your development machine is reachable from ```os.hostname()``` and ```www.${os.hostname()}```. You can either use a service like [ngrok](https://ngrok.com) to achieve this or spin up a quick VPS and run the tests, etc., there.
-
-To run the tests, just:
-
-```sh
-npm test
-```
-
 ## Overview of relationships
 
 ![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
 
-__Not shown (for clarity):__ the `util` namespace with helper modules (for logging, error handling, and an async `forEach` implementation), the `typedefs` namespace with JSDoc type definitions, and the `node_modules` namespace with third-party modules.
+__Not shown (for clarity):__ the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
 
 Generated using [dependency cruiser](https://github.com/sverweij/dependency-cruiser).
 
@@ -103,10 +93,13 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 
 * [@small-tech/auto-encrypt](#module_@small-tech/auto-encrypt)
     * [AutoEncrypt](#exp_module_@small-tech/auto-encrypt--AutoEncrypt) ⏏
-        * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
-        * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
-        * [.shutdown()](#module_@small-tech/auto-encrypt--AutoEncrypt.shutdown)
-        * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling) ⇒ <code>https.Server</code> ℗
+        * _instance_
+            * [.server](#module_@small-tech/auto-encrypt--AutoEncrypt+server)
+        * _static_
+            * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
+            * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
+            * [.shutdown()](#module_@small-tech/auto-encrypt--AutoEncrypt.shutdown)
+            * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling) ⇒ <code>https.Server</code> ℗
 
 <a name="exp_module_@small-tech/auto-encrypt--AutoEncrypt"></a>
 
@@ -116,6 +109,21 @@ Auto Encrypt is a static class. Please do not instantiate.
 Use: AutoEncrypt.https.createServer(…)
 
 **Kind**: Exported class  
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt+server"></a>
+
+#### autoEncrypt.server
+Enumeration.
+
+**Kind**: instance property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Read only**: true  
+**Properties**
+
+| Name | Description |
+| --- | --- |
+| PRODUCTION | Use the production server. |
+| STAGING | Use the staging server. |
+| PEBBLE | Use a local pebble testing server. |
+
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.https"></a>
 
 #### AutoEncrypt.https
@@ -144,7 +152,7 @@ the Server Name Indication (SNI) callback.
 | --- | --- | --- | --- |
 | [options] | <code>Object</code> |  | Optional HTTPS options object with optional additional                                           Auto Encrypt-specific configuration settings. |
 | [options.domains] | <code>Array.&lt;String&gt;</code> |  | Domain names to provision TLS certificates for. If missing, defaults to                                           the hostname of the current computer and its www prefixed subdomain. |
-| [options.staging] | <code>Boolean</code> | <code>false</code> | If true, the Let’s Encrypt staging servers will be used. |
+| [options.server] | <code>Enum</code> | <code>AutoEncrypt.server.PRODUCTION</code> | Let’s Encrypt server to use.                                                                  AutoEncrypt.server.PRODUCTION, ….STAGING,                                                                  or ….PEBBLE. |
 | [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
 
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.shutdown"></a>
@@ -239,9 +247,9 @@ that different request configurations conform to our expectations.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| command | <code>String</code> |  | Name of Let’s Encrypt command to invoke as used by [Directory](Directory)                                             (sans 'Url' suffix). e.g. 'newAccount', 'newOrder', etc. |
-| payload | <code>Object</code> \| <code>String</code> |  | Either an object to use as the payload or, if there is no payload,                                             an empty string. |
-| useKid | <code>Boolean</code> |  | Should the request use a Key ID (true) or, a public JWK (false).                                             (See RFC 8555 § 6.2 Request Authentication) |
+| command | <code>String</code> |  | (Required) Name of Let’s Encrypt command to invoke (see Directory).                                             (sans 'Url' suffix). e.g. 'newAccount', 'newOrder', etc. |
+| payload | <code>Object</code> \| <code>String</code> |  | (Required) Either an object to use as the payload or, if there is no                                             payload, an empty string. |
+| useKid | <code>Boolean</code> |  | (Required) Should request use a Key ID (true) or, public JWK (false).                                             (See RFC 8555 § 6.2 Request Authentication) |
 | [successCodes] | <code>Array.&lt;Number&gt;</code> | <code>[200]</code> | Optional array of codes that signals success. Any other code throws. |
 | [url] | <code>String</code> | <code></code> | If specified, will use this URL directly, ignoring the value in                                             the command parameter. |
 
@@ -379,7 +387,7 @@ Global configuration class. Use initialise() method to populate.
 * [lib/Configuration](#module_lib/Configuration)
     * [Configuration](#exp_module_lib/Configuration--Configuration) ⏏
         * [new Configuration(settings)](#new_module_lib/Configuration--Configuration_new)
-        * [.staging](#module_lib/Configuration--Configuration+staging) : <code>Array.&lt;String&gt;</code>
+        * [.letsEncryptServer](#module_lib/Configuration--Configuration+letsEncryptServer) : <code>LetsEncryptServer</code>
         * [.domains](#module_lib/Configuration--Configuration+domains) : <code>Array.&lt;String&gt;</code>
         * [.settingsPath](#module_lib/Configuration--Configuration+settingsPath) : <code>String</code>
         * [.accountPath](#module_lib/Configuration--Configuration+accountPath) : <code>String</code>
@@ -400,15 +408,15 @@ Initialise the configuration. Must be called before accessing settings. May be c
 
 | Param | Type | Description |
 | --- | --- | --- |
-| settings | <code>Object</code> | Parameter object of settings to initialise the configuration with. |
-| settings.domains | <code>Array.&lt;String&gt;</code> | List of domains that Auto Encrypt will manage TLS certificates for. |
-| settings.staging | <code>Boolean</code> | Should we use Let’s Encrypt’s staging (true) or production servers (false). |
-| settings.settingsPath | <code>String</code> | The root settings paths to use. Uses default path if value is null. |
+| settings | <code>Object</code> | Settings to initialise configuration with. |
+| settings.domains | <code>Array.&lt;String&gt;</code> | List of domains Auto Encrypt will manage TLS certs for. |
+| settings.letsEncryptServer | <code>LetsEncryptServer</code> | Let’s Encrypt Server to use. |
+| settings.settingsPath | <code>String</code> | Root settings path to use. Will use default path if null. |
 
-<a name="module_lib/Configuration--Configuration+staging"></a>
+<a name="module_lib/Configuration--Configuration+letsEncryptServer"></a>
 
-#### configuration.staging : <code>Array.&lt;String&gt;</code>
-Should we use Let’s Encrypt’s staging (true) or production servers (false).
+#### configuration.letsEncryptServer : <code>LetsEncryptServer</code>
+The Let’s Encrypt Server instance.
 
 **Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
 **Read only**: true  
