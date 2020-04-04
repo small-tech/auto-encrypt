@@ -54,13 +54,11 @@ class AutoEncrypt {
   /**
    * Enumeration.
    *
-   * @property PRODUCTION Use the production server.
-   * @property STAGING Use the staging server.
-   * @property PEBBLE Use a local pebble testing server.
+   * @type {LetsEncryptServer.type}
    * @readonly
    * @static
    */
-  static server = LetsEncryptServer.type
+  static serverType = LetsEncryptServer.type
 
   /**
    * By aliasing the https property to the AutoEncrypt static class itself, we enable
@@ -85,9 +83,9 @@ class AutoEncrypt {
    *                                           Auto Encrypt-specific configuration settings.
    * @param {String[]} [options.domains]       Domain names to provision TLS certificates for. If missing, defaults to
    *                                           the hostname of the current computer and its www prefixed subdomain.
-   * @param {Enum}     [options.server=AutoEncrypt.server.PRODUCTION] Let’s Encrypt server to use.
-   *                                                                  AutoEncrypt.server.PRODUCTION, ….STAGING,
-   *                                                                  or ….PEBBLE.
+   * @param {Enum}     [options.serverType=AutoEncrypt.serverType.PRODUCTION] Let’s Encrypt server type to use.
+   *                                                                  AutoEncrypt.serverType.PRODUCTION, ….STAGING,
+   *                                                                  or ….PEBBLE (see LetsEncryptServer.type).
    * @param {String}   [options.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
    *
    * @returns {https.Server} The server instance returned by Node’s https.createServer() method.
@@ -102,7 +100,7 @@ class AutoEncrypt {
     const defaultStagingAndProductionDomains = [os.hostname(), `www.${os.hostname()}`]
     const defaultPebbleDomains               = ['localhost', 'pebble']
     const options                            = _options || {}
-    const letsEncryptServer                  = new LetsEncryptServer(options.server || LetsEncryptServer.type.PRODUCTION)
+    const letsEncryptServer                  = new LetsEncryptServer(options.serverType || LetsEncryptServer.type.PRODUCTION)
     const listener                           = _listener || null
     const settingsPath                       = options.settingsPath || null
 
@@ -133,7 +131,7 @@ class AutoEncrypt {
 
     // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
     delete options.domains
-    delete options.server
+    delete options.serverType
     delete options.settingsPath
 
     const configuration = new Configuration({ settingsPath, domains, server: letsEncryptServer})
