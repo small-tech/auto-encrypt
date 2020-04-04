@@ -1,5 +1,3 @@
-
-
 const os                         = require('os')
 const fs                         = require('fs-extra')
 const path                       = require('path')
@@ -10,6 +8,7 @@ const Configuration              = require('../../lib/Configuration')
 const Directory                  = require('../../lib/Directory')
 const Account                    = require('../../lib/Account')
 const AccountIdentity            = require('../../lib/AccountIdentity')
+const LetsEncryptServer          = require('../../lib/LetsEncryptServer')
 const { httpServerWithResponse,
         throwsErrorOfType,
         throwsErrorOfTypeAsync } = require('../../lib/test-helpers')
@@ -18,7 +17,11 @@ async function setup() {
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
 
-  const configuration = new Configuration({ domains: ['dev.ar.al'], staging: true, settingsPath: customSettingsPath })
+  const configuration = new Configuration({
+    domains: ['dev.ar.al'],
+    server: new LetsEncryptServer(LetsEncryptServer.type.STAGING),
+    settingsPath: customSettingsPath
+  })
   const accountIdentity = new AccountIdentity(configuration)
   const directory = await Directory.getInstanceAsync(configuration)
 

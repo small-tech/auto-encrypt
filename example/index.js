@@ -39,6 +39,9 @@ const server = AutoEncrypt.https.createServer(options, (request, response) => {
   response.end('Hello, world!')
 })
 
+console.log(AutoEncrypt)
+
 server.listen(443, () => {
-  console.log(`\n ✨ “Hello, world!” server is running at https://${os.hostname()}…\n`)
+  console.log(`\n ✨ “Hello, world!” server is running…\n`)
+  console.log(server.address())
 })

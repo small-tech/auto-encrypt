@@ -14,7 +14,7 @@ test('Auto Encrypt', async t => {
   const hostname = os.hostname()
   const options = {
     domains: [hostname],
-    staging: true,
+    server: AutoEncrypt.server.STAGING,
     settingsPath: testSettingsPath
   }
   const server = AutoEncrypt.https.createServer(options, (request, response) => {

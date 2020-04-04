@@ -60,11 +60,7 @@ class AutoEncrypt {
    * @readonly
    * @static
    */
-  static server = {
-    PRODUCTION: 0,
-    STAGING: 1,
-    PEBBLE: 2,
-  }
+  static server = LetsEncryptServer.type
 
   /**
    * By aliasing the https property to the AutoEncrypt static class itself, we enable
@@ -106,9 +102,10 @@ class AutoEncrypt {
     const defaultStagingAndProductionDomains = [os.hostname(), `www.${os.hostname()}`]
     const defaultPebbleDomains               = ['localhost', 'pebble']
     const options                            = _options || {}
-    const letsEncryptServer                  = new LetsEncryptServer(options.server || AutoEncrypt.server.PRODUCTION)
+    const letsEncryptServer                  = new LetsEncryptServer(options.server || LetsEncryptServer.type.PRODUCTION)
     const listener                           = _listener || null
     const settingsPath                       = options.settingsPath || null
+
     //
     // Ignore passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
     //
@@ -121,13 +118,13 @@ class AutoEncrypt {
     let defaultDomains = defaultStagingAndProductionDomains
 
     switch (letsEncryptServer.type) {
-      case AutoEncrypt.server.PEBBLE:
+      case LetsEncryptServer.type.PEBBLE:
         options.domains = null
         defaultDomains = defaultPebbleDomains
         MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE)
       break
 
-      case AutoEncrypt.server.STAGING:
+      case LetsEncryptServer.type.STAGING:
         MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE)
       break
     }
@@ -139,7 +136,7 @@ class AutoEncrypt {
     delete options.server
     delete options.settingsPath
 
-    const configuration = new Configuration({ settingsPath, domains, letsEncryptServer})
+    const configuration = new Configuration({ settingsPath, domains, server: letsEncryptServer})
     const certificate = new Certificate(configuration)
 
     this.#letsEncryptServer = letsEncryptServer

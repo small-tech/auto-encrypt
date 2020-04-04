@@ -3,11 +3,14 @@ const fs                               = require('fs-extra')
 const path                             = require('path')
 const util                             = require('util')
 const test                             = require('tape')
-const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
+const LetsEncryptServer                = require('../../lib/LetsEncryptServer')
 const Configuration                    = require('../../lib/Configuration')
+const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
 
 test('Configuration', t => {
   t.plan(34)
+
+  const letsEncryptStagingServer = new LetsEncryptServer(LetsEncryptServer.type.STAGING)
 
   t.ok(throwsErrorOfType(
     () => { new Configuration() },
@@ -15,7 +18,7 @@ test('Configuration', t => {
   ), 'missing parameter object throws')
 
   t.ok(throwsErrorOfType(
-    () => { new Configuration({staging: true, settingsPath: null}) },
+    () => { new Configuration({server: letsEncryptStagingServer, settingsPath: null}) },
     Symbol.for('Configuration.domainsArrayIsNotAnArrayOfStringsError')
   ), 'missing settings.domains throws')
 
@@ -26,17 +29,17 @@ test('Configuration', t => {
   ), 'missing settings.staging throws')
 
   t.ok(throwsErrorOfType(
-    () => { new Configuration({domains: ['dev.ar.al'], staging: true}) },
+    () => { new Configuration({domains: ['dev.ar.al'], server: letsEncryptStagingServer}) },
     Symbol.for('UndefinedError')
   ), 'undefined settings.settingsPath throws')
 
   t.doesNotThrow(
-    () => { new Configuration({domains: ['dev.ar.al'], staging: true, settingsPath: null}) },
+    () => { new Configuration({domains: ['dev.ar.al'], server: letsEncryptStagingServer, settingsPath: null}) },
     'settings.settingsPath = null does not throw'
   )
 
   t.ok(throwsErrorOfType(
-    () => { new Configuration({domains: ['dev.ar.al', 1, 2, 3], staging: true, settingsPath: null}) },
+    () => { new Configuration({domains: ['dev.ar.al', 1, 2, 3], server: letsEncryptStagingServer, settingsPath: null}) },
     Symbol.for('Configuration.domainsArrayIsNotAnArrayOfStringsError')
   ), 'domains must be an array of string or else it throws')
 
@@ -49,7 +52,7 @@ test('Configuration', t => {
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
 
-  configuration = new Configuration({ domains: ['dev.ar.al'], staging: true, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['dev.ar.al'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
 
   //
   // Settings path.
@@ -78,11 +81,13 @@ test('Configuration', t => {
   const dehydratedExpectedInspectionString = dehydrate(`
   # Configuration (class)
 
-  A single location for shared configuration (e.g., settings paths)
+  A single location for shared configuration.
+
+  Using staging server paths.
 
   Property                   Description                             Value
   -------------------------- --------------------------------------- ---------------------------------------
-  .staging                 : Use Let’s Encrypt (LE) staging servers? true
+  .server                  : Lets Encrypt Server details             {name: 'staging', endpoint: 'https://acme-staging-v02.api.letsencrypt.org/directory}'
   .domains                 : Domains in certificate                  dev.ar.al
   .settingsPath            : Top-level settings path                 /home/aral/.small-tech.org/auto-encrypt/test/staging
   .accountPath             : Path to LE account details JSON file    /home/aral/.small-tech.org/auto-encrypt/test/staging/account.json
@@ -98,7 +103,7 @@ test('Configuration', t => {
   // has 2-4 domains and more than 4 domains.
   //
 
-  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org'], staging: true, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
 
   const expectedCertificateDirectoryPathForTwoDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--and--small-tech.org')
 
@@ -110,7 +115,7 @@ test('Configuration', t => {
   // Test configuration with three domains.
   //
 
-  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org'], staging: true, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
 
   const expectedCertificateDirectoryPathForThreeDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--and--sitejs.org')
 
@@ -122,7 +127,7 @@ test('Configuration', t => {
   // Test configuration with four domains.
   //
 
-  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi'], staging: true, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
 
   const expectedCertificateDirectoryPathForFourDomains = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--sitejs.org--and--better.fyi')
 
@@ -134,7 +139,7 @@ test('Configuration', t => {
   // Test configuration with more than four domains.
   //
 
-  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi', 'laurakalbag.com'], staging: true, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['ar.al', 'small-tech.org', 'sitejs.org', 'better.fyi', 'laurakalbag.com'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
   const expectedStartOfCertificateDirectoryPath = path.join(expectedCustomStagingSettingsPath, 'ar.al--small-tech.org--and--3--others')
 
   const lastSeparatorIndex = configuration.certificateDirectoryPath.lastIndexOf('--')
@@ -153,7 +158,7 @@ test('Configuration', t => {
   // Check the production path with custom settings path.
   //
 
-  configuration = new Configuration({ domains: ['dev.ar.al'], staging: false, settingsPath: customSettingsPath })
+  configuration = new Configuration({ domains: ['dev.ar.al'], server: new LetsEncryptServer(LetsEncryptServer.type.PRODUCTION), settingsPath: customSettingsPath })
 
   const expectedCustomProductionSettingsPath = path.join(customSettingsPath, 'production')
   t.strictEquals(configuration.settingsPath, expectedCustomProductionSettingsPath)
@@ -165,7 +170,7 @@ test('Configuration', t => {
   const defaultSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt')
   const defaultStagingSettingsPath = path.join(defaultSettingsPath, 'staging')
 
-  configuration = new Configuration({domains: ['dev.ar.al'], staging: true, settingsPath: null})
+  configuration = new Configuration({domains: ['dev.ar.al'], server: letsEncryptStagingServer, settingsPath: null})
 
   t.strictEquals(configuration.settingsPath, defaultStagingSettingsPath, 'default staging settings path is set as expected')
 
@@ -177,7 +182,7 @@ test('Configuration', t => {
 
   const defaultProductionSettingsPath = path.join(defaultSettingsPath, 'production')
 
-  configuration = new Configuration({domains: ['dev.ar.al'], staging: false, settingsPath: null})
+  configuration = new Configuration({domains: ['dev.ar.al'], server: new LetsEncryptServer(LetsEncryptServer.type.PRODUCTION), settingsPath: null})
 
   t.strictEquals(configuration.settingsPath, defaultProductionSettingsPath, 'default production settings path is set as expected')
 
@@ -187,7 +192,7 @@ test('Configuration', t => {
   // Attempting to directly set a configuration property should throw.
   //
 
-  ;['staging', 'domains', 'settingsPath', 'accountPath', 'accountIdentityPath', 'certificatePath', 'certificateDirectoryPath', 'certificateIdentityPath'].forEach(setter => {
+  ;['server', 'domains', 'settingsPath', 'accountPath', 'accountIdentityPath', 'certificatePath', 'certificateDirectoryPath', 'certificateIdentityPath'].forEach(setter => {
     t.ok(throwsErrorOfType(
       () => { configuration[setter] = true },
       Symbol.for('ReadOnlyAccessorError')
