@@ -12,16 +12,16 @@
  * @license AGPLv3 or later.
  */
 
-const os                                = require('os')
-const MonkeyPatchTls                    = require('./lib/MonkeyPatchTls')
-const LetsEncryptServer                 = require('./lib/LetsEncryptServer')
-const Configuration                     = require('./lib/Configuration')
-const Certificate                       = require('./lib/Certificate')
-const Pluralise                         = require('./lib/util/Pluralise')
-const Throws                            = require('./lib/util/Throws')
-const log                               = require('./lib/util/log')
-const ocsp                              = require('ocsp')
-const https                             = require('https')
+const os                = require('os')
+const MonkeyPatchTls    = require('./lib/MonkeyPatchTls')
+const LetsEncryptServer = require('./lib/LetsEncryptServer')
+const Configuration     = require('./lib/Configuration')
+const Certificate       = require('./lib/Certificate')
+const Pluralise         = require('./lib/util/Pluralise')
+const Throws            = require('./lib/util/Throws')
+const log               = require('./lib/util/log')
+const ocsp              = require('ocsp')
+const https             = require('https')
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
