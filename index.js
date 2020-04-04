@@ -13,6 +13,9 @@
  */
 
 const os                = require('os')
+const util              = require('util')
+const https             = require('https')
+const ocsp              = require('ocsp')
 const MonkeyPatchTls    = require('./lib/MonkeyPatchTls')
 const LetsEncryptServer = require('./lib/LetsEncryptServer')
 const Configuration     = require('./lib/Configuration')
@@ -20,8 +23,6 @@ const Certificate       = require('./lib/Certificate')
 const Pluralise         = require('./lib/util/Pluralise')
 const Throws            = require('./lib/util/Throws')
 const log               = require('./lib/util/log')
-const ocsp              = require('ocsp')
-const https             = require('https')
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
@@ -43,6 +44,12 @@ const throws = new Throws({
  * @hideconstructor
  */
 class AutoEncrypt {
+  static #letsEncryptServer = null
+  static #defaultDomains    = null
+  static #domains           = null
+  static #settingsPath      = null
+  static #listener          = null
+  static #certificate       = null
 
   /**
    * Enumeration.
@@ -98,38 +105,49 @@ class AutoEncrypt {
 
     const defaultStagingAndProductionDomains = [os.hostname(), `www.${os.hostname()}`]
     const defaultPebbleDomains               = ['localhost', 'pebble']
+    const options                            = _options || {}
+    const letsEncryptServer                  = new LetsEncryptServer(options.server || AutoEncrypt.server.PRODUCTION)
+    const listener                           = _listener || null
+    const settingsPath                       = options.settingsPath || null
+    //
+    // Ignore passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
+    //
+    // Also, If this is running with the staging or pebble server, have Node accept the corresponding root certificate
+    // so that attempts to reach the server (in case of pebble) and use the certificate (in case of both) will succeed.
+    // Note that this does not modify the system trust stores in any way and is only active for the current run of
+    // the Node process.
+    //
 
-    const options           = _options || {}
-    const letsEncryptServer = new LetsEncryptServer(options.server || AutoEncrypt.server.PRODUCTION)
-    const isPebble          = letsEncryptServer.type === AutoEncrypt.server.PEBBLE
-    const isStaging         = letsEncryptServer.type === AutoEncrypt.server.STAGING
+    let defaultDomains = defaultStagingAndProductionDomains
 
-    // Ignore any passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
-    if (isPebble) { _options.domains = null }
-    const defaultDomains = isPebble ? defaultPebbleDomains : defaultStagingAndProductionDomains
+    switch (letsEncryptServer.type) {
+      case AutoEncrypt.server.PEBBLE:
+        options.domains = null
+        defaultDomains = defaultPebbleDomains
+        MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE)
+      break
 
-    const listener          = _listener            || null
-    const domains           = options.domains      || defaultDomains
-    const settingsPath      = options.settingsPath || null
+      case AutoEncrypt.server.STAGING:
+        MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE)
+      break
+    }
+
+    const domains = options.domains || defaultDomains
 
     // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
     delete options.domains
     delete options.server
     delete options.settingsPath
 
-    // If this is running with the staging or pebble server, have Node accept the corresponding root certificate
-    // so that attempts to reach the server (in case of pebble) and use the certificate (in case of both) will succeed.
-    // Note that this does not modify the system trust stores in any way and is only active for the current run of
-    // the Node process.
-    if (isPebble)  { MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE)  }
-    if (isStaging) { MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE) }
-
     const configuration = new Configuration({ settingsPath, domains, letsEncryptServer})
     const certificate = new Certificate(configuration)
 
-    // Also save a reference in the context so it can be used by the prepareForAppExit() method.
-    // (For performance reasons, we have the SNICallback method only do lookups in enclosed scope.)
-    this.certificate = certificate
+    this.#letsEncryptServer = letsEncryptServer
+    this.#defaultDomains    = defaultDomains
+    this.#domains           = domains
+    this.#settingsPath      = settingsPath
+    this.#listener          = listener
+    this.#certificate       = certificate
 
     function sniError (symbolName, callback, emoji, ...args) {
       const error = Symbol.for(symbolName)
@@ -159,7 +177,7 @@ class AutoEncrypt {
    * any references that might cause the app to not exit.
    */
   static shutdown () {
-    this.certificate.stopCheckingForRenewal()
+    this.#certificate.stopCheckingForRenewal()
   }
 
   //
@@ -215,6 +233,18 @@ class AutoEncrypt {
       })
     })
     return server
+  }
+
+  // Custom object description for console output (for debugging).
+  static [util.inspect.custom] () {
+    return `
+      # AutoEncrypt (static class)
+
+        - Using Let’s Encrypt ${this.#letsEncryptServer.name} server.
+        - Managing TLS for ${this.#domains.toString().replace(',', ', ')}${this.#domains === this.#defaultDomains ? ' (default domains)' : ''}.
+        - Settings stored at ${this.#settingsPath === null ? 'default settings path' : this.#settingsPath}.
+        - Listener ${typeof this.#listener === 'function' ? 'is set' : 'not set'}.
+    `
   }
 
   constructor () {
