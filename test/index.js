@@ -32,7 +32,8 @@ test('Auto Encrypt', async t => {
   // Although Auto Encrypt monkey patches Node.js TLS to load the Pebble servers root certificate,
   // in order to actually test our server, we also need to add the dynamically-generated Pebble CA’s
   // root and intermediary certificates. That’s what this does.
-  await MonkeyPatchTls.toAcceptPebbleCARootAndIntermediary()
+  const pebbleCaRootAndIntermediaryCertificates = await MonkeyPatchTls.downloadPebbleCaRootAndIntermediaryCertificates()
+  MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE, pebbleCaRootAndIntermediaryCertificates)
 
   await new Promise ((resolve, reject) => {
     server.listen(443, () => {
@@ -62,6 +63,11 @@ test('Auto Encrypt', async t => {
   })
 
   t.ok(server2 instanceof https.Server, 'second https.Server instance returned as expected')
+
+  // Although Auto Encrypt monkey patches Node.js TLS to load the Pebble servers root certificate,
+  // in order to actually test our server, we also need to add the dynamically-generated Pebble CA’s
+  // root and intermediary certificates. That’s what this does.
+  MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE, pebbleCaRootAndIntermediaryCertificates)
 
   await new Promise ((resolve, reject) => {
     server2.listen(443, () => {
