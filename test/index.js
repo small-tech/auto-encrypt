@@ -4,6 +4,7 @@ const AutoEncrypt                = require('..')
 const bent                       = require('bent')
 const test                       = require('tape')
 const MonkeyPatchTls             = require('../lib/MonkeyPatchTls')
+const Pebble                     = require('@small-tech/node-pebble')
 const { createTestSettingsPath } = require('../lib/test-helpers')
 
 const httpsGetString = bent('GET', 'string')
@@ -14,6 +15,12 @@ test('Auto Encrypt', async t => {
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? AutoEncrypt.serverType.STAGING : AutoEncrypt.serverType.PEBBLE
+
+  let pebbleProcess = null
+  if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
+    // If we’re testing with Pebble, fire up a local Pebble server.
+    pebbleProcess = await Pebble.spawn()
+  }
 
   const testSettingsPath = createTestSettingsPath()
 
@@ -80,6 +87,10 @@ test('Auto Encrypt', async t => {
 
   server2.close()
   AutoEncrypt.shutdown()
+
+  if (pebbleProcess !== null) {
+    pebbleProcess.kill()
+  }
 
   t.end()
 })

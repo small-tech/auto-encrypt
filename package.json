@@ -16,6 +16,7 @@
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "@small-tech/node-pebble": "^2.0.0",
     "bent": "^7.1.2",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
