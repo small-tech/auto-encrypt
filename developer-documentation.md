@@ -94,7 +94,7 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 * [@small-tech/auto-encrypt](#module_@small-tech/auto-encrypt)
     * [AutoEncrypt](#exp_module_@small-tech/auto-encrypt--AutoEncrypt) ⏏
         * _instance_
-            * [.server](#module_@small-tech/auto-encrypt--AutoEncrypt+server)
+            * [.serverType](#module_@small-tech/auto-encrypt--AutoEncrypt+serverType) : <code>LetsEncryptServer.type</code>
         * _static_
             * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
             * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
@@ -109,21 +109,13 @@ Auto Encrypt is a static class. Please do not instantiate.
 Use: AutoEncrypt.https.createServer(…)
 
 **Kind**: Exported class  
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt+server"></a>
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt+serverType"></a>
 
-#### autoEncrypt.server
+#### autoEncrypt.serverType : <code>LetsEncryptServer.type</code>
 Enumeration.
 
 **Kind**: instance property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
 **Read only**: true  
-**Properties**
-
-| Name | Description |
-| --- | --- |
-| PRODUCTION | Use the production server. |
-| STAGING | Use the staging server. |
-| PEBBLE | Use a local pebble testing server. |
-
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.https"></a>
 
 #### AutoEncrypt.https
@@ -152,7 +144,7 @@ the Server Name Indication (SNI) callback.
 | --- | --- | --- | --- |
 | [options] | <code>Object</code> |  | Optional HTTPS options object with optional additional                                           Auto Encrypt-specific configuration settings. |
 | [options.domains] | <code>Array.&lt;String&gt;</code> |  | Domain names to provision TLS certificates for. If missing, defaults to                                           the hostname of the current computer and its www prefixed subdomain. |
-| [options.server] | <code>Enum</code> | <code>AutoEncrypt.server.PRODUCTION</code> | Let’s Encrypt server to use.                                                                  AutoEncrypt.server.PRODUCTION, ….STAGING,                                                                  or ….PEBBLE. |
+| [options.serverType] | <code>Enum</code> | <code>AutoEncrypt.serverType.PRODUCTION</code> | Let’s Encrypt server type to use.                                                                  AutoEncrypt.serverType.PRODUCTION, ….STAGING,                                                                  or ….PEBBLE (see LetsEncryptServer.type). |
 | [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
 
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.shutdown"></a>
@@ -387,7 +379,7 @@ Global configuration class. Use initialise() method to populate.
 * [lib/Configuration](#module_lib/Configuration)
     * [Configuration](#exp_module_lib/Configuration--Configuration) ⏏
         * [new Configuration(settings)](#new_module_lib/Configuration--Configuration_new)
-        * [.letsEncryptServer](#module_lib/Configuration--Configuration+letsEncryptServer) : <code>LetsEncryptServer</code>
+        * [.server](#module_lib/Configuration--Configuration+server) : <code>LetsEncryptServer</code>
         * [.domains](#module_lib/Configuration--Configuration+domains) : <code>Array.&lt;String&gt;</code>
         * [.settingsPath](#module_lib/Configuration--Configuration+settingsPath) : <code>String</code>
         * [.accountPath](#module_lib/Configuration--Configuration+accountPath) : <code>String</code>
@@ -410,12 +402,12 @@ Initialise the configuration. Must be called before accessing settings. May be c
 | --- | --- | --- |
 | settings | <code>Object</code> | Settings to initialise configuration with. |
 | settings.domains | <code>Array.&lt;String&gt;</code> | List of domains Auto Encrypt will manage TLS certs for. |
-| settings.letsEncryptServer | <code>LetsEncryptServer</code> | Let’s Encrypt Server to use. |
+| settings.server | <code>LetsEncryptServer</code> | Let’s Encrypt Server to use. |
 | settings.settingsPath | <code>String</code> | Root settings path to use. Will use default path if null. |
 
-<a name="module_lib/Configuration--Configuration+letsEncryptServer"></a>
+<a name="module_lib/Configuration--Configuration+server"></a>
 
-#### configuration.letsEncryptServer : <code>LetsEncryptServer</code>
+#### configuration.server : <code>LetsEncryptServer</code>
 The Let’s Encrypt Server instance.
 
 **Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
@@ -430,7 +422,7 @@ List of domains that Auto Encrypt will manage TLS certificates for.
 <a name="module_lib/Configuration--Configuration+settingsPath"></a>
 
 #### configuration.settingsPath : <code>String</code>
-The root settings path. There is a different root settings path for staging and production modes.
+The root settings path. There is a different root settings path for pebble, staging and production modes.
 
 **Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
 **Read only**: true  
