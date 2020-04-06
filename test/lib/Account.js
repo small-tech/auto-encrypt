@@ -30,7 +30,7 @@ async function setup() {
   return configuration
 }
 
-test.skip('Account', async t => {
+test('Account', async t => {
   t.plan(6)
 
   const configuration = await setup()
