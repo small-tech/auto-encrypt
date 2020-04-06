@@ -1,7 +1,7 @@
 const test = require('tape')
 const Pluralise = require('../../lib/util/Pluralise')
 
-test.skip('Pluralise', t => {
+test('Pluralise', t => {
   t.plan(5)
 
   const oneThing = ['just one']
