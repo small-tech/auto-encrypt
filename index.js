@@ -107,21 +107,25 @@ class AutoEncrypt {
     //
     // Ignore passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
     //
-    // Also, If this is running with the staging or pebble server, have Node accept the corresponding root certificate
-    // so that attempts to reach the server (in case of pebble) and use the certificate (in case of both) will succeed.
-    // Note that this does not modify the system trust stores in any way and is only active for the current run of
-    // the Node process.
-    //
-
     let defaultDomains = defaultStagingAndProductionDomains
 
     switch (letsEncryptServer.type) {
       case LetsEncryptServer.type.PEBBLE:
         options.domains = null
         defaultDomains = defaultPebbleDomains
-        MonkeyPatchTls.toAccept(MonkeyPatchTls.PEBBLE_ROOT_CERTIFICATE)
       break
 
+      // If this is a staging server, we add the intermediary certificate to Node.js’s trust store (only valid during
+      // the current Node.js process) so that Node will accept the certificate. Useful when running tests against the
+      // staging server.
+      //
+      // If you’re using Pebble for your tests, please install and use node-pebble manually in your tests.
+      // (We cannot automatically provide support for Pebble as it dynamically generates its root and
+      // intermediary CA certificates, which is an asynchronous process whereas the createServer method is
+      // synchronous.)*
+      //
+      // * Yes, we could check for and start the Pebble server in the asynchronous SNICallback, below, but given how
+      // often that function is called, I will not add anything to it beyond the essentials for performance reasons.
       case LetsEncryptServer.type.STAGING:
         MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE)
       break
