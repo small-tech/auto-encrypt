@@ -15,7 +15,7 @@ const { httpServerWithResponse,
 
 async function setup() {
 
- // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
+  // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
