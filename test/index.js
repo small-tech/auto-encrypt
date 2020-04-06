@@ -9,14 +9,30 @@ const { createTestSettingsPath } = require('../lib/test-helpers')
 const httpsGetString = bent('GET', 'string')
 
 test('Auto Encrypt', async t => {
+
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? AutoEncrypt.serverType.STAGING : AutoEncrypt.serverType.PEBBLE
 
   if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
-    // If we’re testing with Pebble, fire up a local Pebble server.
+    //
+    // If we’re testing with Pebble, fire up a local Pebble server and shut it down when all tests are done.
+    //
+    // Note: due to the way Node Pebble and tape are designed, we can get away with only including a call to
+    // ===== Pebble.ready() here instead of in every test file (doing so is also legitimate and would work too) as:
+    //
+    //         - tape will always run this index test first.
+    //         - test.onFinish() is only fired when all tests (not just the ones in this file) are finished running.
+    //
     await Pebble.ready()
+
+    test.onFinish(async () => {
+      if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
+        // If we’re testing with Pebble, shut down the Pebble server.
+        await Pebble.shutdown()
+      }
+    })
   }
 
   const testSettingsPath = createTestSettingsPath()
@@ -73,11 +89,6 @@ test('Auto Encrypt', async t => {
 
   server2.close()
   AutoEncrypt.shutdown()
-
-  if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
-    // If we’re testing with Pebble, shut down the Pebble server.
-    await Pebble.shutdown()
-  }
 
   t.end()
 })
