@@ -20,7 +20,6 @@ async function setup() {
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
 
-
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
 
