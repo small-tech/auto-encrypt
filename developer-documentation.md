@@ -21,9 +21,13 @@ Auto Encrypt is supported on:
 
 ![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
 
-__Not shown (for clarity):__ the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
+__Not shown (for clarity):__ third-party Node modules, the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
 
 Generated using [dependency cruiser](https://github.com/sverweij/dependency-cruiser).
+
+## Tests
+
+Main test tasks use an automatically-managed local Pebble server instance. While all tests pass with default Pebble settings, we run them using `PEBBLE_VA_NOSLEEP: 0` to speed up test running.
 
 ## Modules
 
@@ -44,6 +48,10 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 </dd>
 <dt><a href="#module_lib/Configuration">lib/Configuration</a></dt>
 <dd><p>Global configuration class. Use initialise() method to populate.</p>
+</dd>
+<dt><a href="#module_lib/MonkeyPatchTls">lib/MonkeyPatchTls</a></dt>
+<dd><p>Monkey patches the TLS module to accept run-time root and intermediary Certificate Authority (CA) certificates.</p>
+<p>Based on the method provided by David Barral at <a href="https://link.medium.com/6xHYLeUVq5">https://link.medium.com/6xHYLeUVq5</a>.</p>
 </dd>
 </dl>
 
@@ -462,6 +470,50 @@ The path to the certificate-identity.pem file that holds the private key for the
 
 **Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
 **Read only**: true  
+<a name="module_lib/MonkeyPatchTls"></a>
+
+## lib/MonkeyPatchTls
+Monkey patches the TLS module to accept run-time root and intermediary Certificate Authority (CA) certificates.
+
+Based on the method provided by David Barral at https://link.medium.com/6xHYLeUVq5.
+
+**License**: AGPLv3 or later.  
+**Copyright**: Copyright © 2020 Aral Balkan, Small Technology Foundation.  
+
+* [lib/MonkeyPatchTls](#module_lib/MonkeyPatchTls)
+    * [MonkeyPatchTLS](#exp_module_lib/MonkeyPatchTls--MonkeyPatchTLS) ⏏
+        * [.toAccept(certificatePath, [additionalCertificatesPem])](#module_lib/MonkeyPatchTls--MonkeyPatchTLS.toAccept)
+        * _async_
+            * [.downloadPebbleCaRootAndIntermediaryCertificates()](#module_lib/MonkeyPatchTls--MonkeyPatchTLS.downloadPebbleCaRootAndIntermediaryCertificates) ⇒ <code>String</code>
+
+<a name="exp_module_lib/MonkeyPatchTls--MonkeyPatchTLS"></a>
+
+### MonkeyPatchTLS ⏏
+Monkey patches the TLS module to accept run-time root and intermediary Certificate Authority certificates.
+
+**Kind**: Exported class  
+<a name="module_lib/MonkeyPatchTls--MonkeyPatchTLS.toAccept"></a>
+
+#### MonkeyPatchTLS.toAccept(certificatePath, [additionalCertificatesPem])
+Monkey patches Node’s TLS module to accept the certificate at the passed path as well as, optionally, any other
+certificates passed as a PEM-formatted string.
+
+**Kind**: static method of [<code>MonkeyPatchTLS</code>](#exp_module_lib/MonkeyPatchTls--MonkeyPatchTLS)  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| certificatePath | <code>String</code> |  | Either MonkeyPatchTLS.PEBBLE_ROOT_CERTIFICATE                                                or MonkeyPatchTLS.STAGING_ROOT_CERTIFICATE. |
+| [additionalCertificatesPem] | <code>String</code> | <code>&#x27;&#x27;</code> | Additional certificates to be added to the chain of trust. |
+
+<a name="module_lib/MonkeyPatchTls--MonkeyPatchTLS.downloadPebbleCaRootAndIntermediaryCertificates"></a>
+
+#### MonkeyPatchTLS.downloadPebbleCaRootAndIntermediaryCertificates() ⇒ <code>String</code>
+Downloads and returns the dynamically-generated local Pebble server’s Certificate Authority root
+and intermediary certificates.
+
+**Kind**: static method of [<code>MonkeyPatchTLS</code>](#exp_module_lib/MonkeyPatchTls--MonkeyPatchTLS)  
+**Returns**: <code>String</code> - The Pebble server’s CA root and intermediary certificates as a single PEM-formatted string.  
+**Category**: async  
 <a name="CertificateIdentity"></a>
 
 ## CertificateIdentity ⇐ <code>Identity</code>
