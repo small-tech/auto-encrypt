@@ -13,9 +13,11 @@ test('Auto Encrypt', async t => {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
-  const letsEncryptServerType = process.env.STAGING ? AutoEncrypt.serverType.STAGING : AutoEncrypt.serverType.PEBBLE
+  const isStaging = process.env.STAGING
+  const isPebble = !isStaging
+  const letsEncryptServerType = isStaging ? AutoEncrypt.serverType.STAGING : AutoEncrypt.serverType.PEBBLE
 
-  if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
+  if (isPebble) {
     //
     // If we’re testing with Pebble, fire up a local Pebble server and shut it down when all tests are done.
     //
@@ -52,8 +54,8 @@ test('Auto Encrypt', async t => {
   // Test inspection string.
   const expectedInspectionString = dehydrate(`
   # AutoEncrypt (static class)
-    - Using Let’s Encrypt pebble server.
-    - Managing TLS for localhost, pebble (default domains).
+    - Using Let’s Encrypt ${isPebble ? 'pebble' : 'staging'} server.
+    - Managing TLS for ${isPebble ? 'localhost, pebble (default domains)' : `${hostname}`}.
     - Settings stored at /home/aral/.small-tech.org/auto-encrypt/test.
     - Listener is set.
   `)
