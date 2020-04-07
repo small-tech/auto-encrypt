@@ -24,7 +24,7 @@ test('Auto Encrypt', async t => {
     //         - tape will always run this index test first.
     //         - test.onFinish() is only fired when all tests (not just the ones in this file) are finished running.
     //
-    await Pebble.ready()
+    await Pebble.ready({ PEBBLE_VA_NOSLEEP: 1})
 
     test.onFinish(async () => {
       if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
