@@ -4,19 +4,29 @@
   "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
   "main": "index.js",
   "scripts": {
-    "test": "QUIET=true tape 'test/**/*.js' | tap-spec",
-    "test-debug": "tape 'test/**/*.js' | tap-spec",
-    "coverage": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "test": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
+    "test-debug": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
+    "coverage": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+
+    "test-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
+    "test-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
+    "coverage-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+
+    "test-pebble-sleep-noncereject": "QUIET=true tape 'test/**/*.js' | tap-spec",
+    "test-pebble-sleep-noncereject-debug": "tape 'test/**/*.js' | tap-spec",
+    "coverage-pebble-sleep-noncereject-debug": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+
     "test-staging": "STAGING=true QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-staging-debug": "STAGING=true tape 'test/**/*.js' | tap-spec",
     "coverage-staging": "STAGING=true QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+
     "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^https|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@small-tech/node-pebble": "^3.0.3",
+    "@small-tech/node-pebble": "^4.0.0",
     "bent": "aral/bent#errors-with-response-headers",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
