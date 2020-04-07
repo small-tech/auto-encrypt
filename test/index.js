@@ -1,10 +1,11 @@
-const os                         = require('os')
-const https                      = require('https')
-const AutoEncrypt                = require('..')
-const bent                       = require('bent')
-const test                       = require('tape')
-const Pebble                     = require('@small-tech/node-pebble')
-const { createTestSettingsPath } = require('../lib/test-helpers')
+const os                                    = require('os')
+const https                                 = require('https')
+const util                                  = require('util')
+const AutoEncrypt                           = require('..')
+const bent                                  = require('bent')
+const test                                  = require('tape')
+const Pebble                                = require('@small-tech/node-pebble')
+const { createTestSettingsPath, dehydrate } = require('../lib/test-helpers')
 
 const httpsGetString = bent('GET', 'string')
 
@@ -47,6 +48,16 @@ test('Auto Encrypt', async t => {
   })
 
   t.ok(server instanceof https.Server, 'https.Server instance returned as expected')
+
+  // Test inspection string.
+  const expectedInspectionString = dehydrate(`
+  # AutoEncrypt (static class)
+    - Using Let’s Encrypt pebble server.
+    - Managing TLS for localhost, pebble (default domains).
+    - Settings stored at /home/aral/.small-tech.org/auto-encrypt/test.
+    - Listener is set.
+  `)
+  t.strictEquals(dehydrate(util.inspect(AutoEncrypt)), expectedInspectionString, 'inspection string is as expected')
 
   await new Promise ((resolve, reject) => {
     server.listen(443, () => {
