@@ -247,7 +247,7 @@ class AutoEncrypt {
   }
 
   constructor () {
-    throws.error(Symbol.from('StaticClassCannotBeInstantiatedError'))
+    throws.error(Symbol.for('StaticClassCannotBeInstantiatedError'))
   }
 }
 

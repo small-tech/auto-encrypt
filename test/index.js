@@ -1,11 +1,11 @@
-const os                                    = require('os')
-const https                                 = require('https')
-const util                                  = require('util')
-const AutoEncrypt                           = require('..')
-const bent                                  = require('bent')
-const test                                  = require('tape')
-const Pebble                                = require('@small-tech/node-pebble')
-const { createTestSettingsPath, dehydrate } = require('../lib/test-helpers')
+const os                                                       = require('os')
+const https                                                    = require('https')
+const util                                                     = require('util')
+const AutoEncrypt                                              = require('..')
+const bent                                                     = require('bent')
+const test                                                     = require('tape')
+const Pebble                                                   = require('@small-tech/node-pebble')
+const { createTestSettingsPath, dehydrate, throwsErrorOfType } = require('../lib/test-helpers')
 
 const httpsGetString = bent('GET', 'string')
 
@@ -36,6 +36,12 @@ test('Auto Encrypt', async t => {
       }
     })
   }
+
+  // Attempt to instantiate static AutoEncrypt class should throw.
+  t.ok(throwsErrorOfType(
+    () => { new AutoEncrypt() },
+    Symbol.for('StaticClassCannotBeInstantiatedError')
+  ), 'attempt to instantiate AutoEncrypt static class throws as expected')
 
   const testSettingsPath = createTestSettingsPath()
 
