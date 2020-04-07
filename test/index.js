@@ -79,6 +79,25 @@ test('Auto Encrypt', async t => {
 
   t.strictEquals(response, 'ok', 'response is as expected')
 
+  //
+  // Test SNICallback.
+  //
+  const symbols = Object.getOwnPropertySymbols(server)
+  sniCallbackSymbol = symbols.filter(symbol => symbol.toString() === 'Symbol(snicallback)')[0]
+
+  await new Promise ((resolve, reject) => {
+    const sniCallback = server[sniCallbackSymbol]
+
+    sniCallback('localhost', (error, secureContext) => {
+      if (error) {
+        t.fail('SNI Callback should not error, but it did: ${error}')
+        return
+      }
+      t.pass('SNI Callback returned secure context')
+      resolve()
+    })
+  })
+
   server.close()
   AutoEncrypt.shutdown()
 
