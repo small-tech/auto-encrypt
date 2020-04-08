@@ -44,6 +44,27 @@ test('Auto Encrypt', async t => {
   // Test that AutoEncrypt.https is an alias for AutoEncrypt (syntactic sugar).
   t.strictEquals(AutoEncrypt.https, AutoEncrypt, 'AutoEncrypt.https is an alias for AutoEncrypt')
 
+  //
+  // Test that server creation with listener as only argument works.
+  //
+  AutoEncrypt.createServer(() => {})
+
+  const expectedProductionServerDetails = dehydrate(`
+    # AutoEncrypt (static class)
+
+    - Using Let’s Encrypt production server.
+    - Managing TLS for dev.ar.al, www.dev.ar.al (default domains).
+    - Settings stored at default settings path.
+    - Listener is set.
+  `)
+
+  const productionServerDetails = dehydrate(util.inspect(AutoEncrypt))
+
+  t.strictEquals(productionServerDetails, expectedProductionServerDetails, 'creating server with listener as only argument works as expected')
+
+  AutoEncrypt.shutdown()
+
+
   // Attempt to instantiate static AutoEncrypt class should throw.
   t.ok(throwsErrorOfType(
     () => { new AutoEncrypt() },
