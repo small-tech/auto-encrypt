@@ -251,32 +251,41 @@ test('Auto Encrypt', async t => {
         on: (eventName, eventCallback) => {
           t.strictEquals(eventName, 'OCSPRequest', 'OSCPRequest event listener is added as expected')
 
-          eventCallback(certificateDer, issuerDer, (error, response) => {
+          // First time: should get it result from the server.
+          eventCallback(certificateDer, issuerDer, async (error, response) => {
             if (error) {
               t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
-              reject()
             }
             t.pass(`OSCPRequest event handler returned non-error response.`)
-            resolve()
+
+            // Close the mock OCSP server so that if the second call doesn’t hit the cache, the call will fail.
+            mockOcspServer.close()
+
+            // Wait until the server is closed.
+            await new Promise((resolve, reject) => {
+              mockOcspServer.on('close', () => {
+                resolve()
+              })
+              mockOcspServer.on('error', (error) => {
+                reject(error)
+              })
+            })
+
+            // Second time: should get the result from cache without hitting the server or the call will fail.
+            eventCallback(certificateDer, issuerDer, (error, response) => {
+              if (error) {
+                t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
+                reject()
+              }
+              t.pass(`OSCPRequest event handler returned non-error response.`)
+              resolve()
+            })
           })
         }
       }
       AutoEncrypt.addOcspStapling(mockHttpsServer)
     })
-
     AutoEncrypt.clearOcspCacheTimers()
-    mockOcspServer.close()
-
-    // Wait until the server is closed before returning.
-    await new Promise((resolve, reject) => {
-      mockOcspServer.on('close', () => {
-        resolve()
-      })
-      mockOcspServer.on('error', (error) => {
-        reject(error)
-      })
-    })
   }
-
   t.end()
 })
