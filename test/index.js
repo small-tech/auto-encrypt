@@ -106,7 +106,8 @@ test('Auto Encrypt', async t => {
   await new Promise ((resolve, reject) => {
     const sniCallback = server[sniCallbackSymbol]
 
-    sniCallback('localhost', (error, secureContext) => {
+    const domainToHit = isPebble ? 'localhost' : hostname
+    sniCallback(domainToHit, (error, secureContext) => {
       if (error) {
         t.fail('SNI Callback should not error, but it did: ${error}')
         return
