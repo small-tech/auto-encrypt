@@ -8,7 +8,7 @@ const Configuration                    = require('../../lib/Configuration')
 const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
 
 test('Configuration', t => {
-  t.plan(34)
+  t.plan(35)
 
   const letsEncryptStagingServer = new LetsEncryptServer(LetsEncryptServer.type.STAGING)
 
@@ -32,6 +32,11 @@ test('Configuration', t => {
     () => { new Configuration({domains: ['dev.ar.al'], server: letsEncryptStagingServer}) },
     Symbol.for('UndefinedError')
   ), 'undefined settings.settingsPath throws')
+
+  t.ok(throwsErrorOfType(
+    () => { new Configuration({domains: ['dev.ar.al'], server: LetsEncryptServer.type.STAGING, settingsPath: null}) },
+    Symbol.for('ArgumentError')
+  ), 'throws if server.settings is not an instance of LetsEncryptServer')
 
   t.doesNotThrow(
     () => { new Configuration({domains: ['dev.ar.al'], server: letsEncryptStagingServer, settingsPath: null}) },
