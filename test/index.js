@@ -146,6 +146,27 @@ test('Auto Encrypt', async t => {
   AutoEncrypt.shutdown()
 
   //
+  // Depending on which server type we’re testing, test server creation with the other one also.
+  //
+  if (isPebble) {
+    const hostname = os.hostname()
+    let options = {
+      domains: [hostname],
+      serverType: AutoEncrypt.serverType.STAGING,
+      settingsPath: testSettingsPath
+    }
+    const server = AutoEncrypt.https.createServer(options)
+    t.pass('testing with Pebble server but verified that staging server is created correctly also')
+  } else {
+    let options = {
+      serverType: AutoEncrypt.serverType.PEBBLE,
+      settingsPath: testSettingsPath
+    }
+    const server = AutoEncrypt.https.createServer(options)
+    t.pass('testing with staging server but verified that pebble server is created correctly also')
+  }
+
+  //
   // Test OCSPStapling. (We can only test this fully using the Pebble server.)
   //
 
