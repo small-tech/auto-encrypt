@@ -41,6 +41,9 @@ test('Auto Encrypt', async t => {
     })
   }
 
+  // Test that AutoEncrypt.https is an alias for AutoEncrypt (syntactic sugar).
+  t.strictEquals(AutoEncrypt.https, AutoEncrypt, 'AutoEncrypt.https is an alias for AutoEncrypt')
+
   // Attempt to instantiate static AutoEncrypt class should throw.
   t.ok(throwsErrorOfType(
     () => { new AutoEncrypt() },
