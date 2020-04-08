@@ -2,6 +2,10 @@ const os                                                       = require('os')
 const https                                                    = require('https')
 const util                                                     = require('util')
 const AutoEncrypt                                              = require('..')
+const Configuration                                            = require('../lib/Configuration')
+const Certificate                                              = require('../lib/Certificate')
+const LetsEncryptServer                                        = require('../lib/LetsEncryptServer')
+const ocsp                                                     = require('ocsp')
 const bent                                                     = require('bent')
 const test                                                     = require('tape')
 const Pebble                                                   = require('@small-tech/node-pebble')
@@ -126,6 +130,68 @@ test('Auto Encrypt', async t => {
 
   server2.close()
   AutoEncrypt.shutdown()
+
+  //
+  // Test OCSPStapling. (We can only test this fully using the Pebble server.)
+  //
+
+  if (isPebble) {
+    const configuration = new Configuration({
+      settingsPath: testSettingsPath,
+      domains: ['localhost', 'pebble'],
+      server: new LetsEncryptServer(AutoEncrypt.serverType.PEBBLE)
+    })
+
+    const certificate = new Certificate(configuration)
+    const certificatePem = certificate.pem
+    const certificateDetails = certificate.parseDetails(certificatePem)
+
+    const certificateDer = ocsp.utils.toDER(certificatePem)
+    const issuerDer = ocsp.utils.toDER(await httpsGetString('https://localhost:15000/intermediates/0'))
+
+    // Start a mock OCSP server at the port specified in the Pebble configuration file.
+    let mockOcspServer
+    await new Promise(async (resolve, reject) => {
+      const ocspServerCert = await httpsGetString('https://localhost:15000/intermediates/0')
+      const ocspServerKey  = await httpsGetString('https://localhost:15000/intermediate-keys/0')
+
+      // Create the mock OCSP server.
+      mockOcspServer = ocsp.Server.create({
+        cert: ocspServerCert, // Pebble Root CA cert.
+        key : ocspServerKey   // Pebble Root CA private key.
+      })
+
+      // Add the cert.
+      mockOcspServer.addCert(certificateDetails.serialNumber, 'good')
+
+      mockOcspServer.listen(8888, () => {
+        resolve()
+      })
+    })
+
+    await new Promise(async (resolve, reject) => {
+      const mockHttpsServer = {
+        on: (eventName, eventCallback) => {
+          t.strictEquals(eventName, 'OCSPRequest', 'OSCPRequest event listener is added as expected')
+
+          const result = eventCallback(certificateDer, issuerDer, (error, response) => {
+            if (error) {
+              t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
+              reject()
+            }
+            t.pass(`OSCPRequest event handler returned non-error response.`)
+            resolve()
+          })
+        }
+      }
+      AutoEncrypt.addOcspStapling(mockHttpsServer)
+    })
+
+    mockOcspServer.on('exit', () => {
+      t.end()
+    })
+    mockOcspServer.close()
+  }
 
   t.end()
 })
