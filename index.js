@@ -73,6 +73,9 @@ class AutoEncrypt {
    */
   static get https () { return AutoEncrypt }
 
+
+  static #ocspCache = null
+
   /**
    * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
    * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
@@ -171,11 +174,26 @@ class AutoEncrypt {
     return server
   }
 
+
+  /**
+   * The OCSP module does not have a means of clearing its cache check timers
+   * so we do it here. (Otherwise, the test suite would hang.)
+   */
+  static clearOcspCacheTimers () {
+    if (this.ocspCache !== null) {
+      const cacheIds = Object.keys(this.ocspCache.cache)
+      cacheIds.forEach(cacheId => {
+        clearInterval(this.ocspCache.cache[cacheId].timer)
+      })
+    }
+  }
+
   /**
    * Shut Auto Encrypt down. Do this before app exit. Performs necessary clean-up and removes
    * any references that might cause the app to not exit.
    */
   static shutdown () {
+    this.clearOcspCacheTimers()
     this.#certificate.stopCheckingForRenewal()
   }
 
@@ -206,7 +224,8 @@ class AutoEncrypt {
     //
     // (Source: https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling)
 
-    const cache = new ocsp.Cache()
+    this.ocspCache = new ocsp.Cache()
+    const cache = this.ocspCache
 
     server.on('OCSPRequest', (certificate, issuer, callback) => {
       ocsp.getOCSPURI(certificate, function(error, uri) {

@@ -143,6 +143,7 @@ test('Auto Encrypt', async t => {
     })
 
     const certificate = new Certificate(configuration)
+    certificate.stopCheckingForRenewal()
     const certificatePem = certificate.pem
     const certificateDetails = certificate.parseDetails(certificatePem)
 
@@ -169,12 +170,13 @@ test('Auto Encrypt', async t => {
       })
     })
 
+    let mockHttpsServer
     await new Promise(async (resolve, reject) => {
-      const mockHttpsServer = {
+      mockHttpsServer = {
         on: (eventName, eventCallback) => {
           t.strictEquals(eventName, 'OCSPRequest', 'OSCPRequest event listener is added as expected')
 
-          const result = eventCallback(certificateDer, issuerDer, (error, response) => {
+          eventCallback(certificateDer, issuerDer, (error, response) => {
             if (error) {
               t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
               reject()
@@ -187,10 +189,18 @@ test('Auto Encrypt', async t => {
       AutoEncrypt.addOcspStapling(mockHttpsServer)
     })
 
-    mockOcspServer.on('exit', () => {
-      t.end()
-    })
+    AutoEncrypt.clearOcspCacheTimers()
     mockOcspServer.close()
+
+    // Wait until the server is closed before returning.
+    await new Promise((resolve, reject) => {
+      mockOcspServer.on('close', () => {
+        resolve()
+      })
+      mockOcspServer.on('error', (error) => {
+        reject(error)
+      })
+    })
   }
 
   t.end()
