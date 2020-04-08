@@ -85,16 +85,15 @@ test('Auto Encrypt', async t => {
   let response = httpsGetString(urlToHit)
 
   // Test server is busy response while attempting to provision the initial certificate.
-  let responseWhenServerShouldBeBusy
   try {
-    responseWhenServerShouldBeBusy = await httpsGetString(urlToHit)
+    await httpsGetString(urlToHit)
     t.fail('call to server should not succeed when server is busy provisioning initial certificate')
   } catch (error) {
     t.strictEquals(error.code, 'ECONNRESET', 'correct error returned during connection attempt when server is busy provisioning initial certificate')
   }
 
+  // Confirm that the first request returns successfully as expected.
   response = await response
-
   t.strictEquals(response, 'ok', 'response is as expected')
 
   //
@@ -103,6 +102,7 @@ test('Auto Encrypt', async t => {
   const symbols = Object.getOwnPropertySymbols(server)
   sniCallbackSymbol = symbols.filter(symbol => symbol.toString() === 'Symbol(snicallback)')[0]
 
+  // Test SNI success.
   await new Promise ((resolve, reject) => {
     const sniCallback = server[sniCallbackSymbol]
 
@@ -110,12 +110,30 @@ test('Auto Encrypt', async t => {
     sniCallback(domainToHit, (error, secureContext) => {
       if (error) {
         t.fail('SNI Callback should not error, but it did: ${error}')
+        reject()
         return
       }
       t.pass('SNI Callback returned secure context')
       resolve()
     })
   })
+
+  // Test SNI failure.
+  await new Promise ((resolve, reject) => {
+    const sniCallback = server[sniCallbackSymbol]
+
+    const unsupportedDomain = 'unsupported.domain'
+    sniCallback(unsupportedDomain, (error, secureContext) => {
+      if (error) {
+        t.strictEquals(error.symbol, Symbol.for('SNIIgnoreUnsupportedDomainError'), 'call to unsupported domain fails SNI check as expected')
+        resolve()
+        return
+      }
+      t.fail('call to unsupported domain should fail SNI check but it succeeded')
+      reject()
+    })
+  })
+
 
   server.close()
   AutoEncrypt.shutdown()
