@@ -82,7 +82,18 @@ test('Auto Encrypt', async t => {
 
   const urlToHit = `https://${ process.env.STAGING ? hostname : 'localhost' }`
 
-  const response = await httpsGetString(urlToHit)
+  let response = httpsGetString(urlToHit)
+
+  // Test server is busy response while attempting to provision the initial certificate.
+  let responseWhenServerShouldBeBusy
+  try {
+    responseWhenServerShouldBeBusy = await httpsGetString(urlToHit)
+    t.fail('call to server should not succeed when server is busy provisioning initial certificate')
+  } catch (error) {
+    t.strictEquals(error.code, 'ECONNRESET', 'correct error returned during connection attempt when server is busy provisioning initial certificate')
+  }
+
+  response = await response
 
   t.strictEquals(response, 'ok', 'response is as expected')
 
