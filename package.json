@@ -22,7 +22,7 @@
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@small-tech/node-pebble": "^4.0.0",
+    "@small-tech/node-pebble": "^4.1.0",
     "bent": "aral/bent#errors-with-response-headers",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
