@@ -21,9 +21,13 @@ Auto Encrypt is supported on:
 
 ![Dependency relationship diagram for Auto Correct](artefacts/dependency-graph.svg)
 
-__Not shown (for clarity):__ the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
+__Not shown (for clarity):__ third-party Node modules, the `util` namespace with helper modules – for logging, error handling, and an async `forEach` implementation – and the `typedefs` namespace with JSDoc type definitions.
 
 Generated using [dependency cruiser](https://github.com/sverweij/dependency-cruiser).
+
+## Tests
+
+Main test tasks use an automatically-managed local Pebble server instance. While all tests pass with default Pebble settings, we run them using `PEBBLE_VA_NOSLEEP: 0` to speed up test execution.
 
 {{>main}}
 

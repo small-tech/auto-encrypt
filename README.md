@@ -31,7 +31,7 @@ npm i @small-tech/auto-encrypt
     AutoEncrypt.https.createServer(…)
     ```
 
-3. Before exiting your app, shut down Auto Encrypt:
+3. For a graceful exit, before shutting down your app, shut down Auto Encrypt:
 
     ```js
     AutoEncrypt.shutdown()
@@ -59,25 +59,25 @@ server.listen(() => {
 AutoEncrypt.shutdown()
 ```
 
-Note that on Linux, ports 80 and 443 require special privileges. Please see [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports). If you just need a Node web server that handles all that and more for you (or to see how to implement privilege escalation seamlesly in your own servers, see [Site.js](https://sitejs.org)).
+Note that on Linux, ports 80 and 443 require special privileges. Please see [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports). If you just need a Node web server that handles all that and more for you (or to see how to implement privilege escalation seamlessly in your own servers, see [Site.js](https://sitejs.org)).
 
 ## Configuration
 
 You can customise the default configuration by adding Auto Encrypt-specific options to the options object you pass to the Node `https` server.
 
-You can specify the domains you want the certificate to support, whether the Let’s Encrypt staging server should be used instead of the default production server (useful during development and testing), and to specify a custom settings path for your Let’s Encrypt account and certificate information to be stored in.
+You can specify the domains you want the certificate to support, whether the Let’s Encrypt staging server or a local [Pebble](https://github.com/letsencrypt/pebble) server should be used instead of the default production server (useful during development and testing), and to specify a custom settings path for your Let’s Encrypt account and certificate information to be stored in.
 
 ### Example
 
 ```js
-const autoEncrypt = require('@small-tech/auto-encrypt')
+const AutoEncrypt = require('@small-tech/auto-encrypt')
 
 const options = {
   // Regular HTTPS server and TLS server options, if any, go here.
 
   // Optional Auto Encrypt options:
   domains: ['first.domain', 'second.domain', /* … */],
-  staging: true,
+  server: AutoEncrypt.server.STAGING,
   settingsPath: '/custom/settings/path'
 }
 
@@ -92,12 +92,12 @@ const server = AutoEncrypt.https.createServer(options, listener)
 Here is the full list of Auto Encrypt options (all optional) and their defaults:
 
   - `domains`: the hostname of the current computer and the www subdomain at that hostname.
-  - `staging`: false; it will use the production server (which has [rate limits](https://letsencrypt.org/docs/rate-limits/)).
+  - `server`: it will use the production server (which has [rate limits](https://letsencrypt.org/docs/rate-limits/)). Valid values are `AutoEncrypt.server.(PEBBLE|STAGING|PRODUCTION)`.
   - `settingsPath`: _~/.small-tech.org/auto-encrypt/_
 
 ## Making a graceful exit
 
-When you’re ready to exit your app, you must call the `AutoEncrypt.shutdown()` method. This will allow Auto Encrypt to perform housekeeping and to destroy its certificate check update interval which, if not destroyed, will prevent your app from exiting.
+When you’re ready to exit your app, call the `AutoEncrypt.shutdown()` method. This will allow Auto Encrypt to perform housekeeping and to destroy its certificate check update interval which, if not destroyed, will prevent your app from exiting.
 
 ## Developer documentation
 

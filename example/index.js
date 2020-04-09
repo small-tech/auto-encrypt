@@ -31,7 +31,7 @@ options = {
   /* Custom http server options, if any, go here (we don’t have any in this
     example, so we could just not have passed this empty object at all). */
 
-  staging: true,          // The default is true (production). We want to use LE staging environment.
+  serverType: AutoEncrypt.serverType.PEBBLE,                // (The default is .PRODUCTION.)
   domains: [os.hostname(), `www.${os.hostname()}`]
 }
 
@@ -39,6 +39,9 @@ const server = AutoEncrypt.https.createServer(options, (request, response) => {
   response.end('Hello, world!')
 })
 
+console.log(AutoEncrypt)
+
 server.listen(443, () => {
-  console.log(`\n ✨ “Hello, world!” server is running at https://${os.hostname()}…\n`)
+  console.log(`\n ✨ “Hello, world!” server is running…\n`)
+  console.log(server.address())
 })

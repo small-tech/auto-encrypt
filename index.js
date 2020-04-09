@@ -12,14 +12,17 @@
  * @license AGPLv3 or later.
  */
 
-const os                                = require('os')
-const Configuration                     = require('./lib/Configuration')
-const Certificate                       = require('./lib/Certificate')
-const Pluralise                         = require('./lib/util/Pluralise')
-const Throws                            = require('./lib/util/Throws')
-const log                               = require('./lib/util/log')
-const ocsp                              = require('ocsp')
-const https                             = require('https')
+const os                = require('os')
+const util              = require('util')
+const https             = require('https')
+const ocsp              = require('ocsp')
+const MonkeyPatchTls    = require('./lib/MonkeyPatchTls')
+const LetsEncryptServer = require('./lib/LetsEncryptServer')
+const Configuration     = require('./lib/Configuration')
+const Certificate       = require('./lib/Certificate')
+const Pluralise         = require('./lib/util/Pluralise')
+const Throws            = require('./lib/util/Throws')
+const log               = require('./lib/util/log')
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
@@ -41,6 +44,22 @@ const throws = new Throws({
  * @hideconstructor
  */
 class AutoEncrypt {
+  static #letsEncryptServer = null
+  static #defaultDomains    = null
+  static #domains           = null
+  static #settingsPath      = null
+  static #listener          = null
+  static #certificate       = null
+
+  /**
+   * Enumeration.
+   *
+   * @type {LetsEncryptServer.type}
+   * @readonly
+   * @static
+   */
+  static serverType = LetsEncryptServer.type
+
   /**
    * By aliasing the https property to the AutoEncrypt static class itself, we enable
    * people to add AutoEncrypt to their existing apps by requiring the module
@@ -54,6 +73,9 @@ class AutoEncrypt {
    */
   static get https () { return AutoEncrypt }
 
+
+  static #ocspCache = null
+
   /**
    * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
    * https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
@@ -64,29 +86,70 @@ class AutoEncrypt {
    *                                           Auto Encrypt-specific configuration settings.
    * @param {String[]} [options.domains]       Domain names to provision TLS certificates for. If missing, defaults to
    *                                           the hostname of the current computer and its www prefixed subdomain.
-   * @param {Boolean}  [options.staging=false] If true, the Let’s Encrypt staging servers will be used.
+   * @param {Enum}     [options.serverType=AutoEncrypt.serverType.PRODUCTION] Let’s Encrypt server type to use.
+   *                                                                  AutoEncrypt.serverType.PRODUCTION, ….STAGING,
+   *                                                                  or ….PEBBLE (see LetsEncryptServer.type).
    * @param {String}   [options.settingsPath=~/.small-tech.org/auto-encrypt/] Path to save certificates/keys to.
    *
    * @returns {https.Server} The server instance returned by Node’s https.createServer() method.
    */
   static createServer(_options, _listener) {
-    const listener       = _listener              || null
-    const options        = _options               || {}
-    const domains        = options.domains        || [os.hostname(), `www.${os.hostname()}`]
-    const staging        = options.staging        || false
-    const settingsPath   = options.settingsPath   || null
+    // The first parameter is optional. If omitted, the first argument, if any, is treated as the request listener.
+    if (typeof _options === 'function') {
+      _listener = _options
+      _options = {}
+    }
+
+    const defaultStagingAndProductionDomains = [os.hostname(), `www.${os.hostname()}`]
+    const defaultPebbleDomains               = ['localhost', 'pebble']
+    const options                            = _options || {}
+    const letsEncryptServer                  = new LetsEncryptServer(options.serverType || LetsEncryptServer.type.PRODUCTION)
+    const listener                           = _listener || null
+    const settingsPath                       = options.settingsPath || null
+
+    //
+    // Ignore passed domains (if any) if we’re using pebble as we can only issue for localhost and pebble.
+    //
+    let defaultDomains = defaultStagingAndProductionDomains
+
+    switch (letsEncryptServer.type) {
+      case LetsEncryptServer.type.PEBBLE:
+        options.domains = null
+        defaultDomains = defaultPebbleDomains
+      break
+
+      // If this is a staging server, we add the intermediary certificate to Node.js’s trust store (only valid during
+      // the current Node.js process) so that Node will accept the certificate. Useful when running tests against the
+      // staging server.
+      //
+      // If you’re using Pebble for your tests, please install and use node-pebble manually in your tests.
+      // (We cannot automatically provide support for Pebble as it dynamically generates its root and
+      // intermediary CA certificates, which is an asynchronous process whereas the createServer method is
+      // synchronous.)*
+      //
+      // * Yes, we could check for and start the Pebble server in the asynchronous SNICallback, below, but given how
+      // often that function is called, I will not add anything to it beyond the essentials for performance reasons.
+      case LetsEncryptServer.type.STAGING:
+        MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE)
+      break
+    }
+
+    const domains = options.domains || defaultDomains
 
     // Delete the Auto Encrypt-specific properties from the options object to not pollute the namespace.
     delete options.domains
-    delete options.staging
+    delete options.serverType
     delete options.settingsPath
 
-    const configuration = new Configuration({ settingsPath, staging, domains })
+    const configuration = new Configuration({ settingsPath, domains, server: letsEncryptServer})
     const certificate = new Certificate(configuration)
 
-    // Also save a reference in the context so it can be used by the prepareForAppExit() method.
-    // (For performance reasons, we have the SNICallback method only do lookups in enclosed scope.)
-    this.certificate = certificate
+    this.#letsEncryptServer = letsEncryptServer
+    this.#defaultDomains    = defaultDomains
+    this.#domains           = domains
+    this.#settingsPath      = settingsPath
+    this.#listener          = listener
+    this.#certificate       = certificate
 
     function sniError (symbolName, callback, emoji, ...args) {
       const error = Symbol.for(symbolName)
@@ -111,12 +174,27 @@ class AutoEncrypt {
     return server
   }
 
+
+  /**
+   * The OCSP module does not have a means of clearing its cache check timers
+   * so we do it here. (Otherwise, the test suite would hang.)
+   */
+  static clearOcspCacheTimers () {
+    if (this.ocspCache !== null) {
+      const cacheIds = Object.keys(this.ocspCache.cache)
+      cacheIds.forEach(cacheId => {
+        clearInterval(this.ocspCache.cache[cacheId].timer)
+      })
+    }
+  }
+
   /**
    * Shut Auto Encrypt down. Do this before app exit. Performs necessary clean-up and removes
    * any references that might cause the app to not exit.
    */
   static shutdown () {
-    this.certificate.stopCheckingForRenewal()
+    this.clearOcspCacheTimers()
+    this.#certificate.stopCheckingForRenewal()
   }
 
   //
@@ -146,7 +224,8 @@ class AutoEncrypt {
     //
     // (Source: https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling)
 
-    const cache = new ocsp.Cache()
+    this.ocspCache = new ocsp.Cache()
+    const cache = this.ocspCache
 
     server.on('OCSPRequest', (certificate, issuer, callback) => {
       ocsp.getOCSPURI(certificate, function(error, uri) {
@@ -154,9 +233,6 @@ class AutoEncrypt {
         if (uri === null) return callback()
 
         const request = ocsp.request.generate(certificate, issuer)
-
-        // Todo: CHECK: Does the cache.probe method expire the cache
-        // ===== before the OCSP response expires? []
 
         cache.probe(request.id, (error, cached) => {
           if (error) return callback(error)
@@ -177,8 +253,20 @@ class AutoEncrypt {
     return server
   }
 
+  // Custom object description for console output (for debugging).
+  static [util.inspect.custom] () {
+    return `
+      # AutoEncrypt (static class)
+
+        - Using Let’s Encrypt ${this.#letsEncryptServer.name} server.
+        - Managing TLS for ${this.#domains.toString().replace(',', ', ')}${this.#domains === this.#defaultDomains ? ' (default domains)' : ''}.
+        - Settings stored at ${this.#settingsPath === null ? 'default settings path' : this.#settingsPath}.
+        - Listener ${typeof this.#listener === 'function' ? 'is set' : 'not set'}.
+    `
+  }
+
   constructor () {
-    throws.error(Symbol.from('StaticClassCannotBeInstantiatedError'))
+    throws.error(Symbol.for('StaticClassCannotBeInstantiatedError'))
   }
 }
 
