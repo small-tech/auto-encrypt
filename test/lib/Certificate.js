@@ -1,14 +1,14 @@
-const os                         = require('os')
-const fs                         = require('fs-extra')
-const path                       = require('path')
-const util                       = require('util')
-const tls                        = require('tls')
-const moment                     = require('moment')
-const test                       = require('tape')
-const Certificate                = require('../../lib/Certificate')
-const Configuration              = require('../../lib/Configuration')
-const LetsEncryptServer          = require('../../lib/LetsEncryptServer')
-const { dehydrate, timeItAsync } = require('../../lib/test-helpers')
+const os                                                = require('os')
+const fs                                                = require('fs-extra')
+const path                                              = require('path')
+const util                                              = require('util')
+const tls                                               = require('tls')
+const moment                                            = require('moment')
+const test                                              = require('tape')
+const Certificate                                       = require('../../lib/Certificate')
+const Configuration                                     = require('../../lib/Configuration')
+const LetsEncryptServer                                 = require('../../lib/LetsEncryptServer')
+const { dehydrate, timeItAsync, symbolOfErrorThrownBy } = require('../../lib/test-helpers')
 
 function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -172,6 +172,18 @@ test('Certificate', async t => {
 
   t.strictEquals(originalCertificate, fs.readFileSync(certificatePath, 'utf-8'), 'certificate from after recovery matches certificate from before')
   t.strictEquals(originalCertificateIdentity, fs.readFileSync(certificateIdentityPath, 'utf-8'), 'certificate identity from after recovery matches certificate identity from before')
+
+  //
+  // Test that read-only setters are read-only.
+  //
+  const a = ['key', 'serialNumber', 'issuer', 'subject', 'alternativeNames', 'issueDate', 'expiryDate', 'renewalDate']
+  a.forEach(readOnlySetter => {
+    t.strictEquals(
+      symbolOfErrorThrownBy(() => { certificate2[readOnlySetter] = 'dummy value' }),
+      Symbol.for('ReadOnlyAccessorError'),
+      `trying to set read-only property ${readOnlySetter} throws`
+    )
+  })
 
   // Stop automatic renewal checks.
   certificate2.stopCheckingForRenewal()
