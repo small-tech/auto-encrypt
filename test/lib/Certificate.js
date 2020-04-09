@@ -36,6 +36,12 @@ test('Certificate', async t => {
   // Test initial certificate creation.
   //
 
+  t.strictEquals(
+    symbolOfErrorThrownBy(() => new Certificate()),
+    Symbol.for('UndefinedOrNullError'),
+    'missing configuration while calling constructor throws'
+  )
+
   const certificate = new Certificate(configuration)
   t.pass('initial certificate instantiation succeeds')
 
@@ -189,6 +195,18 @@ test('Certificate', async t => {
   t.strictEquals(certificate2.identity.privatePEM, originalCertificateIdentity, 'certificate identity is as expected')
 
   // Stop automatic renewal checks.
+  certificate2.stopCheckingForRenewal()
+
+  // Test that also check now option works with start checking for renewal method.
+  const actualCheckForRenewalMethod = certificate2.checkForRenewal
+  let checkForRenewalCalled = false
+  certificate2.checkForRenewal = () => {
+    checkForRenewalCalled = true
+  }
+  certificate2.startCheckingForRenewal(/* alsoCheckNow */ true)
+  t.strictEquals(checkForRenewalCalled, true, 'checkForRenewal called via startCheckingForRenewal(true) as expected')
+  certificate2.checkForRenewal = actualCheckForRenewalMethod
+
   certificate2.stopCheckingForRenewal()
 
   t.end()
