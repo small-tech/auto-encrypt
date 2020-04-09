@@ -2,6 +2,8 @@
   "name": "@small-tech/auto-encrypt",
   "version": "1.0.0",
   "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
+  "author": "Aral Balkan",
+  "license": "AGPL-3.0-or-later",
   "main": "index.js",
   "scripts": {
     "test": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
@@ -19,8 +21,9 @@
     "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^https|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
-  "author": "Aral Balkan",
-  "license": "AGPL-3.0-or-later",
+  "nyc": {
+    "exclude": ["test/**/*.js", "lib/test-helpers/*.js", "lib/x.509/*.js"]
+  },
   "dependencies": {
     "@small-tech/node-pebble": "^4.1.0",
     "bent": "aral/bent#errors-with-response-headers",
