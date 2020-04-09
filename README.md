@@ -2,7 +2,7 @@
 
 __Under heavy development and not officially released yet. Play with it if you want to but please don’t use it in production.__
 
-Adds [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) and automatic provisioning and renewal of [Let’s Encrypt](https://letsencrypt.org) TLS certificates to [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
+Adds automatic provisioning and renewal of [Let’s Encrypt](https://letsencrypt.org) TLS certificates with [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) to [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
 ## How it works
 
