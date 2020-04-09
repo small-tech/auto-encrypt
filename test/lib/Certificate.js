@@ -185,6 +185,9 @@ test('Certificate', async t => {
     )
   })
 
+  // Test that certificate identity is set correctly.
+  t.strictEquals(certificate2.identity.privatePEM, originalCertificateIdentity, 'certificate identity is as expected')
+
   // Stop automatic renewal checks.
   certificate2.stopCheckingForRenewal()
 
