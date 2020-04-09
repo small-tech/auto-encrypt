@@ -2,6 +2,7 @@ const os                = require('os')
 const fs                = require('fs-extra')
 const path              = require('path')
 const test              = require('tape')
+const Certificate       = require('../../lib/Certificate')
 const Configuration     = require('../../lib/Configuration')
 const LetsEncryptServer = require('../../lib/LetsEncryptServer')
 
@@ -20,12 +21,19 @@ async function setup() {
   })
 }
 
-test.skip('Certificate', async t => {
-  setup()
+test('Certificate', async t => {
+  const configuration = setup()
 
   //
   // Test initial certificate creation.
   //
+  const certificate = new Certificate(configuration)
+  t.pass('initial certificate instantiation succeeds')
+
+  const certificate2 = new Certificate(configuration)
+  t.pass('subsequent certificate instantiation succeeds')
+
+  t.strictEquals(certificate.serialNumber, certificate2.serialNumber, 'same certificate is returned during initial and subsequent requests')
 
   t.end()
 })
