@@ -3,6 +3,7 @@ const fs                         = require('fs-extra')
 const path                       = require('path')
 const util                       = require('util')
 const tls                        = require('tls')
+const moment                     = require('moment')
 const test                       = require('tape')
 const Certificate                = require('../../lib/Certificate')
 const Configuration              = require('../../lib/Configuration')
@@ -68,6 +69,22 @@ test('Certificate', async t => {
   t.notStrictEquals(actualCertificate2State, expectedInitialCertificateState, 'certificate loaded from cache as expected on subsequent access')
   t.strictEquals(certificate.serialNumber, certificate2.serialNumber, 'same certificate is returned during initial and subsequent access')
 
+  // Stop automatic checks.
+  certificate2.stopCheckingForRenewal()
+
+  // Check manually for renewal (should not be renewed).
+  await certificate2.checkForRenewal()
+
+  t.strictEquals(certificate.serialNumber, certificate2.serialNumber, 'certificate renewal check returns as expected when certicicate does not need renewal')
+
+  // Change the renewal date on the certificate manually to yesterday.
+  certificate2.__changeRenewalDate(moment(new Date()).subtract(1, 'day'))
+
+  // Check manually for renewal again (should be renewed).
+  await certificate2.checkForRenewal()
+  t.notStrictEquals(certificate.serialNumber, certificate2.serialNumber, 'certificate is renewed correctly when necessary')
+
+  // Stop automatic checks.
   certificate2.stopCheckingForRenewal()
 
   t.end()
