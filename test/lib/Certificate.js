@@ -84,7 +84,96 @@ test('Certificate', async t => {
   await certificate2.checkForRenewal()
   t.notStrictEquals(certificate.serialNumber, certificate2.serialNumber, 'certificate is renewed correctly when necessary')
 
-  // Stop automatic checks.
+  //
+  // Test failed certificate update recovery.
+  //
+
+  const oldCertificateIdentityPath = `${configuration.certificateIdentityPath}.old`
+  const oldCertificatePath = `${configuration.certificatePath}.old`
+  const certificateIdentityPath = configuration.certificateIdentityPath
+  const certificatePath = configuration.certificatePath
+
+  const originalCertificate = fs.readFileSync(certificatePath, 'utf-8')
+  const originalCertificateIdentity = fs.readFileSync(certificateIdentityPath, 'utf-8')
+
+  //
+  // Ensure we have the environment we expect from previous runs.
+  //
+  t.ok(fs.existsSync(certificatePath), 'certificate exists where we expect it')
+  t.ok(fs.existsSync(certificateIdentityPath), 'certificate identity exists where we expect it')
+  t.notOk(fs.existsSync(oldCertificatePath), 'old certificate does not exist as expected')
+  t.notOk(fs.existsSync(oldCertificateIdentityPath), 'old certificate identity does not exist as expected')
+
+  //
+  // Case 1 (edge case): Both old and new certificate files are present. We expect the old ones
+  // =================== to be removed and only the new ones to remain.
+  //
+
+  fs.writeFileSync(oldCertificatePath, 'dummy old certificate', 'utf-8')
+  fs.writeFileSync(oldCertificateIdentityPath, 'dummy old certificate identity', 'utf-8')
+
+  certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+
+  t.ok(fs.existsSync(certificateIdentityPath), 'active certificate identity found after failed renewal recovery')
+  t.ok(fs.existsSync(certificatePath), 'active certificate identity found after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificateIdentityPath), 'old certificate identity removed after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificatePath), 'old certificate removed after failed renewal attempt recovery')
+
+  //
+  // Case 2-a: Neither certificate nor certificate exist. Old certificates exist. We expect the old ones to be
+  // restored and used instead.
+  //
+
+  fs.moveSync(certificateIdentityPath, oldCertificateIdentityPath)
+  fs.moveSync(certificatePath, oldCertificatePath)
+  fs.removeSync(certificatePath)
+  fs.removeSync(certificateIdentityPath)
+
+  certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+
+  t.ok(fs.existsSync(certificateIdentityPath), 'active certificate identity found after failed renewal recovery')
+  t.ok(fs.existsSync(certificatePath), 'active certificate identity found after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificateIdentityPath), 'old certificate identity removed after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificatePath), 'old certificate removed after failed renewal attempt recovery')
+
+  //
+  // Case 2-b: Certificate exists but certificate identity doesn’t. Old certificates exist. We expect the old ones
+  // to be restored and used.
+  //
+
+  fs.copySync(certificatePath, oldCertificatePath)
+  fs.moveSync(certificateIdentityPath, oldCertificateIdentityPath)
+
+  certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+
+  t.ok(fs.existsSync(certificateIdentityPath), 'active certificate identity found after failed renewal recovery')
+  t.ok(fs.existsSync(certificatePath), 'active certificate identity found after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificateIdentityPath), 'old certificate identity removed after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificatePath), 'old certificate removed after failed renewal attempt recovery')
+
+  //
+  // Case 2-c: Certificate identity exists but certificate doesn’t. Old certificates exist. We expect the old ones
+  // to be restored and used.
+  //
+
+  fs.copySync(certificateIdentityPath, oldCertificateIdentityPath)
+  fs.moveSync(certificatePath, oldCertificatePath)
+
+  certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+
+  t.ok(fs.existsSync(certificateIdentityPath), 'active certificate identity found after failed renewal recovery')
+  t.ok(fs.existsSync(certificatePath), 'active certificate identity found after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificateIdentityPath), 'old certificate identity removed after failed renewal recovery')
+  t.notOk(fs.existsSync(oldCertificatePath), 'old certificate removed after failed renewal attempt recovery')
+
+  //
+  // Make sure that the certificates we have after the recovery tests are the same ones that we started out with.
+  //
+
+  t.strictEquals(originalCertificate, fs.readFileSync(certificatePath, 'utf-8'), 'certificate from after recovery matches certificate from before')
+  t.strictEquals(originalCertificateIdentity, fs.readFileSync(certificateIdentityPath, 'utf-8'), 'certificate identity from after recovery matches certificate identity from before')
+
+  // Stop automatic renewal checks.
   certificate2.stopCheckingForRenewal()
 
   t.end()
