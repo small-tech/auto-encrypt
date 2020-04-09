@@ -197,6 +197,13 @@ test('Certificate', async t => {
   // Stop automatic renewal checks.
   certificate2.stopCheckingForRenewal()
 
+  // Test startCheckingForRenewal method.
+  t.strictEquals(certificate2.__checkForRenewalIntervalId._destroyed, true, 'renewal checks are stopped as expected')
+  certificate2.startCheckingForRenewal()
+  t.strictEquals(certificate2.__checkForRenewalIntervalId._destroyed, false, 'renewal checks are started as expected')
+
+  certificate2.stopCheckingForRenewal()
+
   // Test that also check now option works with start checking for renewal method.
   const actualCheckForRenewalMethod = certificate2.checkForRenewal
   let checkForRenewalCalled = false
