@@ -106,6 +106,7 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
         * _static_
             * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
             * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
+            * [.clearOcspCacheTimers()](#module_@small-tech/auto-encrypt--AutoEncrypt.clearOcspCacheTimers)
             * [.shutdown()](#module_@small-tech/auto-encrypt--AutoEncrypt.shutdown)
             * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling) ⇒ <code>https.Server</code> ℗
 
@@ -155,6 +156,13 @@ the Server Name Indication (SNI) callback.
 | [options.serverType] | <code>Enum</code> | <code>AutoEncrypt.serverType.PRODUCTION</code> | Let’s Encrypt server type to use.                                                                  AutoEncrypt.serverType.PRODUCTION, ….STAGING,                                                                  or ….PEBBLE (see LetsEncryptServer.type). |
 | [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
 
+<a name="module_@small-tech/auto-encrypt--AutoEncrypt.clearOcspCacheTimers"></a>
+
+#### AutoEncrypt.clearOcspCacheTimers()
+The OCSP module does not have a means of clearing its cache check timers
+so we do it here. (Otherwise, the test suite would hang.)
+
+**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.shutdown"></a>
 
 #### AutoEncrypt.shutdown()
@@ -265,6 +273,7 @@ Represents a Let’s Encrypt TLS certificate.
     * [Certificate](#exp_module_lib/Certificate--Certificate) ⏏
         * [new Certificate(configuration)](#new_module_lib/Certificate--Certificate_new)
         * [.attemptToRecoverFromFailedRenewalAttemptIfNecessary()](#module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary)
+        * [.util.inspect.custom()](#module_lib/Certificate--Certificate+util.inspect.custom)
         * _async_
             * [.getSecureContext()](#module_lib/Certificate--Certificate+getSecureContext) ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
             * [.createSecureContext(renewCertificate)](#module_lib/Certificate--Certificate+createSecureContext) ⇒ <code>Promise</code> ℗
@@ -298,6 +307,12 @@ Check if certificate-identity.pem.old or certificate.pem.old files exist.
 If they do, it means that something went wrong while  certificate was trying to be
 renewed. So restore them and use them and hopefully the next renewal attempt will
 succeed or at least buy the administrator of the server some time to fix the issue.
+
+**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+<a name="module_lib/Certificate--Certificate+util.inspect.custom"></a>
+
+#### certificate.util.inspect.custom()
+Custom inspection string.
 
 **Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
 <a name="module_lib/Certificate--Certificate+getSecureContext"></a>
