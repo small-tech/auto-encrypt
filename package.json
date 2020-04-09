@@ -22,7 +22,7 @@
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "nyc": {
-    "exclude": ["test/**/*.js", "lib/test-helpers/*.js", "lib/x.509/*.js"]
+    "exclude": ["test/**/*.js", "lib/test-helpers/*.js", "typedefs/lib/*.js", "lib/util/*.js", "lib/x.509/*.js"]
   },
   "dependencies": {
     "@small-tech/node-pebble": "^4.1.0",
