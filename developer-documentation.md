@@ -58,8 +58,6 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 ## Classes
 
 <dl>
-<dt><a href="#CertificateIdentity">CertificateIdentity</a> ⇐ <code>Identity</code></dt>
-<dd></dd>
 <dt><a href="#Order">Order</a></dt>
 <dd></dd>
 </dl>
@@ -529,41 +527,6 @@ and intermediary certificates.
 **Kind**: static method of [<code>MonkeyPatchTLS</code>](#exp_module_lib/MonkeyPatchTls--MonkeyPatchTLS)  
 **Returns**: <code>String</code> - The Pebble server’s CA root and intermediary certificates as a single PEM-formatted string.  
 **Category**: async  
-<a name="CertificateIdentity"></a>
-
-## CertificateIdentity ⇐ <code>Identity</code>
-**Kind**: global class  
-**Extends**: <code>Identity</code>  
-**License**: AGPLv3 or later  
-**Copyright**: Aral Balkan, Small Technology Foundation  
-
-* [CertificateIdentity](#CertificateIdentity) ⇐ <code>Identity</code>
-    * [new CertificateIdentity()](#new_CertificateIdentity_new)
-    * [.CertificateIdentity](#CertificateIdentity.CertificateIdentity)
-        * [new CertificateIdentity(configuration)](#new_CertificateIdentity.CertificateIdentity_new)
-
-<a name="new_CertificateIdentity_new"></a>
-
-### new CertificateIdentity()
-Generates, stores, loads, and saves the certificate identity. The default
-certificate identity file path is:
-
-~/.small-tech.org/auto-encrypt/certificate-identity.pem
-
-<a name="CertificateIdentity.CertificateIdentity"></a>
-
-### CertificateIdentity.CertificateIdentity
-**Kind**: static class of [<code>CertificateIdentity</code>](#CertificateIdentity)  
-<a name="new_CertificateIdentity.CertificateIdentity_new"></a>
-
-#### new CertificateIdentity(configuration)
-Creates an instance of CertificateIdentity.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| configuration | <code>Configuration</code> | (Required) Configuration instance. |
-
 <a name="Order"></a>
 
 ## Order

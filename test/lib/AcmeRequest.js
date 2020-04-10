@@ -7,7 +7,7 @@ const AcmeRequest                = require('../../lib/AcmeRequest')
 const Configuration              = require('../../lib/Configuration')
 const Directory                  = require('../../lib/Directory')
 const Account                    = require('../../lib/Account')
-const AccountIdentity            = require('../../lib/AccountIdentity')
+const AccountIdentity            = require('../../lib/identities/AccountIdentity')
 const LetsEncryptServer          = require('../../lib/LetsEncryptServer')
 const { httpServerWithResponse,
         throwsErrorOfType,

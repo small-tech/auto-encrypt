@@ -6,7 +6,7 @@ const { throwsErrorOfType } = require('../../lib/test-helpers')
 const Configuration         = require('../../lib/Configuration')
 const Account               = require('../../lib/Account')
 const Directory             = require('../../lib/Directory')
-const AccountIdentity       = require('../../lib/AccountIdentity')
+const AccountIdentity       = require('../../lib/identities/AccountIdentity')
 const AcmeRequest           = require('../../lib/AcmeRequest')
 const LetsEncryptServer     = require('../../lib/LetsEncryptServer')
 

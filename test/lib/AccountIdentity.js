@@ -1,6 +1,6 @@
 const test                      = require('tape')
 const { symbolOfErrorThrownBy } = require('../../lib/test-helpers')
-const AccountIdentity           = require('../../lib/AccountIdentity')
+const AccountIdentity           = require('../../lib/identities/AccountIdentity')
 
 test('Account Identity', t => {
 
