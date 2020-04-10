@@ -24,6 +24,17 @@ const Pluralise         = require('./lib/util/Pluralise')
 const Throws            = require('./lib/util/Throws')
 const log               = require('./lib/util/log')
 
+// Unhandled rejections are currently a warning in Node but we want them to crash right away.
+process.on('unhandledRejection', error => {
+  console.error('')
+  console.error('╔══════════════════════════════════════════════════════════════════════════════╗')
+  console.error('║                      Unhandled rejection (crashing)                          ║')
+  console.error('╚══════════════════════════════════════════════════════════════════════════════╝')
+  console.error('')
+  console.error(error)
+  process.exit(1)
+})
+
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
   [Symbol.for('BusyProvisioningCertificateError')]:
