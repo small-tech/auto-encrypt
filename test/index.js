@@ -5,6 +5,7 @@ const AutoEncrypt                                              = require('..')
 const Configuration                                            = require('../lib/Configuration')
 const Certificate                                              = require('../lib/Certificate')
 const LetsEncryptServer                                        = require('../lib/LetsEncryptServer')
+const waitFor                                                  = require('../lib/util/waitFor')
 const ocsp                                                     = require('ocsp')
 const bent                                                     = require('bent')
 const test                                                     = require('tape')
@@ -104,6 +105,8 @@ test('Auto Encrypt', async t => {
   const urlToHit = `https://${ process.env.STAGING ? hostname : 'localhost' }`
 
   let response = httpsGetString(urlToHit)
+
+  await waitFor(1)
 
   // Test server is busy response while attempting to provision the initial certificate.
   try {
