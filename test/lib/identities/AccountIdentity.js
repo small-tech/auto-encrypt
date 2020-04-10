@@ -47,12 +47,46 @@ test('Account Identity', t => {
   const accountId = new AccountIdentity(configuration)
 
   t.strictEquals(accountId.filePath, configuration.accountIdentityPath, 'correct file path is set')
+  t.true(fs.existsSync(accountId.filePath), 'the identity PEM file exists')
 
   t.ok(jose.JWK.isKey(accountId.key), 'the key is a jose.JWK RSAKey as expected')
   t.strictEquals(accountId.privatePEM, accountId.key.toPEM(/* private = */ true), 'private PEM is as expected')
   t.strictEquals(accountId.thumbprint, accountId.key.thumbprint, 'thumbprint is as expected')
   t.deepEquals(accountId.privateJWK, accountId.key.toJWK(/* private = */ true), 'private JWK is as expected')
   t.deepEquals(accountId.publicJWK , accountId.key.toJWK(/* private = */ false), 'public JWK is as expected')
+
+  //
+  // Ensure that the persisted PEM is usable.
+  //
+
+  const identityPemBuffer = fs.readFileSync(accountId.filePath)
+  let key
+  t.doesNotThrow(() => {
+    key = jose.JWK.asKey(identityPemBuffer)
+  }, 'creating a JWK from the persisted PEM file does not throw')
+  t.true(jose.JWK.isKey(key), 'the key is an instance of JWK.key')
+  t.strictEquals(key.kty, 'RSA', 'the key type is RSA')
+  t.strictEquals(key.type, 'private', 'the key is the private key')
+
+  // Check that the key ID from the PEM we loaded matches the key ID from the key in memory.
+  t.strictEquals(accountId.key.kid, key.kid, 'key IDs should match')
+
+  //
+  // Check that JSON Web Keys (JWK) are as expected.
+  //
+  const expectedPrivateJwkProperties = JSON.stringify([
+    'e',   'n',  'd',
+    'p',   'q',  'dp',
+    'dq',  'qi', 'kty',
+    'kid'
+  ])
+  const expectedPublicJwkProperties = JSON.stringify([ 'e', 'n', 'kty', 'kid' ])
+
+  const actualPrivateJwkProperties = JSON.stringify(Object.keys(accountId.privateJWK))
+  const actualPublicJwkProperties = JSON.stringify(Object.keys(accountId.publicJWK))
+
+  t.strictEquals(actualPrivateJwkProperties, expectedPrivateJwkProperties, 'private JWK properties are as expected')
+  t.strictEquals(actualPublicJwkProperties, expectedPublicJwkProperties, 'public JWK properties are as expected')
 
   // Test that read-only setters are actually read-only.
   ;['key', 'privatePEM', 'thumbprint', 'privateJWK', 'publicJWK', 'filePath'].forEach(readOnlySetter => {
@@ -63,6 +97,7 @@ test('Account Identity', t => {
     )
   })
 
+  // Test the inspection string.
   const expectedInspectionString = dehydrate(`# Identity
   Generates, stores, loads, and saves an identity (JWT OKP key using
   Ed25519 curve) from/to file storage.

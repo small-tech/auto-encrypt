@@ -8,5 +8,8 @@ test('Certificate Identity', t => {
     Symbol.for('UndefinedOrNullError'),
     'missing configuration during instantiation throws as expected'
   )
+
+  // NB. Most of the common Identity superclass-related tests are in the AccountIdentity tests.
+
   t.end()
 })
