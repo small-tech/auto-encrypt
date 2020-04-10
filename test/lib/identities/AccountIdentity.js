@@ -1,11 +1,12 @@
 const os                        = require('os')
 const path                      = require('path')
 const fs                        = require('fs-extra')
+const jose                      = require('jose')
 const test                      = require('tape')
-const Identity                  = require('../../lib/Identity')
-const Configuration             = require('../../lib/Configuration')
-const LetsEncryptServer         = require('../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy } = require('../../lib/test-helpers')
+const AccountIdentity           = require('../../../lib/identities/AccountIdentity')
+const Configuration             = require('../../../lib/Configuration')
+const LetsEncryptServer         = require('../../../lib/LetsEncryptServer')
+const { symbolOfErrorThrownBy } = require('../../../lib/test-helpers')
 
 function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -27,7 +28,7 @@ function setup() {
   })
 }
 
-test('Identity', t => {
+test('Account Identity', t => {
 
   const configuration = setup()
 
@@ -35,28 +36,22 @@ test('Identity', t => {
   // Initialisation (error conditions)
   //
 
-  // Both arguments missing should throw.
+  // Missing configuration argument should throw.
   t.strictEquals(
-    symbolOfErrorThrownBy(() => new Identity()),
+    symbolOfErrorThrownBy(() => new AccountIdentity()),
     Symbol.for('UndefinedOrNullError'),
-    'throws when both arguments are missing'
+    'throws when configuration argument is missing'
   )
 
-  // Missing second argument should throw.
-  t.strictEquals(
-    symbolOfErrorThrownBy(() => new Identity(configuration)),
-    Symbol.for('UndefinedOrNullError'),
-    'throws when second argument is missing'
-  )
+  const accountId = new AccountIdentity(configuration)
 
-  // Incorrect second argument should throw
-  t.strictEquals(
-    symbolOfErrorThrownBy(() => new Identity(configuration, 'unknownPathKey')),
-    Symbol.for('UnsupportedIdentityType'),
-    'throws when identity file path is unknown (unsupported identity type)'
-  )
+  t.strictEquals(accountId.filePath, configuration.accountIdentityPath, 'correct file path is set')
 
-  // NB. See AccountIdentity tests for tests of initialised properties.
+  t.ok(jose.JWK.isKey(accountId.key), 'the key is a jose.JWK RSAKey as expected')
+  t.strictEquals(accountId.privatePEM, accountId.key.toPEM(/* private = */ true), 'private PEM is as expected')
+  t.strictEquals(accountId.thumbprint, accountId.key.thumbprint, 'thumbprint is as expected')
+  t.deepEquals(accountId.privateJWK, accountId.key.toJWK(/* private = */ true), 'private JWK is as expected')
+  t.deepEquals(accountId.publicJWK , accountId.key.toJWK(/* private = */ false), 'public JWK is as expected')
 
   t.end()
 })
