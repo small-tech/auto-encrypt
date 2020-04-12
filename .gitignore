@@ -1,6 +1,3 @@
-node_modules
-.nyc_output
-docs/**
-test.bak
 .vscode
-test/pebble
+.nyc_output
+node_modules
