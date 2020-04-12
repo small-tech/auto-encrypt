@@ -101,7 +101,7 @@ test('Account Identity', t => {
   const expectedInspectionString = dehydrate(`# Identity
   Generates, stores, loads, and saves an identity (JWT OKP key using
   Ed25519 curve) from/to file storage.
-  - Identity file path: /home/aral/.small-tech.org/auto-encrypt/test/pebble/account-identity.pem
+  - Identity file path: ${configuration.accountIdentityPath}
   ## Properties
   - .key        : the jose.JWK.RSAKey instance
   - .privatePEM : PEM representation of the private key
