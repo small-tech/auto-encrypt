@@ -22,10 +22,15 @@
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
   "nyc": {
-    "exclude": ["test/**/*.js", "lib/test-helpers/*.js", "typedefs/lib/*.js", "lib/util/*.js", "lib/x.509/*.js"]
+    "exclude": [
+      "test/**/*.js",
+      "lib/test-helpers/*.js",
+      "typedefs/lib/*.js",
+      "lib/util/*.js",
+      "lib/x.509/*.js"
+    ]
   },
   "dependencies": {
-    "@small-tech/node-pebble": "^4.1.0",
     "bent": "aral/bent#errors-with-response-headers",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
@@ -35,6 +40,7 @@
     "server-destroy": "^1.0.1"
   },
   "devDependencies": {
+    "@small-tech/node-pebble": "^4.2.3",
     "dependency-cruiser": "^8.1.0",
     "jsdoc": "^3.6.3",
     "jsdoc-to-markdown": "^5.0.3",

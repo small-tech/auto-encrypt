@@ -5,7 +5,6 @@ const AutoEncrypt                                              = require('..')
 const Configuration                                            = require('../lib/Configuration')
 const Certificate                                              = require('../lib/Certificate')
 const LetsEncryptServer                                        = require('../lib/LetsEncryptServer')
-const waitFor                                                  = require('../lib/util/waitFor')
 const ocsp                                                     = require('ocsp')
 const bent                                                     = require('bent')
 const test                                                     = require('tape')
@@ -106,11 +105,6 @@ test('Auto Encrypt', async t => {
 
   let response = httpsGetString(urlToHit)
 
-  // A short delay to see if it helps avoid
-  // https://source.small-tech.org/site.js/lib/auto-encrypt/-/issues/26
-  // (Quite possibly a nextTick() might even solve it but I can spare a millisecond for convenience.) ;)
-  await waitFor(1)
-
   // Test server is busy response while attempting to provision the initial certificate.
   try {
     await httpsGetString(urlToHit)
@@ -120,7 +114,11 @@ test('Auto Encrypt', async t => {
   }
 
   // Confirm that the first request returns successfully as expected.
-  response = await response
+  try {
+    response = await response
+  } catch (error) {
+    t.fail(`the first response should not throw but it does. ${error}`)
+  }
   t.strictEquals(response, 'ok', 'response is as expected')
 
   //
