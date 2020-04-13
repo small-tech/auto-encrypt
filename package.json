@@ -14,7 +14,7 @@
     "coverage-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "test-pebble-sleep-noncereject": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-pebble-sleep-noncereject-debug": "tape 'test/**/*.js' | tap-spec",
-    "coverage-pebble-sleep-noncereject-debug": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "coverage-pebble-sleep-noncereject": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "test-staging": "STAGING=true QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-staging-debug": "STAGING=true tape 'test/**/*.js' | tap-spec",
     "coverage-staging": "STAGING=true QUIET=true nyc tape 'test/**/*.js' | tap-nyc",

@@ -9,7 +9,9 @@ const Account                   = require('../../lib/Account')
 const AccountIdentity           = require('../../lib/identities/AccountIdentity')
 const AcmeRequest               = require('../../lib/AcmeRequest')
 const LetsEncryptServer         = require('../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy } = require('../../lib/test-helpers')
+const { symbolOfErrorThrownBy,
+        MockServer }            = require('../../lib/test-helpers')
+
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -21,7 +23,7 @@ async function setup() {
   fs.removeSync(customSettingsPath)
 
   const configuration = new Configuration({
-    domains: ['dev.ar.al'],
+    domains: [os.hostname(), `www.${os.hostname()}`],
     server: new LetsEncryptServer(letsEncryptServerType),
     settingsPath: customSettingsPath
   })
@@ -34,6 +36,40 @@ async function setup() {
 
   return { configuration, accountIdentity }
 }
+
+async function setupMock() {
+  const letsEncryptServer = new LetsEncryptServer(LetsEncryptServer.type.MOCK)
+
+  const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
+  fs.removeSync(customSettingsPath)
+
+  const configuration = new Configuration({
+    domains: [os.hostname(), `www.${os.hostname()}`],
+    server: letsEncryptServer,
+    settingsPath: customSettingsPath
+  })
+
+  const mockServerBaseUrl = 'http://localhost:9829'
+  const mockDirectoryServer = await MockServer.getInstanceAsync((request, response) => {
+    response.end(JSON.stringify({
+      keyChange: `${mockServerBaseUrl}/key-change`,
+      newAccount: `${mockServerBaseUrl}/new-account`,
+      newNonce: `${mockServerBaseUrl}/new-nonce`,
+      newOrder: `${mockServerBaseUrl}/new-order`,
+      revokeCert: `${mockServerBaseUrl}/revoke-cert`,
+      meta: {
+        termsOfService: '',
+        website: ''
+      }
+    }))
+  })
+  const directory = await Directory.getInstanceAsync(configuration)
+  await mockDirectoryServer.destroy()
+
+  // TODO: left off here.
+}
+
+
 
 test('Order', async t => {
   const { configuration, accountIdentity } = await setup()
@@ -53,6 +89,8 @@ test('Order', async t => {
       `trying to set read-only property ${readOnlySetter} throws`
     )
   })
+
+  await setupMock()
 
   t.end()
 })
