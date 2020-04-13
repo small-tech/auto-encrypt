@@ -6,7 +6,7 @@ test('Authorisation Request', async t => {
   t.strictEquals(
     await symbolOfErrorThrownByAsync(async () => { await (new AuthorisationRequest()).execute() }),
     Symbol.for('UndefinedOrNullError'),
-    'attempting to execute authorisation request without configuration argument throws as expected'
+    'attempting to execute authorisation request without authorisation url argument throws as expected'
   )
 
   t.end()
