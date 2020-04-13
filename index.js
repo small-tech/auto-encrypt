@@ -16,7 +16,7 @@ const os                = require('os')
 const util              = require('util')
 const https             = require('https')
 const ocsp              = require('ocsp')
-const MonkeyPatchTls    = require('./lib/staging/MonkeyPatchTls')
+const monkeyPatchTls    = require('./lib/staging/monkeyPatchTls')
 const LetsEncryptServer = require('./lib/LetsEncryptServer')
 const Configuration     = require('./lib/Configuration')
 const Certificate       = require('./lib/Certificate')
@@ -130,7 +130,7 @@ class AutoEncrypt {
       // * Yes, we could check for and start the Pebble server in the asynchronous SNICallback, below, but given how
       // often that function is called, I will not add anything to it beyond the essentials for performance reasons.
       case LetsEncryptServer.type.STAGING:
-        MonkeyPatchTls.toAccept(MonkeyPatchTls.STAGING_ROOT_CERTIFICATE)
+        monkeyPatchTls()
       break
     }
 

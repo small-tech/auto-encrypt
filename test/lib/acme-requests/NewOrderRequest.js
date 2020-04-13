@@ -1,8 +1,6 @@
 const os                             = require('os')
 const fs                             = require('fs-extra')
 const path                           = require('path')
-const util                           = require('util')
-const nock                           = require('nock')
 const test                           = require('tape')
 const NewOrderRequest                = require('../../../lib/acme-requests/NewOrderRequest')
 const Directory                      = require('../../../lib/Directory')
@@ -11,8 +9,7 @@ const AccountIdentity                = require('../../../lib/identities/AccountI
 const AcmeRequest                    = require('../../../lib/AcmeRequest')
 const Configuration                  = require('../../../lib/Configuration')
 const LetsEncryptServer              = require('../../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy,
-        symbolOfErrorThrownByAsync } = require('../../../lib/test-helpers')
+const { symbolOfErrorThrownByAsync } = require('../../../lib/test-helpers')
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -51,26 +48,6 @@ test('New Order Request', async t => {
     Symbol.for('UndefinedOrNullError'),
     'attempting to execute new order request without configuration argument throws as expected'
   )
-
-  nock('https://localhost:14000')
-    .post('/order-plz')
-    .reply(403, {
-      status: 403,
-      type: 'urn:ietf:params:acme:error:accountDoesNotExist',
-      detail: 'The request specified an account that does not exist'
-    })
-
-  const newOrderRequest = new NewOrderRequest()
-
-  t.strictEquals(
-    await symbolOfErrorThrownByAsync(
-      async () => { await newOrderRequest.execute(configuration) }
-    ),
-    Symbol.for('AcmeRequest.requestError'),
-    'error returned from server throws as expected'
-  )
-
-  nock.cleanAll()
 
   t.end()
 })
