@@ -2,7 +2,7 @@ const test                               = require('tape')
 const ReadyForChallengeValidationRequest = require('../../../lib/acme-requests/ReadyForChallengeValidationRequest')
 const { symbolOfErrorThrownByAsync }     = require('../../../lib/test-helpers')
 
-test('Authorisation Request', async t => {
+test('Ready For Challenge Validation Request', async t => {
   t.strictEquals(
     await symbolOfErrorThrownByAsync(async () => { await (new ReadyForChallengeValidationRequest()).execute() }),
     Symbol.for('UndefinedOrNullError'),
