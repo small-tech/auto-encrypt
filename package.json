@@ -2,6 +2,7 @@
   "name": "@small-tech/auto-encrypt",
   "version": "1.0.0",
   "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
+  "keywords": ["let's encrypt", "acme", "http-01", "https", "tls", "auto encrypt", "small tech", "automatic"],
   "author": "Aral Balkan",
   "license": "AGPL-3.0-or-later",
   "main": "index.js",

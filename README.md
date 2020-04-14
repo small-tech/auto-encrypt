@@ -14,7 +14,7 @@ The first time your web site is hit, it will take a couple of seconds to load as
 npm i @small-tech/auto-encrypt
 ```
 
-## Basic usage
+## Usage
 
 ### Instructions
 
@@ -27,8 +27,8 @@ npm i @small-tech/auto-encrypt
 2. Prefix your server creation code with a reference to the Auto Encrypt class:
 
     ```js
-    // https.createServer(…) becomes
-    AutoEncrypt.https.createServer(…)
+    // const server = https.createServer(…) becomes
+    const server = AutoEncrypt.https.createServer(…)
     ```
 
 3. For a graceful exit, before shutting down your app, shut down Auto Encrypt:

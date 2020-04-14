@@ -65,10 +65,9 @@ class AutoEncrypt {
    * people to add AutoEncrypt to their existing apps by requiring the module
    * and prefixing their https.createServer(…) line with AutoEncrypt:
    *
-   * @example const AutoEncrypt = require('auto-encrypt')
+   * @example const AutoEncrypt = require('@small-tech/auto-encrypt')
    * const server = AutoEncrypt.https.createServer()
    *
-   * @readonly
    * @static
    */
   static get https () { return AutoEncrypt }
