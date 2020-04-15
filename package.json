@@ -3,21 +3,33 @@
   "version": "1.0.0",
   "description": "Automatically provisions and renews Let’s Encrypt™ TLS certificates for Node.js® https servers (including Express.js, etc.)",
   "keywords": ["let's encrypt", "acme", "http-01", "https", "tls", "auto encrypt", "small tech", "automatic"],
-  "author": "Aral Balkan",
+  "author": {
+    "name": "Aral Balkan",
+    "email": "aral@small-tech.org",
+    "url": "https://ar.al"
+  },
   "license": "AGPL-3.0-or-later",
   "main": "index.js",
+  "funding": {
+    "type": "foundation",
+    "url": "https://small-tech.org/fund-us/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://source.small-tech.org/site.js/lib/auto-encrypt.git"
+  },
   "scripts": {
     "test": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-debug": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
-    "coverage": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "test-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
-    "coverage-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "test-pebble-sleep-noncereject": "QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-pebble-sleep-noncereject-debug": "tape 'test/**/*.js' | tap-spec",
-    "coverage-pebble-sleep-noncereject": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "test-staging": "STAGING=true QUIET=true tape 'test/**/*.js' | tap-spec",
     "test-staging-debug": "STAGING=true tape 'test/**/*.js' | tap-spec",
+    "coverage": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "coverage-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "coverage-pebble-sleep-noncereject": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "coverage-staging": "STAGING=true QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
     "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^https|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
