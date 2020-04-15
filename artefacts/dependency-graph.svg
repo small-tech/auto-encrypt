@@ -88,18 +88,18 @@
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M35.3421,-131.8071C41.9449,-125.0778 51.7361,-116.2407 62,-111 64.7144,-109.6141 67.561,-108.3531 70.4807,-107.2062"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="71.6292,-109.0241 76.5576,-105.0089 70.201,-105.0744 71.6292,-109.0241"/>
 </g>
-<!-- lib/staging/MonkeyPatchTls.js -->
+<!-- lib/staging/monkeyPatchTls.js -->
 <g id="node5" class="node">
-<title>lib/staging/MonkeyPatchTls.js</title>
-<g id="a_node5"><a xlink:href="lib/staging/MonkeyPatchTls.js" xlink:title="MonkeyPatchTls.js">
+<title>lib/staging/monkeyPatchTls.js</title>
+<g id="a_node5"><a xlink:href="lib/staging/monkeyPatchTls.js" xlink:title="monkeyPatchTls.js">
 <path fill="#ffffcc" stroke="#000000" d="M165,-199C165,-199 84,-199 84,-199 81,-199 78,-196 78,-193 78,-193 78,-187 78,-187 78,-184 81,-181 84,-181 84,-181 165,-181 165,-181 168,-181 171,-184 171,-187 171,-187 171,-193 171,-193 171,-196 168,-199 165,-199"/>
-<text text-anchor="middle" x="124.5" y="-187.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">MonkeyPatchTls.js</text>
+<text text-anchor="middle" x="124.5" y="-187.8" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#000000">monkeyPatchTls.js</text>
 </a>
 </g>
 </g>
-<!-- index.js&#45;&gt;lib/staging/MonkeyPatchTls.js -->
+<!-- index.js&#45;&gt;lib/staging/monkeyPatchTls.js -->
 <g id="edge4" class="edge">
-<title>index.js&#45;&gt;lib/staging/MonkeyPatchTls.js</title>
+<title>index.js&#45;&gt;lib/staging/monkeyPatchTls.js</title>
 <path fill="none" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" d="M33.3934,-150.1912C39.6916,-158.5173 50.0811,-170.4534 62,-177 65.2512,-178.7858 68.7205,-180.3268 72.2954,-181.6565"/>
 <polygon fill="#000000" fill-opacity="0.200000" stroke="#000000" stroke-width="2" stroke-opacity="0.200000" points="71.6273,-183.6474 77.9838,-183.5771 72.9708,-179.668 71.6273,-183.6474"/>
 </g>

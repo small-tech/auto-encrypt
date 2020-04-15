@@ -4,6 +4,14 @@ This documentation includes the implementation details of Auto Encrypt and is in
 
 If you just want to use Auto Encrypt, please see the public API, as documented in the [README](readme.md).
 
+The developer documentation is generated using [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown) from the [developer-documentation.hbs](./developer-documentation.hbs) template.
+
+To update the documentation:
+
+```sh
+npm run generate-developer-documentation
+```
+
 ## Like this? Fund us!
 
 [Small Technology Foundation](https://small-tech.org) is a tiny, independent not-for-profit.
@@ -27,7 +35,41 @@ Generated using [dependency cruiser](https://github.com/sverweij/dependency-crui
 
 ## Tests
 
-Main test tasks use an automatically-managed local Pebble server instance. While all tests pass with default Pebble settings, we run them using `PEBBLE_VA_NOSLEEP: 0` to speed up test execution.
+Main test tasks use an automatically-managed local Pebble server instance with settings optimised for performance.
+
+```sh
+npm run test
+```
+
+Tests should also pass with Pebble’s default settings and with the Let’s Encrypt staging server. The full set of test tasks are:
+
+| Name                                | Server  | Sleep? | Nonce reject? | Debug output? |
+|-------------------------------------|---------|--------|---------------|---------------|
+| test                                | Pebble  |   ✘    |       ✘       |       ✘       |
+| test-debug                          | Pebble  |   ✘    |       ✘       |       ✔       |
+| test-pebble-sleep                   | Pebble  |   ✔    |       ✘       |       ✘       |
+| test-pebble-sleep-debug             | Pebble  |   ✔    |       ✘       |       ✔       |
+| test-pebble-sleep-noncereject       | Pebble  |   ✔    |       ✔       |       ✘       |
+| test-pebble-sleep-noncereject-debug | Pebble  |   ✔    |       ✔       |       ✔       |
+| test-staging                        | Staging |  n/a   |      n/a      |       ✘       |
+| test-staging-debug                  | Staging |  n/a   |      n/a      |       ✔       |
+
+## Coverage
+
+There are several different code coverage tasks that correspond to the test tasks. Coverage task names begin with _coverage_ instead of _test_ and there are no debug versions for them.
+
+```sh
+npm run coverage
+```
+
+The full set of coverage tasks are:
+
+| Name                                    | Server  | Sleep? | Nonce reject? |
+|-----------------------------------------|---------|--------|---------------|
+| coverage                                | Pebble  |   ✘    |       ✘       |
+| coverage-pebble-sleep                   | Pebble  |   ✔    |       ✘       |
+| coverage-pebble-sleep-noncereject       | Pebble  |   ✔    |       ✔       |
+| coverage-staging                        | Staging |  n/a   |      n/a      |
 
 ## Modules
 
@@ -127,10 +169,9 @@ people to add AutoEncrypt to their existing apps by requiring the module
 and prefixing their https.createServer(…) line with AutoEncrypt:
 
 **Kind**: static property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
-**Read only**: true  
 **Example**  
 ```js
-const AutoEncrypt = require('auto-encrypt')
+const AutoEncrypt = require('@small-tech/auto-encrypt')
 const server = AutoEncrypt.https.createServer()
 ```
 <a name="module_@small-tech/auto-encrypt--AutoEncrypt.createServer"></a>
