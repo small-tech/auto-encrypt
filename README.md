@@ -176,9 +176,12 @@ By default, Auto Encrypt will use the Let’s Encrypt production environment. Th
 
 However, be aware that the production server has [rate limits](https://letsencrypt.org/docs/rate-limits/).
 
-If your testing requires provisioning new certificates, use the staging environment instead. For example, the unit tests all use the staging environment.
+For testing, Auto Encrypt provides seamless support for using the included local Pebble server or the Let’s Encrypt staging server.
 
-If you do use the staging environment, be aware that browsers will reject the staging certificates unless you trust the [Fake LE Root X1 certificate](https://letsencrypt.org/docs/staging-environment/#root-certificate). If testing with an https client written in Node, you can add the fake root certificate to your trust store temporarily, using the [`NODE_EXTRA_CA_CERTS` environment variable](https://nodejs.org/api/cli.html#cli_node_extra_ca_certs_file) or setting the `ca` options property when creating your `https` server. Needless to say, do not add the fake certificate root to the same trust store you use for your everyday browsing.
+If you do use the staging environment, be aware that browsers will reject the staging certificates unless you trust the [Fake LE Root X1 certificate](https://letsencrypt.org/docs/staging-environment/#root-certificate). If testing with an external https client written in Node, you can add the fake root certificate to your trust store temporarily, using the [`NODE_EXTRA_CA_CERTS` environment variable](https://nodejs.org/api/cli.html#cli_node_extra_ca_certs_file) or setting the `ca` options property when creating your `https` server. (Note that if you’re testing with the staging or Pebble server from the same process that Auto Encrypt is running in, Auto Encrypt automatically does this for you by monkeypatching Node’s TLS module with the necessary CA certificates.)
+
+Needless to say, do not add the fake certificate root to the same trust store you use for your everyday browsing.
+
 
 ## Related projects
 
