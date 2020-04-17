@@ -2,7 +2,16 @@
   "name": "@small-tech/auto-encrypt",
   "version": "1.0.0",
   "description": "Adds automatic provisioning and renewal of Let’s Encrypt TLS certificates with OCSP Stapling to Node.js https servers (including Express.js, etc.)",
-  "keywords": ["let's encrypt", "acme", "http-01", "https", "tls", "auto encrypt", "small tech", "automatic"],
+  "keywords": [
+    "let's encrypt",
+    "acme",
+    "http-01",
+    "https",
+    "tls",
+    "auto encrypt",
+    "small tech",
+    "automatic"
+  ],
   "author": {
     "name": "Aral Balkan",
     "email": "aral@small-tech.org",
