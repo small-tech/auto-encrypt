@@ -218,7 +218,13 @@ __The tests are currently broken and in the process of being overhauled followin
 
 Linux has an outdated feature dating from the mainframe days that requires a process that wants to bind to ports < 1024 to have elevated privileges. While this was a security feature in the days of dumb terminals, today it is a security anti-feature. (macOS has dropped this requirement as of macOS Mojave.)
 
-On Linux, ensure your Node process has the right to bind to so-called “privileged” ports by issuing the following command before use:
+On modern Linux systems, you can disable privileged ports like this:
+
+```sh
+sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0
+```
+
+Or, if you want to cling to ancient historic relics like a conservative to a racist statue, ensure your Node process has the right to bind to so-called “privileged” ports by issuing the following command before use:
 
 ```sh
 sudo setcap cap_net_bind_service=+ep $(which node)
