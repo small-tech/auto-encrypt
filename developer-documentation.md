@@ -37,6 +37,8 @@ Generated using [dependency cruiser](https://github.com/sverweij/dependency-crui
 
 Main test tasks use an automatically-managed local Pebble server instance with settings optimised for performance.
 
+__Important:__ Make sure that your system is reachable from your hostname before running the tests.
+
 ```sh
 npm run test
 ```
