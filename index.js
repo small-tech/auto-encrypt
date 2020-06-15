@@ -152,7 +152,7 @@ class AutoEncrypt {
 
     function sniError (symbolName, callback, emoji, ...args) {
       const error = Symbol.for(symbolName)
-      log(` ${emoji} [@small-tech/auto-connect] ${throws.errors[error](...args)}`)
+      log(`   ${emoji}    ❨auto-encrypt❩ ${throws.errors[error](...args)}`)
       callback(throws.createError(error, ...args))
     }
 
