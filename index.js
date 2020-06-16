@@ -227,6 +227,11 @@ class AutoEncrypt {
     const cache = this.ocspCache
 
     server.on('OCSPRequest', (certificate, issuer, callback) => {
+
+      if (certificate == null) {
+        return callback(new Error('Cannot OCSP staple: certificate not yet provisioned.'))
+      }
+
       ocsp.getOCSPURI(certificate, function(error, uri) {
         if (error) return callback(error)
         if (uri === null) return callback()
@@ -249,6 +254,7 @@ class AutoEncrypt {
         })
       })
     })
+
     return server
   }
 
