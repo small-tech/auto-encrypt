@@ -6,6 +6,8 @@ Adds automatic provisioning and renewal of [Let’s Encrypt](https://letsencrypt
 
 The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be seamlessly renewed 30 days before their expiry date.
 
+When not provisioning certificates, Auto Encrypt will also forward HTTP calls to HTTPS on your server.
+
 ## Installation
 
 ```sh
@@ -29,10 +31,12 @@ npm i @small-tech/auto-encrypt
     const server = AutoEncrypt.https.createServer(…)
     ```
 
-3. For a graceful exit, before shutting down your app, shut down Auto Encrypt:
+3. When done, close your server as you would normally:
 
     ```js
-    AutoEncrypt.shutdown()
+    server.close(() => {
+      console.log('The server is now closed.')
+    })
     ```
 
 ### Example
@@ -51,10 +55,11 @@ server.listen(() => {
   console.log(`Auto-encrypted HTTPS server is running at ${os.hostname()} and www.${os.hostname()}.`)
 })
 
-// …
+// Later…
 
-// Before exiting your app:
-AutoEncrypt.shutdown()
+server.close(() => {
+  console.log('The server is now closed.')
+})
 ```
 
 Note that on Linux, ports 80 and 443 require special privileges. Please see [A note on Linux and the security farce that is “privileged ports”](#a-note-on-linux-and-the-security-farce-that-is-priviliged-ports). If you just need a Node web server that handles all that and more for you (or to see how to implement privilege escalation seamlessly in your own servers, see [Site.js](https://sitejs.org)).
@@ -95,7 +100,7 @@ Here is the full list of Auto Encrypt options (all optional) and their defaults:
 
 ## Making a graceful exit
 
-When you’re ready to exit your app, call the `AutoEncrypt.shutdown()` method. This will allow Auto Encrypt to perform housekeeping and to destroy its certificate check update interval which, if not destroyed, will prevent your app from exiting.
+When you’re ready to exit your app, just call the `server.close()` method as you would normally. This will allow Auto Encrypt to perform housekeeping like shutting own the HTTP server that is used for answering Let’s Encrypt challenges as well as performing HTTP to HTTPS redirections and to destroy its certificate check update interval which, if not destroyed, will prevent your app from exiting.
 
 ## Developer documentation
 
@@ -116,9 +121,11 @@ server.listen(() => {
   console.log('Auto-encrypted HTTPS server is running at https://dev.ar.al')
 })
 
-// …
+// Later…
 
-AutoEncrypt.shutdown()
+server.close(() => {
+  console.log('The server is now closed.')
+})
 ```
 
 ### Express.js
@@ -142,9 +149,11 @@ server.listen(() => {
 })
 
 
-// …
+// Later…
 
-AutoEncrypt.shutdown()
+server.close(() => {
+  console.log('The server is now closed.')
+})
 ```
 
 ## Like this? Fund us!
@@ -161,7 +170,7 @@ If you’re evaluating this for a “startup” or an enterprise, let us save yo
 
 ## Client details
 
-Auto Encrypt does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname, serves it using OCSP Stapling, and automatically renews your certificate thereafter.
+Auto Encrypt does one thing and one thing well: it automatically provisions a Let’s Encrypt TLS certificate for your Node.js https servers using the HTTP-01 challenge method when your server is first hit from its hostname, serves it using OCSP Stapling, and automatically renews your certificate thereafter. And, when not provisioning certificates, it forwards any HTTP requests that your machine gets to HTTPS.
 
 Auto Encrypt __does not_ and __will not__:
 
@@ -245,7 +254,7 @@ The code uses TC39 class fields with the following naming conventions for privat
 #_property    // unsafe  property access (should only be used in accessors)
 ```
 
-(Documenting these here as private class fields (hashnames) are relatively new as of this writing and may not be familiar to some. The use of the underscore to differentiate direct property access from mediated access via an accessor is a project convention.)
+(Documenting these here as private class fields – ‘hashnames’ – are relatively new as of this writing and may not be familiar to some. The use of the underscore to differentiate direct property access from mediated access via an accessor is a project convention.)
 
 ## Like this? Fund us!
 

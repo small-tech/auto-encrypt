@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2020-07-02
+
+### Changed
+
+  - Breaking change: you no longer have to call AutoEncrypt.shutdown() manually. Closing your server will do it automatically (#33).
+
+### Added
+
+  - Automatic HTTP to HTTPS redirection. An HTTP server is now kept running for the lifetime of your HTTPS server and, when it is not responding to Let’s Encrypt challenges, it redirects HTTP calls on port 80 to your HTTPS server (#32).
+
 ## [1.0.3] - 2020-06-20
 
 ### Fixed

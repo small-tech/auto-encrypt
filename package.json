@@ -1,6 +1,6 @@
 {
   "name": "@small-tech/auto-encrypt",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "Adds automatic provisioning and renewal of Let’s Encrypt TLS certificates with OCSP Stapling to Node.js https servers (including Express.js, etc.)",
   "keywords": [
     "let's encrypt",
@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "bent": "aral/bent#errors-with-response-headers",
+    "encodeurl": "^1.0.2",
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
     "moment": "^2.24.0",
