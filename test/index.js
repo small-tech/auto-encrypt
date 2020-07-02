@@ -10,6 +10,7 @@ const bent                                                     = require('bent')
 const test                                                     = require('tape')
 const Pebble                                                   = require('@small-tech/node-pebble')
 const { createTestSettingsPath, dehydrate, throwsErrorOfType } = require('../lib/test-helpers')
+const HttpServer = require('../lib/HttpServer')
 
 const httpsGetString = bent('GET', 'string')
 
@@ -34,6 +35,11 @@ test('Auto Encrypt', async t => {
     await Pebble.ready()
 
     test.onFinish(async () => {
+
+      // As some of the unit tests result in the HTTP Server being created, ensure that it is
+      // shut down at the end so we can exit.
+      await HttpServer.destroySharedInstance()
+
       if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
         // If we’re testing with Pebble, shut down the Pebble server.
         await Pebble.shutdown()
@@ -47,7 +53,7 @@ test('Auto Encrypt', async t => {
   //
   // Test that server creation with listener as only argument works.
   //
-  AutoEncrypt.createServer(() => {})
+  const server0 = AutoEncrypt.createServer(() => {})
 
   const expectedProductionServerDetails = dehydrate(`
     # AutoEncrypt (static class)
@@ -64,7 +70,6 @@ test('Auto Encrypt', async t => {
 
   AutoEncrypt.shutdown()
 
-
   // Attempt to instantiate static AutoEncrypt class should throw.
   t.ok(throwsErrorOfType(
     () => { new AutoEncrypt() },
@@ -79,11 +84,11 @@ test('Auto Encrypt', async t => {
     serverType: letsEncryptServerType,
     settingsPath: testSettingsPath
   }
-  const server = AutoEncrypt.https.createServer(options, (request, response) => {
+  const server1 = AutoEncrypt.https.createServer(options, (request, response) => {
     response.end('ok')
   })
 
-  t.ok(server instanceof https.Server, 'https.Server instance returned as expected')
+  t.ok(server1 instanceof https.Server, 'https.Server instance returned as expected')
 
   // Test inspection string.
   const expectedInspectionString = dehydrate(`
@@ -96,7 +101,7 @@ test('Auto Encrypt', async t => {
   t.strictEquals(dehydrate(util.inspect(AutoEncrypt)), expectedInspectionString, 'inspection string is as expected')
 
   await new Promise ((resolve, reject) => {
-    server.listen(443, () => {
+    server1.listen(443, () => {
       resolve()
     })
   })
@@ -124,12 +129,12 @@ test('Auto Encrypt', async t => {
   //
   // Test SNICallback.
   //
-  const symbols = Object.getOwnPropertySymbols(server)
+  const symbols = Object.getOwnPropertySymbols(server1)
   sniCallbackSymbol = symbols.filter(symbol => symbol.toString() === 'Symbol(snicallback)')[0]
 
   // Test SNI success.
   await new Promise ((resolve, reject) => {
-    const sniCallback = server[sniCallbackSymbol]
+    const sniCallback = server1[sniCallbackSymbol]
 
     const domainToHit = isPebble ? 'localhost' : hostname
     sniCallback(domainToHit, (error, secureContext) => {
@@ -145,7 +150,7 @@ test('Auto Encrypt', async t => {
 
   // Test SNI failure.
   await new Promise ((resolve, reject) => {
-    const sniCallback = server[sniCallbackSymbol]
+    const sniCallback = server1[sniCallbackSymbol]
 
     const unsupportedDomain = 'unsupported.domain'
     sniCallback(unsupportedDomain, (error, secureContext) => {
@@ -160,8 +165,13 @@ test('Auto Encrypt', async t => {
   })
 
 
-  server.close()
-  AutoEncrypt.shutdown()
+  // Wait for server shutdown.
+  await new Promise((resolve, reject) => {
+    server1.close(() => {
+      resolve()
+    })
+  })
+
 
   // Create a second server. This time, it should get the certificate from disk.
   // Note: recreating options object as original one was passed by reference and
@@ -186,8 +196,13 @@ test('Auto Encrypt', async t => {
   const response2 = await httpsGetString(urlToHit)
   t.strictEquals(response, 'ok', 'second response is as expected')
 
-  server2.close()
-  AutoEncrypt.shutdown()
+  // Wait for server shutdown.
+  await new Promise((resolve, reject) => {
+    server2.close(() => {
+      resolve()
+    })
+  })
+
 
   //
   // Depending on which server type we’re testing, test server creation with the other one also.
@@ -209,6 +224,8 @@ test('Auto Encrypt', async t => {
     const server = AutoEncrypt.https.createServer(options)
     t.pass('testing with staging server but verified that pebble server is created correctly also')
   }
+
+  AutoEncrypt.shutdown()
 
   //
   // Test OCSPStapling. (We can only test this fully using the Pebble server.)
