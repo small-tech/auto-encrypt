@@ -33,19 +33,19 @@ test('Auto Encrypt', async t => {
     //         - test.onFinish() is only fired when all tests (not just the ones in this file) are finished running.
     //
     await Pebble.ready()
-
-    test.onFinish(async () => {
-
-      // As some of the unit tests result in the HTTP Server being created, ensure that it is
-      // shut down at the end so we can exit.
-      await HttpServer.destroySharedInstance()
-
-      if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
-        // If we’re testing with Pebble, shut down the Pebble server.
-        await Pebble.shutdown()
-      }
-    })
   }
+
+  test.onFinish(async () => {
+
+    // As some of the unit tests result in the HTTP Server being created, ensure that it is
+    // shut down at the end so we can exit.
+    await HttpServer.destroySharedInstance()
+
+    if (letsEncryptServerType === AutoEncrypt.serverType.PEBBLE) {
+      // If we’re testing with Pebble, shut down the Pebble server.
+      await Pebble.shutdown()
+    }
+  })
 
   // Test that AutoEncrypt.https is an alias for AutoEncrypt (syntactic sugar).
   t.strictEquals(AutoEncrypt.https, AutoEncrypt, 'AutoEncrypt.https is an alias for AutoEncrypt')
@@ -109,6 +109,16 @@ test('Auto Encrypt', async t => {
   const urlToHit = `https://${ process.env.STAGING ? hostname : 'localhost' }`
 
   let response = httpsGetString(urlToHit)
+
+  //
+  // Note: sometimes, when running with the staging server via ngrok, you will get the following error:
+  // ===== (node:997014) UnhandledPromiseRejectionWarning: Error: Client network socket disconnected before secure TLS
+  //       connection was established.
+  //
+  // I cannot reproduce this error when testing with the Pebble server locally so I’m assuming it has something to do
+  // with the ngrok proxy. If this is observed in the wild under non-proxy conditions, it should be investigated
+  // further.
+  //
 
   // Test server is busy response while attempting to provision the initial certificate.
   try {
