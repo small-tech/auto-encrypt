@@ -22,6 +22,7 @@ const Configuration     = require('./lib/Configuration')
 const Certificate       = require('./lib/Certificate')
 const Pluralise         = require('./lib/util/Pluralise')
 const Throws            = require('./lib/util/Throws')
+const HttpServer        = require('./lib/HttpServer')
 const log               = require('./lib/util/log')
 
 // Custom errors thrown by the autoEncrypt function.
@@ -170,6 +171,39 @@ class AutoEncrypt {
     }
 
     const server = this.addOcspStapling(https.createServer(options, listener))
+
+    //
+    // Monkey-patch the server.
+    //
+
+    server.__autoEncrypt__self = this
+
+    // Monkey-patch the server’s listen method so that we can start up the HTTP
+    // Server at the same time.
+    server.__autoEncrypt__originalListen = server.listen
+    server.__autoEncrypt__listen = function(...args) {
+      // Start the HTTP server.
+      HttpServer.getSharedInstance().then(() => {
+        // Start the HTTPS server.
+        return this.__autoEncrypt__originalListen.apply(this, args)
+      })
+    }
+
+
+    // Monkey-patch the server’s close method so that we can perform clean-up and
+    // also shut down the HTTP server transparently when server.close() is called.
+    server.__autoEncrypt__originalClose = server.close
+    server.close = function (...args) {
+      // Clean-up our own house.
+      this.__autoEncrypt__self.shutdown()
+
+      // Shut down the HTTP server.
+      HttpServer.destroySharedInstance().then(() => {
+        // Shut down the HTTPS server.
+        return this.__autoEncrypt__originalClose.apply(this, args)
+      })
+    }
+
     return server
   }
 
