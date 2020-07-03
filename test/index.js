@@ -107,7 +107,6 @@ test('Auto Encrypt', async t => {
   })
 
   const urlToHit = `https://${ process.env.STAGING ? hostname : 'localhost' }`
-
   let response = httpsGetString(urlToHit)
 
   //
@@ -135,6 +134,17 @@ test('Auto Encrypt', async t => {
     t.fail(`the first response should not throw but it does. ${error}`)
   }
   t.strictEquals(response, 'ok', 'response is as expected')
+
+  // Test http to https redirection.
+  const httpUrl = `http://${ process.env.STAGING ? `${hostname}/` : 'localhost/' }`
+  const httpToHttpsRedirectRequest = bent('GET', 307)
+  try {
+    const response = await httpToHttpsRedirectRequest(httpUrl)
+    t.pass('HTTP requests returns 307 redirection as expected')
+    t.strictEquals(response.headers.location, httpUrl.replace('http:', 'https:'), 'HTTP to HTTPS redirection URL is correct')
+  } catch (error) {
+    t.fail(`HTTP to HTTPS redirection fails when it should succeed. ${error}`)
+  }
 
   //
   // Test SNICallback.
@@ -287,7 +297,7 @@ test('Auto Encrypt', async t => {
             if (error) {
               t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
             }
-            t.pass(`OSCPRequest event handler returned non-error response.`)
+            t.pass(`OSCPRequest event handler returned non-error response`)
 
             // Close the mock OCSP server so that if the second call doesn’t hit the cache, the call will fail.
             mockOcspServer.close()
@@ -308,7 +318,7 @@ test('Auto Encrypt', async t => {
                 t.fail(`OCSPRequest event handler should not error but it did. ${error}`)
                 reject()
               }
-              t.pass(`OSCPRequest event handler returned non-error response.`)
+              t.pass(`OSCPRequest event handler returned non-error response`)
               resolve()
             })
           })
