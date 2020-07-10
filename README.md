@@ -104,7 +104,7 @@ When you’re ready to exit your app, just call the `server.close()` method as y
 
 ## Developer documentation
 
-If you want to help improve Auto Encrypt or better understand how it is structured and operates, please see the [developer documentation](developer-documentation.md).
+If you want to help improve Auto Encrypt or better understand how it is structured and operates, please see the [developer documentation](https://github.com/small-tech/auto-encrypt/blob/master/developer-documentation.md).
 
 ## Examples
 
@@ -217,11 +217,13 @@ A drop-in [standard Node.js HTTPS module](https://nodejs.org/dist/latest-v12.x/d
 
 A complete [small technology](https://small-tech.org/about/#small-technology) tool for developing, testing, and deploying a secure static or dynamic personal web site or app with zero configuration.
 
-## Coverage
+## Tests and coverage
 
-__The tests are currently broken and in the process of being overhauled following some major development work.__
+This project aims for > 80% coverage. At a recent check, coverage was at 95.29% (statements), 82.69% (branch), 95.19% (functions), 95.68% (lines).
 
-(For the latest state, run `npm run coverage`)
+To see the current state of code coverage, run `npm run coverage`.
+
+For more details, please see the [developer documentation](https://github.com/small-tech/auto-encrypt/blob/master/developer-documentation.md#tests).
 
 ## A note on Linux and the security farce that is “privileged ports”
 
