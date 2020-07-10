@@ -2,7 +2,9 @@
 //
 // Plain Node HTTPS server example using Auto Encrypt.
 //
-// For this example to work, make sure:
+// This example uses the local Pebble testing server.
+//
+// Before you alter it to use the Let’s Encrypt staging or production servers, ensure that:
 //
 // 1. You have your hostname set correctly for your system.
 //
@@ -24,22 +26,29 @@
 
 const os = require('os')
 const AutoEncrypt = require('../index')
+const Pebble = require('@small-tech/node-pebble')
 
 console.log('\n 🌄 Auto Encrypt “Hello, world!” Example \n')
 
-options = {
-  /* Custom http server options, if any, go here (we don’t have any in this
-    example, so we could just not have passed this empty object at all). */
+async function main() {
 
-  serverType: AutoEncrypt.serverType.PEBBLE,                // (The default is .PRODUCTION.)
-  domains: [os.hostname(), `www.${os.hostname()}`]
+  // Pebble is the local Let’s Encrypt testing server.
+  await Pebble.ready()
+
+  options = {
+    /* Custom http server options, if any, go here (we don’t have any in this
+      example, so we could just not have passed this empty object at all). */
+
+    serverType: AutoEncrypt.serverType.PEBBLE                // (The default is .PRODUCTION.)
+  }
+
+  const server = AutoEncrypt.https.createServer(options, (request, response) => {
+    response.end('Hello, world!')
+  })
+
+  server.listen(443, () => {
+    console.log(`\n ✨ “Hello, world!” server is running at https://localhost:${server.address().port}…\n`)
+  })
 }
 
-const server = AutoEncrypt.https.createServer(options, (request, response) => {
-  response.end('Hello, world!')
-})
-
-server.listen(443, () => {
-  console.log(`\n ✨ “Hello, world!” server is running…\n`)
-  console.log(server.address())
-})
+main()
