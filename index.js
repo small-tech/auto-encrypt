@@ -181,7 +181,7 @@ class AutoEncrypt {
     // Monkey-patch the server’s listen method so that we can start up the HTTP
     // Server at the same time.
     server.__autoEncrypt__originalListen = server.listen
-    server.__autoEncrypt__listen = function(...args) {
+    server.listen = function(...args) {
       // Start the HTTP server.
       HttpServer.getSharedInstance().then(() => {
         // Start the HTTPS server.
