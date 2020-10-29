@@ -58,20 +58,20 @@
     "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
     "moment": "^2.24.0",
-    "node-forge": "^0.9.1",
+    "node-forge": "^0.10.0",
     "ocsp": "^1.2.0",
     "server-destroy": "^1.0.1"
   },
   "devDependencies": {
-    "@small-tech/node-pebble": "^4.2.3",
-    "dependency-cruiser": "^8.1.0",
-    "jsdoc": "^3.6.3",
-    "jsdoc-to-markdown": "^5.0.3",
+    "@small-tech/node-pebble": "^4.2.4",
+    "dependency-cruiser": "^9.15.1",
+    "jsdoc": "^3.6.6",
+    "jsdoc-to-markdown": "^6.0.1",
     "nock": "^12.0.3",
-    "nyc": "^14.1.1",
+    "nyc": "^15.1.0",
     "tap-nyc": "^1.0.3",
-    "tap-spec": "^5.0.0",
-    "tape": "^4.13.0",
+    "tap-spec": "https://github.com/small-tech/tap-spec",
+    "tape": "^5.0.1",
     "wtfnode": "^0.8.1"
   }
 }
