@@ -308,7 +308,7 @@ Represents a Let’s Encrypt TLS certificate.
 
 * [lib/Certificate](#module_lib/Certificate)
     * [Certificate](#exp_module_lib/Certificate--Certificate) ⏏
-        * [new Certificate(configuration)](#new_module_lib/Certificate--Certificate_new)
+        * [new Certificate(domains)](#new_module_lib/Certificate--Certificate_new)
         * [.attemptToRecoverFromFailedRenewalAttemptIfNecessary()](#module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary)
         * [.util.inspect.custom()](#module_lib/Certificate--Certificate+util.inspect.custom)
         * _async_
@@ -329,13 +329,13 @@ Represents a Let’s Encrypt TLS certificate.
 **Kind**: Exported class  
 <a name="new_module_lib/Certificate--Certificate_new"></a>
 
-#### new Certificate(configuration)
+#### new Certificate(domains)
 Creates an instance of Certificate.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| configuration | <code>Configuration</code> | Configuration instance. |
+| domains | <code>Array.&lt;String&gt;</code> | List of domains this certificate covers. |
 
 <a name="module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary"></a>
 
