@@ -55,11 +55,12 @@ test('Auto Encrypt', async t => {
   //
   const server0 = AutoEncrypt.createServer(() => {})
 
+  const hostname = os.hostname()
   const expectedProductionServerDetails = dehydrate(`
     # AutoEncrypt (static class)
 
     - Using Let’s Encrypt production server.
-    - Managing TLS for dev.ar.al, www.dev.ar.al (default domains).
+    - Managing TLS for ${hostname}, www.${hostname} (default domains).
     - Settings stored at default settings path.
     - Listener is set.
   `)
@@ -78,7 +79,6 @@ test('Auto Encrypt', async t => {
 
   const testSettingsPath = createTestSettingsPath()
 
-  const hostname = os.hostname()
   let options = {
     domains: [hostname],
     serverType: letsEncryptServerType,
@@ -159,7 +159,7 @@ test('Auto Encrypt', async t => {
     const domainToHit = isPebble ? 'localhost' : hostname
     sniCallback(domainToHit, (error, secureContext) => {
       if (error) {
-        t.fail('SNI Callback should not error, but it did: ${error}')
+        t.fail(`SNI Callback should not error, but it did: ${error}`)
         reject()
         return
       }
