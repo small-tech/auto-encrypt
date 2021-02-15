@@ -37,7 +37,13 @@ Generated using [dependency cruiser](https://github.com/sverweij/dependency-crui
 
 Main test tasks use an automatically-managed local Pebble server instance with settings optimised for performance.
 
-__Important:__ Make sure that your system is reachable from your hostname before running the tests.
+__Pebble tests__: please add the following line to your hosts file (e.g., `/etc/hosts`) as the Pebble tests require your machine to be reachable using the `localhost` and `pebble` hostnames:
+
+```
+127.0.0.1       pebble
+```
+
+__Staging tests:__ Make sure that your system is reachable from your hostname before running the tests (e.g., using ngrok)
 
 ```sh
 npm run test
