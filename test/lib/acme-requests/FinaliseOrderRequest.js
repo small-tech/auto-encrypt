@@ -11,6 +11,8 @@ import LetsEncryptServer from '../../../lib/LetsEncryptServer.js'
 import { symbolOfErrorThrownByAsync } from '../../../lib/test-helpers/index.js'
 import Pebble from '@small-tech/node-pebble'
 
+import FinaliseOrderRequest from '../../../lib/acme-requests/FinaliseOrderRequest.js'
+
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
@@ -48,9 +50,6 @@ async function setup() {
   return configuration
 }
 
-// import test from 'tape'
-import FinaliseOrderRequest from '../../../lib/acme-requests/FinaliseOrderRequest.js'
-// import { symbolOfErrorThrownByAsync } from '../../../lib/test-helpers/index.js'
 
 test('Finalise Order Request', async t => {
   const configuration = await setup()

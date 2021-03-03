@@ -2,7 +2,6 @@ import os from 'os'
 import fs from 'fs-extra'
 import path from 'path'
 import test from 'tape'
-import NewOrderRequest from '../../../lib/acme-requests/NewOrderRequest.js'
 import Directory from '../../../lib/Directory.js'
 import Account from '../../../lib/Account.js'
 import AccountIdentity from '../../../lib/identities/AccountIdentity.js'
@@ -11,6 +10,8 @@ import Configuration from '../../../lib/Configuration.js'
 import LetsEncryptServer from '../../../lib/LetsEncryptServer.js'
 import { symbolOfErrorThrownByAsync } from '../../../lib/test-helpers/index.js'
 import Pebble from '@small-tech/node-pebble'
+
+import NewOrderRequest from '../../../lib/acme-requests/NewOrderRequest.js'
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
