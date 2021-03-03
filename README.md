@@ -219,7 +219,7 @@ A complete [small technology](https://small-tech.org/about/#small-technology) to
 
 ## Tests and coverage
 
-This project aims for > 80% coverage. At a recent check, coverage was at 95.29% (statements), 82.69% (branch), 95.19% (functions), 95.68% (lines).
+This project aims for > 80% coverage. At a recent check, coverage was at 97.42% (statements), 92.64% (branch), 91.49% (functions), 97.42% (lines).
 
 To see the current state of code coverage, run `npm run coverage`.
 
