@@ -1,17 +1,16 @@
-const os                         = require('os')
-const fs                         = require('fs-extra')
-const path                       = require('path')
-const test                       = require('tape')
-const jose                       = require('jose')
-const AcmeRequest                = require('../../lib/AcmeRequest')
-const Configuration              = require('../../lib/Configuration')
-const Directory                  = require('../../lib/Directory')
-const Account                    = require('../../lib/Account')
-const AccountIdentity            = require('../../lib/identities/AccountIdentity')
-const LetsEncryptServer          = require('../../lib/LetsEncryptServer')
-const { httpServerWithResponse,
-        throwsErrorOfType,
-        throwsErrorOfTypeAsync } = require('../../lib/test-helpers')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import test from 'tape'
+import jose from 'jose'
+import AcmeRequest from '../../lib/AcmeRequest.js'
+import Configuration from '../../lib/Configuration.js'
+import Directory from '../../lib/Directory.js'
+import Account from '../../lib/Account.js'
+import AccountIdentity from '../../lib/identities/AccountIdentity.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import { httpServerWithResponse, throwsErrorOfType, throwsErrorOfTypeAsync } from '../../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
 
 async function setup() {
 
@@ -19,6 +18,10 @@ async function setup() {
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
@@ -32,6 +35,10 @@ async function setup() {
   const directory = await Directory.getInstanceAsync(configuration)
 
   AcmeRequest.uninitialise()
+
+  test.onFinish(async () => {
+    await Pebble.shutdown()
+  })
 
   return { configuration, accountIdentity, directory }
 }

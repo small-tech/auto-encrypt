@@ -1,19 +1,24 @@
-const os                                   = require('os')
-const fs                                   = require('fs-extra')
-const path                                 = require('path')
-const util                                 = require('util')
-const test                                 = require('tape')
-const Nonce                                = require('../../lib/Nonce')
-const Directory                            = require('../../lib/Directory')
-const Configuration                        = require('../../lib/Configuration')
-const LetsEncryptServer                    = require('../../lib/LetsEncryptServer')
-const { dehydrate, symbolOfErrorThrownBy } = require('../../lib/test-helpers')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import util from 'util'
+import test from 'tape'
+import Nonce from '../../lib/Nonce.js'
+import Directory from '../../lib/Directory.js'
+import Configuration from '../../lib/Configuration.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import { dehydrate, symbolOfErrorThrownBy } from '../../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
 
-function setup() {
+async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
 
   const domains = {
     [LetsEncryptServer.type.PEBBLE]: ['localhost', 'pebble'],
@@ -31,7 +36,13 @@ function setup() {
 
 test('Nonce', async t => {
 
-  const configuration = setup()
+  const configuration = await setup()
+
+  // Teardown
+  t.teardown(async () => {
+    await Pebble.shutdown()
+  })
+
   const directory = await Directory.getInstanceAsync(configuration)
 
   // Missing directory argument should throw.

@@ -1,23 +1,35 @@
-const os                        = require('os')
-const fs                        = require('fs-extra')
-const path                      = require('path')
-const test                      = require('tape')
-const Order                     = require('../../lib/Order')
-const Configuration             = require('../../lib/Configuration')
-const Directory                 = require('../../lib/Directory')
-const Account                   = require('../../lib/Account')
-const AccountIdentity           = require('../../lib/identities/AccountIdentity')
-const AcmeRequest               = require('../../lib/AcmeRequest')
-const LetsEncryptServer         = require('../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy,
-        MockServer }            = require('../../lib/test-helpers')
-
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import test from 'tape'
+import Order from '../../lib/Order.js'
+import Configuration from '../../lib/Configuration.js'
+import Directory from '../../lib/Directory.js'
+import Account from '../../lib/Account.js'
+import AccountIdentity from '../../lib/identities/AccountIdentity.js'
+import AcmeRequest from '../../lib/AcmeRequest.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import { symbolOfErrorThrownBy, MockServer } from '../../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
+import HttpServer from '../../lib/HttpServer.js'
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
+
+  test.onFinish(async () => {
+    await Pebble.shutdown()
+
+    // As some of the unit tests result in the HTTP Server being created, ensure that it is
+    // shut down at the end so we can exit.
+    await HttpServer.destroySharedInstance()
+  })
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
@@ -37,41 +49,8 @@ async function setup() {
   return { configuration, accountIdentity }
 }
 
-async function setupMock() {
-  const letsEncryptServer = new LetsEncryptServer(LetsEncryptServer.type.MOCK)
-
-  const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
-
-  const configuration = new Configuration({
-    domains: [os.hostname(), `www.${os.hostname()}`],
-    server: letsEncryptServer,
-    settingsPath: customSettingsPath
-  })
-
-  const mockServerBaseUrl = 'http://localhost:9829'
-  const mockDirectoryServer = await MockServer.getInstanceAsync((request, response) => {
-    response.end(JSON.stringify({
-      keyChange: `${mockServerBaseUrl}/key-change`,
-      newAccount: `${mockServerBaseUrl}/new-account`,
-      newNonce: `${mockServerBaseUrl}/new-nonce`,
-      newOrder: `${mockServerBaseUrl}/new-order`,
-      revokeCert: `${mockServerBaseUrl}/revoke-cert`,
-      meta: {
-        termsOfService: '',
-        website: ''
-      }
-    }))
-  })
-  const directory = await Directory.getInstanceAsync(configuration)
-  await mockDirectoryServer.destroy()
-
-  // TODO: left off here.
-}
-
-
-
-test('Order', async t => {
+test('Order', t => {
+  t.plan(10)
   const { configuration, accountIdentity } = await setup()
 
   const order = await Order.getInstanceAsync(configuration, accountIdentity)
@@ -89,8 +68,6 @@ test('Order', async t => {
       `trying to set read-only property ${readOnlySetter} throws`
     )
   })
-
-  await setupMock()
-
+  t.pass()
   t.end()
 })

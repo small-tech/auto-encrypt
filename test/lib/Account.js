@@ -1,14 +1,15 @@
-const os                    = require('os')
-const fs                    = require('fs-extra')
-const path                  = require('path')
-const test                  = require('tape')
-const { throwsErrorOfType } = require('../../lib/test-helpers')
-const Configuration         = require('../../lib/Configuration')
-const Account               = require('../../lib/Account')
-const Directory             = require('../../lib/Directory')
-const AccountIdentity       = require('../../lib/identities/AccountIdentity')
-const AcmeRequest           = require('../../lib/AcmeRequest')
-const LetsEncryptServer     = require('../../lib/LetsEncryptServer')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import test from 'tape'
+import { throwsErrorOfType } from '../../lib/test-helpers/index.js'
+import Account from '../../lib/Account.js'
+import Configuration from '../../lib/Configuration.js'
+import Directory from '../../lib/Directory.js'
+import AccountIdentity from '../../lib/identities/AccountIdentity.js'
+import AcmeRequest from '../../lib/AcmeRequest.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import Pebble from '@small-tech/node-pebble'
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -16,6 +17,14 @@ async function setup() {
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
   const server = new LetsEncryptServer(letsEncryptServerType)
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
+
+  test.onFinish(async () => {
+    await Pebble.shutdown()
+  })
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)

@@ -1,5 +1,5 @@
-const test = require('tape')
-const Pluralise = require('../../lib/util/Pluralise')
+import test from 'tape'
+import Pluralise from '../../lib/util/Pluralise.js'
 
 test('Pluralise', t => {
   t.plan(5)

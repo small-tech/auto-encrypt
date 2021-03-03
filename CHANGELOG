@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - Work in progress
+
+### Changed
+
+  - Is now an ECMAScript Modules (ESM) project
+  - Dev: now using esm-tape-runner
+  - Dev: replaced tap-spec and tap-nyc with @small-tech/tap-monkey
+
 ## [2.0.6] - 2021-02-16
 
 ### Fixed

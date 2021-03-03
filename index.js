@@ -11,19 +11,18 @@
  * @copyright © 2020 Aral Balkan, Small Technology Foundation.
  * @license AGPLv3 or later.
  */
-
-const os                = require('os')
-const util              = require('util')
-const https             = require('https')
-const ocsp              = require('ocsp')
-const monkeyPatchTls    = require('./lib/staging/monkeyPatchTls')
-const LetsEncryptServer = require('./lib/LetsEncryptServer')
-const Configuration     = require('./lib/Configuration')
-const Certificate       = require('./lib/Certificate')
-const Pluralise         = require('./lib/util/Pluralise')
-const Throws            = require('./lib/util/Throws')
-const HttpServer        = require('./lib/HttpServer')
-const log               = require('./lib/util/log')
+import os from 'os'
+import util from 'util'
+import https from 'https'
+import ocsp from 'ocsp'
+import monkeyPatchTls from './lib/staging/monkeyPatchTls.js'
+import LetsEncryptServer from './lib/LetsEncryptServer.js'
+import Configuration from './lib/Configuration.js'
+import Certificate from './lib/Certificate.js'
+import Pluralise from './lib/util/Pluralise.js'
+import Throws from './lib/util/Throws.js'
+import HttpServer from './lib/HttpServer.js'
+import log from './lib/util/log.js'
 
 // Custom errors thrown by the autoEncrypt function.
 const throws = new Throws({
@@ -44,13 +43,13 @@ const throws = new Throws({
  * @alias module:@small-tech/auto-encrypt
  * @hideconstructor
  */
-class AutoEncrypt {
-  static #letsEncryptServer = null
-  static #defaultDomains    = null
-  static #domains           = null
-  static #settingsPath      = null
-  static #listener          = null
-  static #certificate       = null
+export default class AutoEncrypt {
+  static letsEncryptServer = null
+  static defaultDomains    = null
+  static domains           = null
+  static settingsPath      = null
+  static listener          = null
+  static certificate       = null
 
   /**
    * Enumeration.
@@ -66,7 +65,7 @@ class AutoEncrypt {
    * people to add AutoEncrypt to their existing apps by requiring the module
    * and prefixing their https.createServer(…) line with AutoEncrypt:
    *
-   * @example const AutoEncrypt = require('@small-tech/auto-encrypt')
+   * @example import AutoEncrypt from '@small-tech/auto-encrypt'
    * const server = AutoEncrypt.https.createServer()
    *
    * @static
@@ -74,7 +73,7 @@ class AutoEncrypt {
   static get https () { return AutoEncrypt }
 
 
-  static #ocspCache = null
+  static ocspCache = null
 
   /**
    * Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
@@ -144,12 +143,12 @@ class AutoEncrypt {
     const configuration = new Configuration({ settingsPath, domains, server: letsEncryptServer})
     const certificate = new Certificate(configuration)
 
-    this.#letsEncryptServer = letsEncryptServer
-    this.#defaultDomains    = defaultDomains
-    this.#domains           = domains
-    this.#settingsPath      = settingsPath
-    this.#listener          = listener
-    this.#certificate       = certificate
+    this.letsEncryptServer = letsEncryptServer
+    this.defaultDomains    = defaultDomains
+    this.domains           = domains
+    this.settingsPath      = settingsPath
+    this.listener          = listener
+    this.certificate       = certificate
 
     function sniError (symbolName, callback, emoji, ...args) {
       const error = Symbol.for(symbolName)
@@ -227,7 +226,7 @@ class AutoEncrypt {
    */
   static shutdown () {
     this.clearOcspCacheTimers()
-    this.#certificate.stopCheckingForRenewal()
+    this.certificate.stopCheckingForRenewal()
   }
 
   //
@@ -255,7 +254,7 @@ class AutoEncrypt {
     // By turning on OCSP Stapling, you can improve the performance of your website, provide better privacy protections
     // … and help Let’s Encrypt efficiently serve as many people as possible.
     //
-    // (Source: https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling)
+    // (Source: https://letsencrypt.org/docs/integration-guide/implement-ocsp-stapling)
 
     this.ocspCache = new ocsp.Cache()
     const cache = this.ocspCache
@@ -295,12 +294,12 @@ class AutoEncrypt {
   // Custom object description for console output (for debugging).
   static [util.inspect.custom] () {
     return `
-      # AutoEncrypt (static class)
+       # AutoEncrypt (static class)
 
-        - Using Let’s Encrypt ${this.#letsEncryptServer.name} server.
-        - Managing TLS for ${this.#domains.toString().replace(',', ', ')}${this.#domains === this.#defaultDomains ? ' (default domains)' : ''}.
-        - Settings stored at ${this.#settingsPath === null ? 'default settings path' : this.#settingsPath}.
-        - Listener ${typeof this.#listener === 'function' ? 'is set' : 'not set'}.
+        - Using Let’s Encrypt ${this.letsEncryptServer.name} server.
+        - Managing TLS for ${this.domains.toString().replace(',', ', ')}${this.domains === this.defaultDomains ? ' (default domains)' : ''}.
+        - Settings stored at ${this.settingsPath === null ? 'default settings path' : this.settingsPath}.
+        - Listener ${typeof this.listener === 'function' ? 'is set' : 'not set'}.
     `
   }
 
@@ -308,5 +307,3 @@ class AutoEncrypt {
     throws.error(Symbol.for('StaticClassCannotBeInstantiatedError'))
   }
 }
-
-module.exports = AutoEncrypt

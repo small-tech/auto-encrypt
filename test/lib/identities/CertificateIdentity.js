@@ -1,6 +1,6 @@
-const test                      = require('tape')
-const CertificateIdentity       = require('../../../lib/identities/CertificateIdentity')
-const { symbolOfErrorThrownBy } = require('../../../lib/test-helpers')
+import test from 'tape'
+import CertificateIdentity from '../../../lib/identities/CertificateIdentity.js'
+import { symbolOfErrorThrownBy } from '../../../lib/test-helpers/index.js'
 
 test('Certificate Identity', t => {
   t.strictEquals(

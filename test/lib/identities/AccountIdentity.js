@@ -1,13 +1,13 @@
-const os                                   = require('os')
-const path                                 = require('path')
-const util                                 = require('util')
-const fs                                   = require('fs-extra')
-const jose                                 = require('jose')
-const test                                 = require('tape')
-const AccountIdentity                      = require('../../../lib/identities/AccountIdentity')
-const Configuration                        = require('../../../lib/Configuration')
-const LetsEncryptServer                    = require('../../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy, dehydrate } = require('../../../lib/test-helpers')
+import os from 'os'
+import path from 'path'
+import util from 'util'
+import fs from 'fs-extra'
+import jose from 'jose'
+import test from 'tape'
+import AccountIdentity from '../../../lib/identities/AccountIdentity.js'
+import Configuration from '../../../lib/Configuration.js'
+import LetsEncryptServer from '../../../lib/LetsEncryptServer.js'
+import { symbolOfErrorThrownBy, dehydrate } from '../../../lib/test-helpers/index.js'
 
 function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server

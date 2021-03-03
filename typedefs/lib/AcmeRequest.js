@@ -34,4 +34,4 @@
  * @property {Object|String} body The response body as a native object or as a string.
  */
 
-module.exports = {}
+export default {}
