@@ -1,20 +1,26 @@
-const os                                                = require('os')
-const fs                                                = require('fs-extra')
-const path                                              = require('path')
-const util                                              = require('util')
-const tls                                               = require('tls')
-const moment                                            = require('moment')
-const test                                              = require('tape')
-const Certificate                                       = require('../../lib/Certificate')
-const Configuration                                     = require('../../lib/Configuration')
-const LetsEncryptServer                                 = require('../../lib/LetsEncryptServer')
-const { dehydrate, timeItAsync, symbolOfErrorThrownBy } = require('../../lib/test-helpers')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import util from 'util'
+import tls from 'tls'
+import moment from 'moment'
+import test from 'tape'
+import Certificate from '../../lib/Certificate.js'
+import Configuration from '../../lib/Configuration.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import { dehydrate, timeItAsync, symbolOfErrorThrownBy } from '../../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
+import HttpServer from '../../lib/HttpServer.js'
 
-function setup() {
+async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
 
   const domains = {
     [LetsEncryptServer.type.PEBBLE]: ['localhost', 'pebble'],
@@ -23,6 +29,15 @@ function setup() {
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
+
+  test.onFinish(async () => {
+    await Pebble.shutdown()
+
+        // As some of the unit tests result in the HTTP Server being created, ensure that it is
+    // shut down at the end so we can exit.
+    await HttpServer.destroySharedInstance()
+  })
+
   return new Configuration({
     domains: domains[letsEncryptServerType],
     server: new LetsEncryptServer(letsEncryptServerType),
@@ -31,7 +46,7 @@ function setup() {
 }
 
 test('Certificate', async t => {
-  const configuration = setup()
+  const configuration = await setup()
   //
   // Test initial certificate creation.
   //
@@ -215,6 +230,5 @@ test('Certificate', async t => {
   certificate2.checkForRenewal = actualCheckForRenewalMethod
 
   certificate2.stopCheckingForRenewal()
-
   t.end()
 })

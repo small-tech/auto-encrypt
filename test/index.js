@@ -1,16 +1,16 @@
-const os                                                       = require('os')
-const https                                                    = require('https')
-const util                                                     = require('util')
-const AutoEncrypt                                              = require('..')
-const Configuration                                            = require('../lib/Configuration')
-const Certificate                                              = require('../lib/Certificate')
-const LetsEncryptServer                                        = require('../lib/LetsEncryptServer')
-const ocsp                                                     = require('ocsp')
-const bent                                                     = require('bent')
-const test                                                     = require('tape')
-const Pebble                                                   = require('@small-tech/node-pebble')
-const { createTestSettingsPath, dehydrate, throwsErrorOfType } = require('../lib/test-helpers')
-const HttpServer = require('../lib/HttpServer')
+import os from 'os'
+import https from 'https'
+import util from 'util'
+import AutoEncrypt from '../index.js'
+import Configuration from '../lib/Configuration.js'
+import Certificate from '../lib/Certificate.js'
+import LetsEncryptServer from '../lib/LetsEncryptServer.js'
+import ocsp from 'ocsp'
+import bent from 'bent'
+import test from 'tape'
+import { createTestSettingsPath, dehydrate, throwsErrorOfType } from '../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
+import HttpServer from '../lib/HttpServer.js'
 
 const httpsGetString = bent('GET', 'string')
 
@@ -36,7 +36,6 @@ test('Auto Encrypt', async t => {
   }
 
   test.onFinish(async () => {
-
     // As some of the unit tests result in the HTTP Server being created, ensure that it is
     // shut down at the end so we can exit.
     await HttpServer.destroySharedInstance()
@@ -68,6 +67,7 @@ test('Auto Encrypt', async t => {
   const productionServerDetails = dehydrate(util.inspect(AutoEncrypt))
 
   t.strictEquals(productionServerDetails, expectedProductionServerDetails, 'creating server with listener as only argument works as expected')
+  // t.strictEquals('the actual thing', 'the expected thing', 'shocking intentional error example')
 
   AutoEncrypt.shutdown()
 
@@ -150,7 +150,7 @@ test('Auto Encrypt', async t => {
   // Test SNICallback.
   //
   const symbols = Object.getOwnPropertySymbols(server1)
-  sniCallbackSymbol = symbols.filter(symbol => symbol.toString() === 'Symbol(snicallback)')[0]
+  const sniCallbackSymbol = symbols.filter(symbol => symbol.toString() === 'Symbol(snicallback)')[0]
 
   // Test SNI success.
   await new Promise ((resolve, reject) => {

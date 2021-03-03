@@ -1,13 +1,13 @@
-const os                               = require('os')
-const fs                               = require('fs-extra')
-const path                             = require('path')
-const util                             = require('util')
-const test                             = require('tape')
-const LetsEncryptServer                = require('../../lib/LetsEncryptServer')
-const Configuration                    = require('../../lib/Configuration')
-const { throwsErrorOfType, dehydrate } = require('../../lib/test-helpers')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import util from 'util'
+import test from 'tape'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import Configuration from '../../lib/Configuration.js'
+import { throwsErrorOfType, dehydrate } from '../../lib/test-helpers/index.js'
 
-test('Configuration', t => {
+test('Configuration', async t => {
   t.plan(35)
 
   const letsEncryptStagingServer = new LetsEncryptServer(LetsEncryptServer.type.STAGING)

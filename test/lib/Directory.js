@@ -1,20 +1,24 @@
-const os                             = require('os')
-const fs                             = require('fs-extra')
-const path                           = require('path')
-const util                           = require('util')
-const test                           = require('tape')
-const Directory                      = require('../../lib/Directory')
-const Configuration                  = require('../../lib/Configuration')
-const LetsEncryptServer              = require('../../lib/LetsEncryptServer')
-const { symbolOfErrorThrownBy,
-        symbolOfErrorThrownByAsync,
-        dehydrate }                  = require('../../lib/test-helpers')
+import os from 'os'
+import fs from 'fs-extra'
+import path from 'path'
+import util from 'util'
+import test from 'tape'
+import Directory from '../../lib/Directory.js'
+import Configuration from '../../lib/Configuration.js'
+import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
+import { symbolOfErrorThrownBy, symbolOfErrorThrownByAsync, dehydrate } from '../../lib/test-helpers/index.js'
+import Pebble from '@small-tech/node-pebble'
+import HttpServer from '../../lib/HttpServer.js'
 
-function setup() {
+async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
   // (which is subject to rate limits) if the STAGING environment variable is set.
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
+
+  if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+    await Pebble.ready()
+  }
 
   const domains = {
     [LetsEncryptServer.type.PEBBLE]: ['localhost', 'pebble'],
@@ -23,6 +27,15 @@ function setup() {
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.removeSync(customSettingsPath)
+
+  test.onFinish(async () => {
+    await Pebble.shutdown()
+
+    // As some of the unit tests result in the HTTP Server being created, ensure that it is
+    // shut down at the end so we can exit.
+    await HttpServer.destroySharedInstance()
+  })
+
   return new Configuration({
     domains: domains[letsEncryptServerType],
     server: new LetsEncryptServer(letsEncryptServerType),
@@ -31,7 +44,7 @@ function setup() {
 }
 
 test('Directory', async t => {
-  const configuration = setup()
+  const configuration = await setup()
 
   // Test argument validation.
   t.strictEquals(

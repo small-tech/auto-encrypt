@@ -24,9 +24,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const os = require('os')
-const AutoEncrypt = require('../index')
-const Pebble = require('@small-tech/node-pebble')
+import AutoEncrypt from '../index.js'
+import Pebble from '@small-tech/node-pebble'
+
+// const os = require('os')
+// const AutoEncrypt = require('../dist/auto-encrypt.js')
+// const Pebble = require('@small-tech/node-pebble')
 
 console.log('\n 🌄 Auto Encrypt “Hello, world!” Example \n')
 
@@ -35,7 +38,7 @@ async function main() {
   // Pebble is the local Let’s Encrypt testing server.
   await Pebble.ready()
 
-  options = {
+  const options = {
     /* Custom http server options, if any, go here (we don’t have any in this
       example, so we could just not have passed this empty object at all). */
 
