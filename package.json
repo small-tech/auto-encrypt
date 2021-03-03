@@ -18,6 +18,7 @@
     "url": "https://ar.al"
   },
   "license": "AGPL-3.0-or-later",
+  "type": "module",
   "main": "index.js",
   "funding": {
     "type": "foundation",
@@ -28,22 +29,22 @@
     "url": "https://github.com/small-tech/auto-encrypt.git"
   },
   "scripts": {
-    "test": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
-    "test-debug": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
-    "test-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true tape 'test/**/*.js' | tap-spec",
-    "test-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 tape 'test/**/*.js' | tap-spec",
-    "test-pebble-sleep-noncereject": "QUIET=true tape 'test/**/*.js' | tap-spec",
-    "test-pebble-sleep-noncereject-debug": "tape 'test/**/*.js' | tap-spec",
-    "test-staging": "STAGING=true QUIET=true tape 'test/**/*.js' | tap-spec",
-    "test-staging-debug": "STAGING=true tape 'test/**/*.js' | tap-spec",
-    "coverage": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "coverage-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "coverage-pebble-sleep-noncereject": "QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
-    "coverage-staging": "STAGING=true QUIET=true nyc tape 'test/**/*.js' | tap-nyc",
+    "test": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-debug": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-pebble-sleep-debug": "PEBBLE_WFE_NONCEREJECT=0 esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-pebble-sleep-noncereject": "QUIET=true esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-pebble-sleep-noncereject-debug": "esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-staging": "STAGING=true QUIET=true esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "test-staging-debug": "STAGING=true esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "coverage": "PEBBLE_VA_NOSLEEP=1 PEBBLE_WFE_NONCEREJECT=0 QUIET=true c8 esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "coverage-pebble-sleep": "PEBBLE_WFE_NONCEREJECT=0 QUIET=true c8 esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "coverage-pebble-sleep-noncereject": "QUIET=true c8 esm-tape-runner 'test/**/*.js' | tap-monkey",
+    "coverage-staging": "STAGING=true QUIET=true c8 esm-tape-runner 'test/**/*.js' | tap-monkey",
     "generate-dependency-diagram": "node_modules/.bin/depcruise --exclude \"^node_modules|lib/util|typedefs|^https|^crypto$|^fs$|^os$|^tls$|^path$|^events$|^http$|^util\" --output-type dot index.js | dot -T svg > artefacts/dependency-graph.svg",
     "generate-developer-documentation": "npm run generate-dependency-diagram && node_modules/.bin/jsdoc2md --private --template developer-documentation.hbs --files typedefs/**/*.js --files index.js --files lib/*.js > developer-documentation.md"
   },
-  "nyc": {
+  "c8": {
     "exclude": [
       "test/**/*.js",
       "lib/test-helpers/*.js",
@@ -63,14 +64,15 @@
     "server-destroy": "^1.0.1"
   },
   "devDependencies": {
+    "@small-tech/esm-tape-runner": "^1.0.1",
     "@small-tech/node-pebble": "^4.2.4",
+    "@small-tech/tap-monkey": "^1.1.1",
+    "c8": "^7.6.0",
     "dependency-cruiser": "^9.15.1",
+    "esbuild": "^0.8.53",
     "jsdoc": "^3.6.6",
     "jsdoc-to-markdown": "^6.0.1",
-    "nyc": "^15.1.0",
-    "tap-nyc": "^1.0.3",
-    "tap-spec": "https://github.com/small-tech/tap-spec",
-    "tape": "^5.0.1",
+    "tape": "^5.2.1",
     "wtfnode": "^0.8.1"
   }
 }
