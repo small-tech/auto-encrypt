@@ -19,8 +19,12 @@ async function setup() {
   // Use npm test task for the former and npm run test-staging task for the latter.
   const letsEncryptServerType = process.env.STAGING ? LetsEncryptServer.type.STAGING : LetsEncryptServer.type.PEBBLE
 
+  let domains =  [os.hostname(), `www.${os.hostname()}`]
+
+  // If we’re running on pebble, test with localhost.
   if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
     await Pebble.ready()
+    domains = ['localhost']
   }
 
   test.onFinish(async () => {
@@ -35,7 +39,7 @@ async function setup() {
   fs.removeSync(customSettingsPath)
 
   const configuration = new Configuration({
-    domains: [os.hostname(), `www.${os.hostname()}`],
+    domains,
     server: new LetsEncryptServer(letsEncryptServerType),
     settingsPath: customSettingsPath
   })
@@ -49,8 +53,7 @@ async function setup() {
   return { configuration, accountIdentity }
 }
 
-test('Order', t => {
-  t.plan(10)
+test('Order', async t => {
   const { configuration, accountIdentity } = await setup()
 
   const order = await Order.getInstanceAsync(configuration, accountIdentity)
@@ -68,6 +71,5 @@ test('Order', t => {
       `trying to set read-only property ${readOnlySetter} throws`
     )
   })
-  t.pass()
   t.end()
 })
