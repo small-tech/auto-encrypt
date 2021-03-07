@@ -1,13 +1,12 @@
 import os from 'os'
-import fs from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
-import util from 'util'
 import test from 'tape'
 import Nonce from '../../lib/Nonce.js'
 import Directory from '../../lib/Directory.js'
 import Configuration from '../../lib/Configuration.js'
 import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
-import { dehydrate, symbolOfErrorThrownBy } from '../../lib/test-helpers/index.js'
+import { symbolOfErrorThrownBy } from '../../lib/test-helpers/index.js'
 import Pebble from '@small-tech/node-pebble'
 
 async function setup() {
@@ -26,7 +25,7 @@ async function setup() {
   }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
+  fs.rmSync(customSettingsPath, { recursive: true, force: true })
   return new Configuration({
     domains: domains[letsEncryptServerType],
     server: new LetsEncryptServer(letsEncryptServerType),

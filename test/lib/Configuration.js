@@ -1,5 +1,5 @@
 import os from 'os'
-import fs from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
 import util from 'util'
 import test from 'tape'
@@ -55,7 +55,7 @@ test('Configuration', async t => {
   let configuration
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
+  fs.rmSync(customSettingsPath, { recursive: true, force: true })
 
   configuration = new Configuration({ domains: ['dev.ar.al'], server: letsEncryptStagingServer, settingsPath: customSettingsPath })
 

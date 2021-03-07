@@ -1,7 +1,7 @@
 import os from 'os'
 import path from 'path'
 import util from 'util'
-import fs from 'fs-extra'
+import fs from 'fs'
 import jose from 'jose'
 import test from 'tape'
 import AccountIdentity from '../../../lib/identities/AccountIdentity.js'
@@ -21,7 +21,8 @@ function setup() {
   }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
+  fs.rmSync(customSettingsPath, { recursive: true, force: true })
+
   return new Configuration({
     domains: domains[letsEncryptServerType],
     server: new LetsEncryptServer(letsEncryptServerType),

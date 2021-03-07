@@ -61,7 +61,6 @@
   "dependencies": {
     "bent": "aral/bent#errors-with-response-headers",
     "encodeurl": "^1.0.2",
-    "fs-extra": "^8.1.0",
     "jose": "^1.24.0",
     "moment": "^2.24.0",
     "node-forge": "^0.10.0",

@@ -1,5 +1,5 @@
 import os from 'os'
-import fs from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
 import util from 'util'
 import test from 'tape'
@@ -26,7 +26,7 @@ async function setup() {
   }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
+  fs.rmSync(customSettingsPath, { recursive: true, force: true })
 
   test.onFinish(async () => {
     await Pebble.shutdown()

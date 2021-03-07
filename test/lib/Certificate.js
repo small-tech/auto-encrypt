@@ -1,5 +1,5 @@
 import os from 'os'
-import fs from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
 import util from 'util'
 import tls from 'tls'
@@ -11,6 +11,12 @@ import LetsEncryptServer from '../../lib/LetsEncryptServer.js'
 import { dehydrate, timeItAsync, symbolOfErrorThrownBy } from '../../lib/test-helpers/index.js'
 import Pebble from '@small-tech/node-pebble'
 import HttpServer from '../../lib/HttpServer.js'
+
+function ensureDirSync (directory) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true })
+  }
+}
 
 async function setup() {
   // Run the tests using either a local Pebble server (default) or the Let’s Encrypt Staging server
@@ -28,7 +34,7 @@ async function setup() {
   }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
-  fs.removeSync(customSettingsPath)
+  fs.rmSync(customSettingsPath, {recursive: true, force: true})
 
   test.onFinish(async () => {
     await Pebble.shutdown()
@@ -145,10 +151,10 @@ test('Certificate', async t => {
   // restored and used instead.
   //
 
-  fs.moveSync(certificateIdentityPath, oldCertificateIdentityPath)
-  fs.moveSync(certificatePath, oldCertificatePath)
-  fs.removeSync(certificatePath)
-  fs.removeSync(certificateIdentityPath)
+  fs.renameSync(certificateIdentityPath, oldCertificateIdentityPath)
+  fs.renameSync(certificatePath, oldCertificatePath)
+  fs.rmSync(certificatePath, {recursive: true, force: true})
+  fs.rmSync(certificateIdentityPath, {recursive: true, force: true})
 
   certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
 
@@ -162,8 +168,8 @@ test('Certificate', async t => {
   // to be restored and used.
   //
 
-  fs.copySync(certificatePath, oldCertificatePath)
-  fs.moveSync(certificateIdentityPath, oldCertificateIdentityPath)
+  fs.copyFileSync(certificatePath, oldCertificatePath)
+  fs.renameSync(certificateIdentityPath, oldCertificateIdentityPath)
 
   certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
 
@@ -177,8 +183,8 @@ test('Certificate', async t => {
   // to be restored and used.
   //
 
-  fs.copySync(certificateIdentityPath, oldCertificateIdentityPath)
-  fs.moveSync(certificatePath, oldCertificatePath)
+  fs.copyFileSync(certificateIdentityPath, oldCertificateIdentityPath)
+  fs.renameSync(certificatePath, oldCertificatePath)
 
   certificate2.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
 
