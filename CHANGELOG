@@ -4,13 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - Work in progress
+## [2.1.0] - 2021-03-08
 
 ### Changed
 
   - Is now an ECMAScript Modules (ESM) project
   - Dev: now using @small-tech/esm-tape-runner
   - Dev: replaced tap-spec and tap-nyc with @small-tech/tap-monkey
+
+### Fixed
+
+  - No longer crashes when checking for certificate renewal. (#34)
 
 ### Improved
 
