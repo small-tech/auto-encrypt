@@ -20,7 +20,8 @@
   "license": "AGPL-3.0-or-later",
   "main": "index.js",
   "files": [
-    "lib"
+    "lib",
+    "typedefs"
   ],
   "funding": {
     "type": "foundation",
