@@ -37,9 +37,11 @@ async function setup() {
   fs.rmSync(customSettingsPath, {recursive: true, force: true})
 
   test.onFinish(async () => {
-    await Pebble.shutdown()
+    if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+      await Pebble.shutdown()
+    }
 
-        // As some of the unit tests result in the HTTP Server being created, ensure that it is
+    // As some of the unit tests result in the HTTP Server being created, ensure that it is
     // shut down at the end so we can exit.
     await HttpServer.destroySharedInstance()
   })
@@ -226,15 +228,15 @@ test('Certificate', async t => {
   certificate2.stopCheckingForRenewal()
 
   // Test that also check now option works with start checking for renewal method.
-  const actualCheckForRenewalMethod = certificate2.checkForRenewal
+  const actualCheckForRenewalMethod = certificate2.checkForRenewal.bind(certificate2)
   let checkForRenewalCalled = false
-  certificate2.checkForRenewal = () => {
+  certificate2.checkForRenewal = (() => {
     checkForRenewalCalled = true
-  }
+  }).bind(certificate2)
   certificate2.startCheckingForRenewal(/* alsoCheckNow */ true)
   t.strictEquals(checkForRenewalCalled, true, 'checkForRenewal called via startCheckingForRenewal(true) as expected')
   certificate2.checkForRenewal = actualCheckForRenewalMethod
-
   certificate2.stopCheckingForRenewal()
+
   t.end()
 })

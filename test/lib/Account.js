@@ -20,11 +20,11 @@ async function setup() {
 
   if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
     await Pebble.ready()
+    test.onFinish(async () => {
+      await Pebble.shutdown()
+    })
   }
 
-  test.onFinish(async () => {
-    await Pebble.shutdown()
-  })
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
   fs.rmSync(customSettingsPath, { recursive: true, force: true })

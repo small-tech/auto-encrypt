@@ -28,7 +28,9 @@ async function setup() {
   }
 
   test.onFinish(async () => {
-    await Pebble.shutdown()
+    if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
+      await Pebble.shutdown()
+    }
 
     // As some of the unit tests result in the HTTP Server being created, ensure that it is
     // shut down at the end so we can exit.

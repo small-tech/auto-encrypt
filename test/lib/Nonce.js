@@ -17,6 +17,9 @@ async function setup() {
 
   if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
     await Pebble.ready()
+    test.onFinish(async () => {
+      await Pebble.shutdown()
+    })
   }
 
   const domains = {
@@ -36,12 +39,6 @@ async function setup() {
 test('Nonce', async t => {
 
   const configuration = await setup()
-
-  // Teardown
-  t.teardown(async () => {
-    await Pebble.shutdown()
-  })
-
   const directory = await Directory.getInstanceAsync(configuration)
 
   // Missing directory argument should throw.

@@ -21,6 +21,9 @@ async function setup() {
 
   if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
     await Pebble.ready()
+    test.onFinish(async () => {
+      await Pebble.shutdown()
+    })
   }
 
   const customSettingsPath = path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')
@@ -35,10 +38,6 @@ async function setup() {
   const directory = await Directory.getInstanceAsync(configuration)
 
   AcmeRequest.uninitialise()
-
-  test.onFinish(async () => {
-    await Pebble.shutdown()
-  })
 
   return { configuration, accountIdentity, directory }
 }

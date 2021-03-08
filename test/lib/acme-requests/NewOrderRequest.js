@@ -21,6 +21,9 @@ async function setup() {
 
   if (letsEncryptServerType === LetsEncryptServer.type.PEBBLE) {
     await Pebble.ready()
+    test.onFinish(async () => {
+      await Pebble.shutdown()
+    })
   }
 
   const domains = {
@@ -42,10 +45,6 @@ async function setup() {
   AcmeRequest.initialise(directory, accountIdentity)
   const account = await Account.getInstanceAsync(configuration)
   AcmeRequest.account = account
-
-  test.onFinish(async () => {
-    await Pebble.shutdown()
-  })
 
   return configuration
 }
