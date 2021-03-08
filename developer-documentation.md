@@ -22,7 +22,7 @@ We exist in part thanks to patronage by people like you. If you share [our visio
 
 Auto Encrypt is supported on:
 
-  - __Node:__ LTS (currently 12.16.1).
+  - __Node:__ LTS (currently 14.16.0).
   - __ECMAScript:__ [ES2019](https://node.green/#ES2019)
 
 ## Overview of relationships
@@ -37,16 +37,10 @@ Generated using [dependency cruiser](https://github.com/sverweij/dependency-crui
 
 Main test tasks use an automatically-managed local Pebble server instance with settings optimised for performance.
 
-__Pebble tests__: please add the following line to your hosts file (e.g., `/etc/hosts`) as the Pebble tests require your machine to be reachable using the `localhost` and `pebble` hostnames:
-
-```
-127.0.0.1       pebble
-```
-
-__Staging tests:__ Make sure that your system is reachable from your hostname before running the tests (e.g., using ngrok)
+__Important:__ Make sure that your system is reachable from your hostname before running the tests.
 
 ```sh
-npm run test
+npm -s run test
 ```
 
 Tests should also pass with Pebble’s default settings and with the Let’s Encrypt staging server. The full set of test tasks are:
@@ -67,7 +61,7 @@ Tests should also pass with Pebble’s default settings and with the Let’s Enc
 There are several different code coverage tasks that correspond to the test tasks. Coverage task names begin with _coverage_ instead of _test_ and there are no debug versions for them.
 
 ```sh
-npm run coverage
+npm -s run coverage
 ```
 
 The full set of coverage tasks are:
@@ -99,13 +93,6 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.</p>
 <dt><a href="#module_lib/Configuration">lib/Configuration</a></dt>
 <dd><p>Global configuration class. Use initialise() method to populate.</p>
 </dd>
-</dl>
-
-## Classes
-
-<dl>
-<dt><a href="#Order">Order</a></dt>
-<dd></dd>
 </dl>
 
 ## Functions
@@ -144,52 +131,52 @@ hit of an HTTPS route via use of the Server Name Indication (SNI) callback.
 **Copyright**: © 2020 Aral Balkan, Small Technology Foundation.  
 
 * [@small-tech/auto-encrypt](#module_@small-tech/auto-encrypt)
-    * [AutoEncrypt](#exp_module_@small-tech/auto-encrypt--AutoEncrypt) ⏏
+    * [module.exports](#exp_module_@small-tech/auto-encrypt--module.exports) ⏏
         * _instance_
-            * [.serverType](#module_@small-tech/auto-encrypt--AutoEncrypt+serverType) : <code>LetsEncryptServer.type</code>
+            * [.serverType](#module_@small-tech/auto-encrypt--module.exports+serverType) : <code>LetsEncryptServer.type</code>
         * _static_
-            * [.https](#module_@small-tech/auto-encrypt--AutoEncrypt.https)
-            * [.createServer([options])](#module_@small-tech/auto-encrypt--AutoEncrypt.createServer) ⇒ <code>https.Server</code>
-            * [.clearOcspCacheTimers()](#module_@small-tech/auto-encrypt--AutoEncrypt.clearOcspCacheTimers)
-            * [.shutdown()](#module_@small-tech/auto-encrypt--AutoEncrypt.shutdown)
-            * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling) ⇒ <code>https.Server</code> ℗
+            * [.https](#module_@small-tech/auto-encrypt--module.exports.https)
+            * [.createServer([options])](#module_@small-tech/auto-encrypt--module.exports.createServer) ⇒ <code>https.Server</code>
+            * [.clearOcspCacheTimers()](#module_@small-tech/auto-encrypt--module.exports.clearOcspCacheTimers)
+            * [.shutdown()](#module_@small-tech/auto-encrypt--module.exports.shutdown)
+            * [.addOcspStapling(server)](#module_@small-tech/auto-encrypt--module.exports.addOcspStapling) ⇒ <code>https.Server</code> ℗
 
-<a name="exp_module_@small-tech/auto-encrypt--AutoEncrypt"></a>
+<a name="exp_module_@small-tech/auto-encrypt--module.exports"></a>
 
-### AutoEncrypt ⏏
+### module.exports ⏏
 Auto Encrypt is a static class. Please do not instantiate.
 
 Use: AutoEncrypt.https.createServer(…)
 
 **Kind**: Exported class  
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt+serverType"></a>
+<a name="module_@small-tech/auto-encrypt--module.exports+serverType"></a>
 
-#### autoEncrypt.serverType : <code>LetsEncryptServer.type</code>
+#### module.exports.serverType : <code>LetsEncryptServer.type</code>
 Enumeration.
 
-**Kind**: instance property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
 **Read only**: true  
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt.https"></a>
+<a name="module_@small-tech/auto-encrypt--module.exports.https"></a>
 
-#### AutoEncrypt.https
+#### module.exports.https
 By aliasing the https property to the AutoEncrypt static class itself, we enable
 people to add AutoEncrypt to their existing apps by requiring the module
 and prefixing their https.createServer(…) line with AutoEncrypt:
 
-**Kind**: static property of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Kind**: static property of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
 **Example**  
 ```js
-const AutoEncrypt = require('@small-tech/auto-encrypt')
+import AutoEncrypt from '@small-tech/auto-encrypt'
 const server = AutoEncrypt.https.createServer()
 ```
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt.createServer"></a>
+<a name="module_@small-tech/auto-encrypt--module.exports.createServer"></a>
 
-#### AutoEncrypt.createServer([options]) ⇒ <code>https.Server</code>
+#### module.exports.createServer([options]) ⇒ <code>https.Server</code>
 Automatically manages Let’s Encrypt certificate provisioning and renewal for Node.js
 https servers using the HTTP-01 challenge on first hit of an HTTPS route via use of
 the Server Name Indication (SNI) callback.
 
-**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Kind**: static method of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
 **Returns**: <code>https.Server</code> - The server instance returned by Node’s https.createServer() method.  
 
 | Param | Type | Default | Description |
@@ -199,27 +186,27 @@ the Server Name Indication (SNI) callback.
 | [options.serverType] | <code>Enum</code> | <code>AutoEncrypt.serverType.PRODUCTION</code> | Let’s Encrypt server type to use.                                                                  AutoEncrypt.serverType.PRODUCTION, ….STAGING,                                                                  or ….PEBBLE (see LetsEncryptServer.type). |
 | [options.settingsPath] | <code>String</code> | <code>~/.small-tech.org/auto-encrypt/</code> | Path to save certificates/keys to. |
 
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt.clearOcspCacheTimers"></a>
+<a name="module_@small-tech/auto-encrypt--module.exports.clearOcspCacheTimers"></a>
 
-#### AutoEncrypt.clearOcspCacheTimers()
+#### module.exports.clearOcspCacheTimers()
 The OCSP module does not have a means of clearing its cache check timers
 so we do it here. (Otherwise, the test suite would hang.)
 
-**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt.shutdown"></a>
+**Kind**: static method of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
+<a name="module_@small-tech/auto-encrypt--module.exports.shutdown"></a>
 
-#### AutoEncrypt.shutdown()
+#### module.exports.shutdown()
 Shut Auto Encrypt down. Do this before app exit. Performs necessary clean-up and removes
 any references that might cause the app to not exit.
 
-**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
-<a name="module_@small-tech/auto-encrypt--AutoEncrypt.addOcspStapling"></a>
+**Kind**: static method of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
+<a name="module_@small-tech/auto-encrypt--module.exports.addOcspStapling"></a>
 
-#### AutoEncrypt.addOcspStapling(server) ⇒ <code>https.Server</code> ℗
+#### module.exports.addOcspStapling(server) ⇒ <code>https.Server</code> ℗
 Adds Online Certificate Status Protocol (OCSP) stapling (also known as TLS Certificate Status Request extension)
 support to the passed server instance.
 
-**Kind**: static method of [<code>AutoEncrypt</code>](#exp_module_@small-tech/auto-encrypt--AutoEncrypt)  
+**Kind**: static method of [<code>module.exports</code>](#exp_module_@small-tech/auto-encrypt--module.exports)  
 **Returns**: <code>https.Server</code> - HTTPS server instance with OCSP Stapling support.  
 **Access**: private  
 
@@ -236,24 +223,24 @@ Abstract base request class for carrying out signed ACME requests over HTTPS.
 **Copyright**: Copyright © 2020 Aral Balkan, Small Technology Foundation.  
 
 * [lib/AcmeRequest](#module_lib/AcmeRequest)
-    * [AcmeRequest](#exp_module_lib/AcmeRequest--AcmeRequest) ⏏
-        * [.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON])](#module_lib/AcmeRequest--AcmeRequest+execute) ⇒ <code>types.ResponseObject</code>
-        * [._execute(preparedRequest, parseResponseBodyAsJSON)](#module_lib/AcmeRequest--AcmeRequest+_execute) ⇒ <code>types.ResponseObject</code>
-        * [.getBuffer(stream)](#module_lib/AcmeRequest--AcmeRequest+getBuffer) ⇒ <code>Buffer</code>
-        * [.prepare(command, payload, useKid, [successCodes], [url])](#module_lib/AcmeRequest--AcmeRequest+prepare) ⇒ <code>types.PreparedRequest</code>
+    * [module.exports](#exp_module_lib/AcmeRequest--module.exports) ⏏
+        * [.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON])](#module_lib/AcmeRequest--module.exports+execute) ⇒ <code>types.ResponseObject</code>
+        * [._execute(preparedRequest, parseResponseBodyAsJSON)](#module_lib/AcmeRequest--module.exports+_execute) ⇒ <code>types.ResponseObject</code>
+        * [.getBuffer(stream)](#module_lib/AcmeRequest--module.exports+getBuffer) ⇒ <code>Buffer</code>
+        * [.prepare(command, payload, useKid, [successCodes], [url])](#module_lib/AcmeRequest--module.exports+prepare) ⇒ <code>types.PreparedRequest</code>
 
-<a name="exp_module_lib/AcmeRequest--AcmeRequest"></a>
+<a name="exp_module_lib/AcmeRequest--module.exports"></a>
 
-### AcmeRequest ⏏
+### module.exports ⏏
 Abstract base request class for carrying out signed ACME requests over HTTPS.
 
 **Kind**: Exported class  
-<a name="module_lib/AcmeRequest--AcmeRequest+execute"></a>
+<a name="module_lib/AcmeRequest--module.exports+execute"></a>
 
-#### acmeRequest.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON]) ⇒ <code>types.ResponseObject</code>
+#### module.exports.execute(command, payload, useKid, [successCodes], [url], [parseResponseBodyAsJSON]) ⇒ <code>types.ResponseObject</code>
 Executes a remote Let’s Encrypt command and either returns the result or throws.
 
-**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/AcmeRequest--module.exports)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -264,37 +251,37 @@ Executes a remote Let’s Encrypt command and either returns the result or throw
 | [url] | <code>String</code> | <code></code> | If specified, use this URL, ignoring the command parameter. |
 | [parseResponseBodyAsJSON] | <code>Boolean</code> | <code>true</code> | Parse response body as JSON (true) or as string (false). |
 
-<a name="module_lib/AcmeRequest--AcmeRequest+_execute"></a>
+<a name="module_lib/AcmeRequest--module.exports+_execute"></a>
 
-#### acmeRequest.\_execute(preparedRequest, parseResponseBodyAsJSON) ⇒ <code>types.ResponseObject</code>
+#### module.exports.\_execute(preparedRequest, parseResponseBodyAsJSON) ⇒ <code>types.ResponseObject</code>
 Executes a prepared request.
 
-**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/AcmeRequest--module.exports)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | preparedRequest | <code>types.PreparedRequest</code> | The prepared request, ready to be executed. |
 | parseResponseBodyAsJSON | <code>Boolean</code> | Should the request body be parsed as JSON (true) or should                                                        the native response object be returned (false). |
 
-<a name="module_lib/AcmeRequest--AcmeRequest+getBuffer"></a>
+<a name="module_lib/AcmeRequest--module.exports+getBuffer"></a>
 
-#### acmeRequest.getBuffer(stream) ⇒ <code>Buffer</code>
+#### module.exports.getBuffer(stream) ⇒ <code>Buffer</code>
 Concatenates the output of a stream and returns a buffer. Taken from the bent module.
 
-**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/AcmeRequest--module.exports)  
 **Returns**: <code>Buffer</code> - The concatenated output of the Node stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | stream | <code>stream</code> | A Node stream. |
 
-<a name="module_lib/AcmeRequest--AcmeRequest+prepare"></a>
+<a name="module_lib/AcmeRequest--module.exports+prepare"></a>
 
-#### acmeRequest.prepare(command, payload, useKid, [successCodes], [url]) ⇒ <code>types.PreparedRequest</code>
+#### module.exports.prepare(command, payload, useKid, [successCodes], [url]) ⇒ <code>types.PreparedRequest</code>
 Separate the preparation of a request from the execution of it so we can easily test
 that different request configurations conform to our expectations.
 
-**Kind**: instance method of [<code>AcmeRequest</code>](#exp_module_lib/AcmeRequest--AcmeRequest)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/AcmeRequest--module.exports)  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -313,29 +300,28 @@ Represents a Let’s Encrypt TLS certificate.
 **Copyright**: Copyright © 2020 Aral Balkan, Small Technology Foundation.  
 
 * [lib/Certificate](#module_lib/Certificate)
-    * [Certificate](#exp_module_lib/Certificate--Certificate) ⏏
-        * [new Certificate(domains)](#new_module_lib/Certificate--Certificate_new)
-        * [.attemptToRecoverFromFailedRenewalAttemptIfNecessary()](#module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary)
-        * [.util.inspect.custom()](#module_lib/Certificate--Certificate+util.inspect.custom)
+    * [module.exports](#exp_module_lib/Certificate--module.exports) ⏏
+        * [new module.exports(domains)](#new_module_lib/Certificate--module.exports_new)
+        * [.attemptToRecoverFromFailedRenewalAttemptIfNecessary()](#module_lib/Certificate--module.exports+attemptToRecoverFromFailedRenewalAttemptIfNecessary)
         * _async_
-            * [.getSecureContext()](#module_lib/Certificate--Certificate+getSecureContext) ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
-            * [.createSecureContext(renewCertificate)](#module_lib/Certificate--Certificate+createSecureContext) ⇒ <code>Promise</code> ℗
-            * [.provisionCertificate()](#module_lib/Certificate--Certificate+provisionCertificate) ⇒ <code>Promise</code> ℗
-            * [.renewCertificate()](#module_lib/Certificate--Certificate+renewCertificate) ⇒ <code>Promise</code> ℗
-            * [.checkForRenewal()](#module_lib/Certificate--Certificate+checkForRenewal) ⇒ <code>Promise</code> ℗
+            * [.getSecureContext()](#module_lib/Certificate--module.exports+getSecureContext) ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
+            * [.createSecureContext(renewCertificate)](#module_lib/Certificate--module.exports+createSecureContext) ⇒ <code>Promise</code> ℗
+            * [.provisionCertificate()](#module_lib/Certificate--module.exports+provisionCertificate) ⇒ <code>Promise</code> ℗
+            * [.renewCertificate()](#module_lib/Certificate--module.exports+renewCertificate) ⇒ <code>Promise</code> ℗
+            * [.checkForRenewal()](#module_lib/Certificate--module.exports+checkForRenewal) ⇒ <code>Promise</code> ℗
         * _sync_
-            * [.startCheckingForRenewal([alsoCheckNow])](#module_lib/Certificate--Certificate+startCheckingForRenewal) ℗
-            * [.stopCheckingForRenewal()](#module_lib/Certificate--Certificate+stopCheckingForRenewal) ℗
+            * [.startCheckingForRenewal([alsoCheckNow])](#module_lib/Certificate--module.exports+startCheckingForRenewal) ℗
+            * [.stopCheckingForRenewal()](#module_lib/Certificate--module.exports+stopCheckingForRenewal) ℗
 
-<a name="exp_module_lib/Certificate--Certificate"></a>
+<a name="exp_module_lib/Certificate--module.exports"></a>
 
-### Certificate ⏏
+### module.exports ⏏
 Represents a Let’s Encrypt TLS certificate.
 
 **Kind**: Exported class  
-<a name="new_module_lib/Certificate--Certificate_new"></a>
+<a name="new_module_lib/Certificate--module.exports_new"></a>
 
-#### new Certificate(domains)
+#### new module.exports(domains)
 Creates an instance of Certificate.
 
 
@@ -343,35 +329,29 @@ Creates an instance of Certificate.
 | --- | --- | --- |
 | domains | <code>Array.&lt;String&gt;</code> | List of domains this certificate covers. |
 
-<a name="module_lib/Certificate--Certificate+attemptToRecoverFromFailedRenewalAttemptIfNecessary"></a>
+<a name="module_lib/Certificate--module.exports+attemptToRecoverFromFailedRenewalAttemptIfNecessary"></a>
 
-#### certificate.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
+#### module.exports.attemptToRecoverFromFailedRenewalAttemptIfNecessary()
 Check if certificate-identity.pem.old or certificate.pem.old files exist.
 If they do, it means that something went wrong while  certificate was trying to be
 renewed. So restore them and use them and hopefully the next renewal attempt will
 succeed or at least buy the administrator of the server some time to fix the issue.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
-<a name="module_lib/Certificate--Certificate+util.inspect.custom"></a>
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
+<a name="module_lib/Certificate--module.exports+getSecureContext"></a>
 
-#### certificate.util.inspect.custom()
-Custom inspection string.
-
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
-<a name="module_lib/Certificate--Certificate+getSecureContext"></a>
-
-#### certificate.getSecureContext() ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
+#### module.exports.getSecureContext() ⇒ <code>Promise.&lt;tls.SecureContext&gt;</code>
 Get a SecureContext that can be used in an SNICallback.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Returns**: <code>Promise.&lt;tls.SecureContext&gt;</code> - A promise for a SecureContext that can be used in creating https servers.  
 **Category**: async  
-<a name="module_lib/Certificate--Certificate+createSecureContext"></a>
+<a name="module_lib/Certificate--module.exports+createSecureContext"></a>
 
-#### certificate.createSecureContext(renewCertificate) ⇒ <code>Promise</code> ℗
+#### module.exports.createSecureContext(renewCertificate) ⇒ <code>Promise</code> ℗
 Creates and caches a secure context, provisioning a TLS certificate in the process, if necessary.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Returns**: <code>Promise</code> - Fulfils immediately if certificate exists and does not need to be
                                   renewed. Otherwise, fulfils when certificate has been provisioned.  
 **Category**: async  
@@ -381,44 +361,44 @@ Creates and caches a secure context, provisioning a TLS certificate in the proce
 | --- | --- | --- | --- |
 | renewCertificate | <code>Boolean</code> | <code>false</code> | If true, will start the process of renewing the certificate                                   (but will continue to return the existing certificate until it is ready). |
 
-<a name="module_lib/Certificate--Certificate+provisionCertificate"></a>
+<a name="module_lib/Certificate--module.exports+provisionCertificate"></a>
 
-#### certificate.provisionCertificate() ⇒ <code>Promise</code> ℗
+#### module.exports.provisionCertificate() ⇒ <code>Promise</code> ℗
 Provisions a new Let’s Encrypt TLS certificate, persists it, and starts checking for
 renewals on it every day, starting with the next day.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Returns**: <code>Promise</code> - Fulfils once a certificate has been provisioned.  
 **Category**: async  
 **Access**: private  
-<a name="module_lib/Certificate--Certificate+renewCertificate"></a>
+<a name="module_lib/Certificate--module.exports+renewCertificate"></a>
 
-#### certificate.renewCertificate() ⇒ <code>Promise</code> ℗
+#### module.exports.renewCertificate() ⇒ <code>Promise</code> ℗
 Starts the certificate renewal process by requesting the creation of a fresh secure context.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Returns**: <code>Promise</code> - Resolves once certificate is renewed and new secure context is
                               created and cached.  
 **Category**: async  
 **Access**: private  
-<a name="module_lib/Certificate--Certificate+checkForRenewal"></a>
+<a name="module_lib/Certificate--module.exports+checkForRenewal"></a>
 
-#### certificate.checkForRenewal() ⇒ <code>Promise</code> ℗
+#### module.exports.checkForRenewal() ⇒ <code>Promise</code> ℗
 Checks if the certificate needs to be renewed (if it is within 30 days of its expiry date) and, if so,
 renews it. While the method is async, the result is not awaited on usage. Instead, it is a fire-and-forget
 method that’s called via a daily interval.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Returns**: <code>Promise</code> - Fulfils immediately if certificate doesn’t need renewal. Otherwise, fulfils once certificate
                    has been renewed.  
 **Category**: async  
 **Access**: private  
-<a name="module_lib/Certificate--Certificate+startCheckingForRenewal"></a>
+<a name="module_lib/Certificate--module.exports+startCheckingForRenewal"></a>
 
-#### certificate.startCheckingForRenewal([alsoCheckNow]) ℗
+#### module.exports.startCheckingForRenewal([alsoCheckNow]) ℗
 Starts checking for certificate renewals every 24 hours.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Category**: sync  
 **Access**: private  
 
@@ -426,12 +406,12 @@ Starts checking for certificate renewals every 24 hours.
 | --- | --- | --- | --- |
 | [alsoCheckNow] | <code>boolean</code> | <code>false</code> | If true, will also immediately check for renewal when the function is                                       called (use this when loading a previously-provisioned and persisted                                       certificate from disk). |
 
-<a name="module_lib/Certificate--Certificate+stopCheckingForRenewal"></a>
+<a name="module_lib/Certificate--module.exports+stopCheckingForRenewal"></a>
 
-#### certificate.stopCheckingForRenewal() ℗
+#### module.exports.stopCheckingForRenewal() ℗
 Stops the timer that checks for renewal daily. Use this during housekeeping before destroying this object.
 
-**Kind**: instance method of [<code>Certificate</code>](#exp_module_lib/Certificate--Certificate)  
+**Kind**: instance method of [<code>module.exports</code>](#exp_module_lib/Certificate--module.exports)  
 **Category**: sync  
 **Access**: private  
 <a name="module_lib/Configuration"></a>
@@ -443,24 +423,24 @@ Global configuration class. Use initialise() method to populate.
 **Copyright**: © 2020 Aral Balkan, Small Technology Foundation.  
 
 * [lib/Configuration](#module_lib/Configuration)
-    * [Configuration](#exp_module_lib/Configuration--Configuration) ⏏
-        * [new Configuration(settings)](#new_module_lib/Configuration--Configuration_new)
-        * [.server](#module_lib/Configuration--Configuration+server) : <code>LetsEncryptServer</code>
-        * [.domains](#module_lib/Configuration--Configuration+domains) : <code>Array.&lt;String&gt;</code>
-        * [.settingsPath](#module_lib/Configuration--Configuration+settingsPath) : <code>String</code>
-        * [.accountPath](#module_lib/Configuration--Configuration+accountPath) : <code>String</code>
-        * [.accountIdentityPath](#module_lib/Configuration--Configuration+accountIdentityPath) : <code>String</code>
-        * [.certificatePath](#module_lib/Configuration--Configuration+certificatePath) : <code>String</code>
-        * [.certificateDirectoryPath](#module_lib/Configuration--Configuration+certificateDirectoryPath) : <code>String</code>
-        * [.certificateIdentityPath](#module_lib/Configuration--Configuration+certificateIdentityPath) : <code>String</code>
+    * [module.exports](#exp_module_lib/Configuration--module.exports) ⏏
+        * [new module.exports(settings)](#new_module_lib/Configuration--module.exports_new)
+        * [.server](#module_lib/Configuration--module.exports+server) : <code>LetsEncryptServer</code>
+        * [.domains](#module_lib/Configuration--module.exports+domains) : <code>Array.&lt;String&gt;</code>
+        * [.settingsPath](#module_lib/Configuration--module.exports+settingsPath) : <code>String</code>
+        * [.accountPath](#module_lib/Configuration--module.exports+accountPath) : <code>String</code>
+        * [.accountIdentityPath](#module_lib/Configuration--module.exports+accountIdentityPath) : <code>String</code>
+        * [.certificatePath](#module_lib/Configuration--module.exports+certificatePath) : <code>String</code>
+        * [.certificateDirectoryPath](#module_lib/Configuration--module.exports+certificateDirectoryPath) : <code>String</code>
+        * [.certificateIdentityPath](#module_lib/Configuration--module.exports+certificateIdentityPath) : <code>String</code>
 
-<a name="exp_module_lib/Configuration--Configuration"></a>
+<a name="exp_module_lib/Configuration--module.exports"></a>
 
-### Configuration ⏏
+### module.exports ⏏
 **Kind**: Exported class  
-<a name="new_module_lib/Configuration--Configuration_new"></a>
+<a name="new_module_lib/Configuration--module.exports_new"></a>
 
-#### new Configuration(settings)
+#### new module.exports(settings)
 Initialise the configuration. Must be called before accessing settings. May be called more than once.
 
 
@@ -471,77 +451,63 @@ Initialise the configuration. Must be called before accessing settings. May be c
 | settings.server | <code>LetsEncryptServer</code> | Let’s Encrypt Server to use. |
 | settings.settingsPath | <code>String</code> | Root settings path to use. Will use default path if null. |
 
-<a name="module_lib/Configuration--Configuration+server"></a>
+<a name="module_lib/Configuration--module.exports+server"></a>
 
-#### configuration.server : <code>LetsEncryptServer</code>
+#### module.exports.server : <code>LetsEncryptServer</code>
 The Let’s Encrypt Server instance.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+domains"></a>
+<a name="module_lib/Configuration--module.exports+domains"></a>
 
-#### configuration.domains : <code>Array.&lt;String&gt;</code>
+#### module.exports.domains : <code>Array.&lt;String&gt;</code>
 List of domains that Auto Encrypt will manage TLS certificates for.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+settingsPath"></a>
+<a name="module_lib/Configuration--module.exports+settingsPath"></a>
 
-#### configuration.settingsPath : <code>String</code>
+#### module.exports.settingsPath : <code>String</code>
 The root settings path. There is a different root settings path for pebble, staging and production modes.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+accountPath"></a>
+<a name="module_lib/Configuration--module.exports+accountPath"></a>
 
-#### configuration.accountPath : <code>String</code>
+#### module.exports.accountPath : <code>String</code>
 Path to the account.json file that contains the Key Id that uniquely identifies and authorises your account
 in the absence of a JWT (see RFC 8555 § 6.2. Request Authentication).
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+accountIdentityPath"></a>
+<a name="module_lib/Configuration--module.exports+accountIdentityPath"></a>
 
-#### configuration.accountIdentityPath : <code>String</code>
+#### module.exports.accountIdentityPath : <code>String</code>
 The path to the account-identity.pem file that contains the private key for the account.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+certificatePath"></a>
+<a name="module_lib/Configuration--module.exports+certificatePath"></a>
 
-#### configuration.certificatePath : <code>String</code>
+#### module.exports.certificatePath : <code>String</code>
 The path to the certificate.pem file that contains the certificate chain provisioned from Let’s Encrypt.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+certificateDirectoryPath"></a>
+<a name="module_lib/Configuration--module.exports+certificateDirectoryPath"></a>
 
-#### configuration.certificateDirectoryPath : <code>String</code>
+#### module.exports.certificateDirectoryPath : <code>String</code>
 The directory the certificate and certificate identity (private key) PEM files are stored in.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="module_lib/Configuration--Configuration+certificateIdentityPath"></a>
+<a name="module_lib/Configuration--module.exports+certificateIdentityPath"></a>
 
-#### configuration.certificateIdentityPath : <code>String</code>
+#### module.exports.certificateIdentityPath : <code>String</code>
 The path to the certificate-identity.pem file that holds the private key for the TLS certificate.
 
-**Kind**: instance property of [<code>Configuration</code>](#exp_module_lib/Configuration--Configuration)  
+**Kind**: instance property of [<code>module.exports</code>](#exp_module_lib/Configuration--module.exports)  
 **Read only**: true  
-<a name="Order"></a>
-
-## Order
-**Kind**: global class  
-<a name="new_Order_new"></a>
-
-### new Order(configuration)
-Creates an instance of Order.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| configuration | <code>Configuration</code> | (Required) Configuration instance. |
-
 <a name="csrAsPem"></a>
 
 ## csrAsPem(domains, key) ⇒ <code>String</code>
@@ -614,7 +580,7 @@ We exist in part thanks to patronage by people like you. If you share [our visio
 
 ## Copyright
 
-&copy; 2020 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
+&copy; 2020-2021 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
 
 Let’s Encrypt is a trademark of the Internet Security Research Group (ISRG). All rights reserved. Node.js is a trademark of Joyent, Inc. and is used with its permission. We are not endorsed by or affiliated with Joyent or ISRG.
 

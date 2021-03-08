@@ -22,7 +22,7 @@ We exist in part thanks to patronage by people like you. If you share [our visio
 
 Auto Encrypt is supported on:
 
-  - __Node:__ LTS (currently 12.16.1).
+  - __Node:__ LTS (currently 14.16.0).
   - __ECMAScript:__ [ES2019](https://node.green/#ES2019)
 
 ## Overview of relationships
@@ -40,7 +40,7 @@ Main test tasks use an automatically-managed local Pebble server instance with s
 __Important:__ Make sure that your system is reachable from your hostname before running the tests.
 
 ```sh
-npm run test
+npm -s run test
 ```
 
 Tests should also pass with Pebble’s default settings and with the Let’s Encrypt staging server. The full set of test tasks are:
@@ -61,7 +61,7 @@ Tests should also pass with Pebble’s default settings and with the Let’s Enc
 There are several different code coverage tasks that correspond to the test tasks. Coverage task names begin with _coverage_ instead of _test_ and there are no debug versions for them.
 
 ```sh
-npm run coverage
+npm -s run coverage
 ```
 
 The full set of coverage tasks are:
@@ -83,7 +83,7 @@ We exist in part thanks to patronage by people like you. If you share [our visio
 
 ## Copyright
 
-&copy; 2020 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
+&copy; 2020-2021 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
 
 Let’s Encrypt is a trademark of the Internet Security Research Group (ISRG). All rights reserved. Node.js is a trademark of Joyent, Inc. and is used with its permission. We are not endorsed by or affiliated with Joyent or ISRG.
 
