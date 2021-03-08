@@ -4,31 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.1] - 2021-03-08
+## [3.0.0] - 2021-03-08
 
 ### Changed
 
+  - __Breaking change:__ Is now an ECMAScript Modules (ESM) project.
   - Now includes the latest Let’s Encrypt certificate authority root certificate for the staging environment. (This is automatically injected into your Node.js environment when running the server in staging mode and is used during testing.)
+  - Dev: now using @small-tech/esm-tape-runner.
+  - Dev: replaced tap-spec and tap-nyc with @small-tech/tap-monkey.
 
 ### Fixed
 
+  - No longer crashes when checking for certificate renewal. (#34)
   - Tests now run properly in staging mode.
 
-## [2.1.0] - 2021-03-08
+### Improved
 
-### Changed
+  - npm package size is now 193.1kb (down from 345kb previously).
 
-  - Is now an ECMAScript Modules (ESM) project
-  - Dev: now using @small-tech/esm-tape-runner
-  - Dev: replaced tap-spec and tap-nyc with @small-tech/tap-monkey
+## [2.2.0] - 2021-03-08
 
 ### Fixed
 
   - No longer crashes when checking for certificate renewal. (#34)
 
-### Improved
+## [2.1.0 and 2.1.1] - Do not use these versions.
 
-  - npm package size is now 193.1kb (down from 345kb previously).
+These accidentally included the breaking change from 3.0.0 in a semver minor update.
 
 ## [2.0.6] - 2021-02-16
 
