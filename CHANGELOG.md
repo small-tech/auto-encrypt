@@ -22,15 +22,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
   - npm package size is now 193.1kb (down from 345kb previously).
 
-## [2.2.0] - 2021-03-08
-
-### Fixed
-
-  - No longer crashes when checking for certificate renewal. (#34)
-
 ## [2.1.0 and 2.1.1] - Do not use these versions.
 
 These accidentally included the breaking change from 3.0.0 in a semver minor update.
+
+_The CommonJS version of Auto Encrypt now lives in the 2.x branch and the first release from it is version 2.2.0 which has the bug fix and the root certificate update from version 3.0.0 backported. For future 2.x release info, please see the changelog in the 2.x branch._
 
 ## [2.0.6] - 2021-02-16
 
