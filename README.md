@@ -21,7 +21,7 @@ npm i @small-tech/auto-encrypt
 1. Import the module:
 
     ```js
-    const AutoEncrypt = require('@small-tech/auto-encrypt')
+    import AutoEncrypt from '@small-tech/auto-encrypt'
     ```
 
 2. Prefix your server creation code with a reference to the Auto Encrypt class:
@@ -45,7 +45,7 @@ The following code creates an HTTPS server running on port 443 with [OCSP Stapli
 
 
 ```js
-const AutoEncrypt = require('@small-tech/auto-encrypt')
+import AutoEncrypt from '@small-tech/auto-encrypt'
 
 const server = AutoEncrypt.https.createServer((request, response) => {
   response.end('Hello, world')
@@ -73,7 +73,7 @@ You can specify the domains you want the certificate to support, whether the Let
 ### Example
 
 ```js
-const AutoEncrypt = require('@small-tech/auto-encrypt')
+import AutoEncrypt from '@small-tech/auto-encrypt'
 
 const options = {
   // Regular HTTPS server and TLS server options, if any, go here.
@@ -111,7 +111,7 @@ If you want to help improve Auto Encrypt or better understand how it is structur
 ### Regular https
 
 ```js
-const AutoEncrypt = require('@small-tech/auto-encrypt')
+import AutoEncrypt from '@small-tech/auto-encrypt'
 
 const server = AutoEncrypt.https.createServer({ domains: ['dev.ar.al'] }, (request, response) => {
     response.end('Hello, world!')
@@ -132,7 +132,7 @@ server.close(() => {
 
 ```js
 const express = require('express')
-const AutoEncrypt = require('@small-tech/auto-encrypt')
+import AutoEncrypt from '@small-tech/auto-encrypt'
 
 const app = express()
 app.get('/', (request, response) => {
@@ -266,7 +266,7 @@ We exist in part thanks to patronage by people like you. If you share [our visio
 
 ## Copyright
 
-&copy; 2020 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
+&copy; 2020-2021 [Aral Balkan](https://ar.al), [Small Technology Foundation](https://small-tech.org).
 
 Let’s Encrypt is a trademark of the Internet Security Research Group (ISRG). All rights reserved. Node.js is a trademark of Joyent, Inc. and is used with its permission. We are not endorsed by or affiliated with Joyent or ISRG.
 
