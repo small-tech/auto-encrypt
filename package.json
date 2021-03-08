@@ -21,7 +21,8 @@
   "type": "module",
   "main": "index.js",
   "files": [
-    "lib"
+    "lib",
+    "typedefs"
   ],
   "funding": {
     "type": "foundation",
