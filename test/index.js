@@ -119,6 +119,11 @@ test('Auto Encrypt', async t => {
   // further.
   //
 
+  // Wait a breath to ensure that the request has a chance to start.
+  await new Promise((resolve, reject) => {
+    setTimeout(resolve, 500)
+  })
+
   // Test server is busy response while attempting to provision the initial certificate.
   try {
     await httpsGetString(urlToHit)
