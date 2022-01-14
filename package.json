@@ -64,7 +64,7 @@
     "encodeurl": "^1.0.2",
     "jose": "^1.24.0",
     "moment": "^2.24.0",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "ocsp": "^1.2.0",
     "server-destroy": "^1.0.1"
   },
