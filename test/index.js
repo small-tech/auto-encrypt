@@ -1,4 +1,5 @@
 import os from 'os'
+import path from 'path'
 import https from 'https'
 import util from 'util'
 import AutoEncrypt from '../index.js'
@@ -95,7 +96,7 @@ test('Auto Encrypt', async t => {
   # AutoEncrypt (static class)
     - Using Let’s Encrypt ${isPebble ? 'pebble' : 'staging'} server.
     - Managing TLS for ${isPebble ? 'localhost, pebble (default domains)' : `${hostname}`}.
-    - Settings stored at /home/aral/.small-tech.org/auto-encrypt/test.
+    - Settings stored at ${path.join(os.homedir(), '.small-tech.org', 'auto-encrypt', 'test')}.
     - Listener is set.
   `)
   t.strictEquals(dehydrate(util.inspect(AutoEncrypt)), expectedInspectionString, 'inspection string is as expected')
