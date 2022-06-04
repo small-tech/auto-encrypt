@@ -6,6 +6,12 @@ If you just want to use Auto Encrypt, please see the public API, as documented i
 
 The developer documentation is generated using [jsdoc-to-markdown](https://github.com/jsdoc2md/jsdoc-to-markdown) from the [developer-documentation.hbs](./developer-documentation.hbs) template.
 
+The dependency diagram generation process as part of this requires [Graphviz](https://graphviz.org/download) (`dot` command) to be installed. e.g., on Ubuntu:
+
+```sh
+sudo apt install graphviz
+```
+
 To update the documentation:
 
 ```sh
@@ -37,7 +43,18 @@ Generated using [dependency cruiser](https://github.com/sverweij/dependency-crui
 
 Main test tasks use an automatically-managed local Pebble server instance with settings optimised for performance.
 
-__Important:__ Make sure that your system is reachable from your hostname before running the tests.
+### Prerequisites
+
+  1. Add `pebble` as an alias for `127.0.0.1` and `::1` in your _/etc/hosts_ file. If you’re running in a container (e.g., using DistroBox/podman on Fedora Silverblue, make sure you set this in the _etc/hosts_ file of the host system, not the container)) e.g.
+
+     ```
+     # Loopback entries; do not change.
+     # For historical reasons, localhost precedes localhost.localdomain:
+     127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 pebble
+     ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 pebble
+     ```
+
+  2. __To run staging and production tests (you do not need to do this to run the Pebble tests):__ make sure that your system is reachable from your hostname (e.g., by using a service like ngrok.)
 
 ```sh
 npm -s run test
