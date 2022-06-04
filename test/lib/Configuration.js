@@ -94,12 +94,12 @@ test('Configuration', async t => {
   -------------------------- --------------------------------------- ---------------------------------------
   .server                  : Lets Encrypt Server details             {name: 'staging', endpoint: 'https://acme-staging-v02.api.letsencrypt.org/directory}'
   .domains                 : Domains in certificate                  dev.ar.al
-  .settingsPath            : Top-level settings path                 /home/aral/.small-tech.org/auto-encrypt/test/staging
-  .accountPath             : Path to LE account details JSON file    /home/aral/.small-tech.org/auto-encrypt/test/staging/account.json
-  .accountIdentityPath     : Path to private key for LE account      /home/aral/.small-tech.org/auto-encrypt/test/staging/account-identity.pem
-  .certificateDirectoryPath: Path to certificate directory           /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al
-  .certificatePath         : Path to certificate file                /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate.pem
-  .certificateIdentityPath : Path to private key for certificate     /home/aral/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate-identity.pem`)
+  .settingsPath            : Top-level settings path                 ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging
+  .accountPath             : Path to LE account details JSON file    ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging/account.json
+  .accountIdentityPath     : Path to private key for LE account      ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging/account-identity.pem
+  .certificateDirectoryPath: Path to certificate directory           ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging/dev.ar.al
+  .certificatePath         : Path to certificate file                ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate.pem
+  .certificateIdentityPath : Path to private key for certificate     ${os.homedir()}/.small-tech.org/auto-encrypt/test/staging/dev.ar.al/certificate-identity.pem`)
 
   t.strictEquals(dehydrate(util.inspect(configuration)), dehydratedExpectedInspectionString, 'the inspection string is as expected')
 
