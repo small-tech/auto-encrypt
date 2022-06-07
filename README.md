@@ -2,6 +2,8 @@
 
 Adds automatic provisioning and renewal of [Let’s Encrypt](https://letsencrypt.org) TLS certificates with [OCSP Stapling](https://letsencrypt.org/docs/integration-guide/#implement-ocsp-stapling) to [Node.js](https://nodejs.org) [https](https://nodejs.org/dist/latest-v12.x/docs/api/https.html) servers (including [Express.js](https://expressjs.com/), etc.)
 
+__Note:__ this is the CommonJS (CJS) branch of Auto Encrypt. Please see the main branch for the ECMAScript Modules (ESM) version. Security updates are backported to this branch.
+
 ## How it works
 
 The first time your web site is hit, it will take a couple of seconds to load as your Let’s Encrypt TLS certificates are automatically provisioned for you. From there on, your certificates will be seamlessly renewed 30 days before their expiry date.
@@ -11,7 +13,7 @@ When not provisioning certificates, Auto Encrypt will also forward HTTP calls to
 ## Installation
 
 ```sh
-npm i @small-tech/auto-encrypt
+npm i @small-tech/auto-encrypt@cjs
 ```
 
 ## Usage
