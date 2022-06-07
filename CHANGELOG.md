@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2022-06-07
+
+Now with more SHA for the buck.
+
+### Changed
+
+  - Update certificate request (CSR) signing algorithm to SHA-256 from SHA-1 as SHA-1 will be rejected by Let’s Encrypt after September 15, 2022 (see https://community.letsencrypt.org/t/rejecting-sha-1-csrs-and-validation-using-tls-1-0-1-1-urls/175144).
+
 ## [3.0.1] - 2021-03-21
 
 Fixes regression on Windows introduced in 3.x branch.
